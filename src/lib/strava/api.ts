@@ -32,7 +32,7 @@ export async function getStravaActivities(after: number): Promise<StravaActivity
     const data: StravaActivity[] = await response.json();
     allActivities = allActivities.concat(data);
 
-    if (data.length < perPage) {
+    if (data.length == 0) {
       hasMoreActivities = false;
     } else {
       page++;

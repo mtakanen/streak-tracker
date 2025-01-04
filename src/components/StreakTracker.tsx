@@ -12,39 +12,43 @@ interface DayStatus {
   duration: number;
 }
 
-export function StreakTracker() {
+interface StreakTrackerProps {
+  startTimestamp: number; // Unix timestamp
+}
+
+export function StreakTracker({ startTimestamp }: StreakTrackerProps) {
   const [activities, setActivities] = useState<StravaActivity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchActivities = async () => {
-      try {
-        const token = localStorage.getItem('stravaAccessToken');
-        if (!token) {
-          setLoading(false);
-          return;
-        }
-
-        const startOfYear = new Date(new Date().getFullYear(), 0, 1).getTime() / 1000;
-        const data = await getStravaActivities(startOfYear);
-        setActivities(data);
-      } catch (err) {
-        console.log(err);
-        setError(err instanceof Error ? err.message : 'Failed to fetch activities');
-        // Clear tokens if they're invalid
-        if (err instanceof Error) {
-          localStorage.removeItem('stravaAccessToken');
-          localStorage.removeItem('stravaRefreshToken');
-          localStorage.removeItem('stravaTokenExpiry');
-        }
-      } finally {
+  const fetchActivities = async (startTimestamp: number) => {
+    try {
+      const token = localStorage.getItem('stravaAccessToken');
+      if (!token) {
         setLoading(false);
+        return;
       }
-    };
 
-    fetchActivities();
-  }, []);
+      const data = await getStravaActivities(startTimestamp);
+      setActivities(data);
+    } catch (err) {
+      console.log(err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch activities');
+      // Clear tokens if they're invalid
+      if (err instanceof Error) {
+        localStorage.removeItem('stravaAccessToken');
+        localStorage.removeItem('stravaRefreshToken');
+        localStorage.removeItem('stravaTokenExpiry');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchActivities(startTimestamp);
+  }, [startTimestamp]);
+
 
   const getDayStatus = (date: string): DayStatus => {
     const dayActivities = activities.filter(activity =>
@@ -62,7 +66,7 @@ export function StreakTracker() {
   };
 
   const calculateStreakLength = (date: Date): number => {
-    let streak = 1;
+    let streak = 0;
     let currentDate = new Date(date);
 
     while (true) {
@@ -81,35 +85,36 @@ export function StreakTracker() {
     return streak;
   };
 
-  const generateCalendarData = () => {
+const generateCalendarData = (startDate: number) => {
     const weeks = [];
     const today = new Date();
-    const currentWeekNumber = getWeekNumber(today);
-
-    const startOfYear = new Date(today.getFullYear(), 0, 1);
-    const dayOffset = (startOfYear.getDay() === 0 ? 6 : startOfYear.getDay() - 1); // Adjust for Monday start
-
-    for (let week = 1; week <= currentWeekNumber; week++) {
+    const numWeeks = getWeekNumber(today, startDate);
+    const start = new Date(startDate * 1000); // Convert Unix timestamp to Date object
+    const dayOffset = (start.getDay() === 0 ? 6 : start.getDay() - 1); // Adjust for Monday start
+  
+    for (let week = 1; week <= numWeeks; week++) {
       const days = [];
       for (let day = 0; day < 7; day++) {
-        const date = new Date(startOfYear);
-        const dataDate =  new Date(startOfYear);
-        date.setDate(startOfYear.getDate() + (week - 1) * 7 + day - dayOffset);
-        dataDate.setDate(date.getDate() + 1);
+        const calendarDate = new Date(start);  
+        calendarDate.setDate(start.getDate() + (week - 1) * 7 + day - dayOffset);
+        const dataDate =  new Date(start);
+        dataDate.setFullYear(calendarDate.getFullYear());
+        dataDate.setMonth(calendarDate.getMonth());
+        dataDate.setDate(calendarDate.getDate()); // Add 1 day to get the correct date
         const dateString = dataDate.toISOString().split('T')[0];
-        const streakLength = calculateStreakLength(date);
-        days.push({ date, status: getDayStatus(dateString), streakLength });
+        const streakLength = calculateStreakLength(dataDate);
+        days.push({ date: calendarDate, status: getDayStatus(dateString), streakLength });
       }
       weeks.push({ weekNumber: week, days });
     }
-
+  
     return weeks;
   };
 
-  const getWeekNumber = (date: Date) => {
-    const startOfYear = new Date(date.getFullYear(), 0, 1);
-    const pastDaysOfYear = (date.getTime() - startOfYear.getTime()) / 86400000;
-    return Math.ceil((pastDaysOfYear + (startOfYear.getDay() === 0 ? 6 : startOfYear.getDay() - 1) + 1) / 7);
+  const getWeekNumber = (date: Date, startDate: number) => {
+    const start = new Date(startDate * 1000); // Convert Unix timestamp to Date object
+    const pastDays = (date.getTime() - start.getTime()) / 86400000;
+    return Math.ceil((pastDays + (start.getDay() === 0 ? 6 : start.getDay() - 1) + 1) / 7);
   };
 
   if (loading) {
@@ -133,10 +138,9 @@ export function StreakTracker() {
     );
   }
 
-  const calendarData = generateCalendarData();
+  const calendarData = generateCalendarData(startTimestamp);
   const today = new Date();
-  const startOfYear = new Date(today.getFullYear(), 0, 1);
-
+  const startDate = new Date(startTimestamp * 1000);
   return (
     <Card className="w-full max-w-2xl">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -154,24 +158,24 @@ export function StreakTracker() {
               <div className="text-center font-bold">{`W${week.weekNumber}`}</div>
               {week.days.map(({ date, status, streakLength }) => {
                 const isFutureDate = date > today;
-                const isBeforeStartOfYear = date < startOfYear;
+                const isBeforeStartDate = date < startDate;
                 return (
                   <div
                     key={date.toISOString()}
                     className={`p-2 rounded-lg text-center ${
-                      isFutureDate || isBeforeStartOfYear
+                      isFutureDate || isBeforeStartDate
                         ? 'bg-white border-gray-300'
                         : status.completed 
                           ? 'bg-green-100 border-green-500' 
                           : 'bg-red-100 border-red-500'
                     } border`}
                   >
-                    {!isFutureDate && !isBeforeStartOfYear && (
+                    {!isFutureDate && !isBeforeStartDate && (
                       <div className="text-bold">
                         {streakLength}
                       </div>
                     )}
-                    {!isFutureDate && !isBeforeStartOfYear && (
+                    {!isFutureDate && !isBeforeStartDate && (
                       <div className="text-xs mt-1">
                         {status.duration}min
                       </div>
