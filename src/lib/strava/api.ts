@@ -14,6 +14,7 @@ export async function getStravaActivities(after: number): Promise<StravaActivity
   });
 
   if (!response.ok) {
+    console.log(response);
     throw new Error('Failed to fetch activities');
   }
 
