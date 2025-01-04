@@ -30,9 +30,10 @@ export function StreakTracker() {
         const data = await getStravaActivities(startOfYear);
         setActivities(data);
       } catch (err) {
+        console.log(err);
         setError(err instanceof Error ? err.message : 'Failed to fetch activities');
         // Clear tokens if they're invalid
-        if (err instanceof Error && err.message.includes('token')) {
+        if (err instanceof Error) {
           localStorage.removeItem('stravaAccessToken');
           localStorage.removeItem('stravaRefreshToken');
           localStorage.removeItem('stravaTokenExpiry');
@@ -139,7 +140,7 @@ export function StreakTracker() {
   return (
     <Card className="w-full max-w-2xl">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-2xl font-bold">Running Streak Tracker</CardTitle>
+        <CardTitle className="text-2xl font-bold">Streak Tracker</CardTitle>
         <Calendar className="h-6 w-6 text-gray-500" />
       </CardHeader>
       <CardContent>
