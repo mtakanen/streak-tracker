@@ -21,7 +21,7 @@ const HomePage = () => {
   return (
     <div>
       <div>
-        <Image src="/25.png" alt="25 for 25" width={90} height={90} />
+        <Image priority src="/25.png" alt="25 for 25" width={90} height={90} />
       </div>
       {isAuthenticated ? (
         <StreakTracker />
