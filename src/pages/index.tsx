@@ -6,7 +6,7 @@ import { isoDateToUnixTimestamp } from '@/lib/utils';
 
 const HomePage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const startTimestamp = isoDateToUnixTimestamp('2024-12-24'); 
+  const startTimestamp = isoDateToUnixTimestamp('2025-01-01'); 
 
   useEffect(() => {
     const accessToken = localStorage.getItem('stravaAccessToken');
@@ -21,7 +21,7 @@ const HomePage = () => {
   };
 
   return (
-    <div>
+    <div className="mt-8 ml-8">
       <div>
         <Image priority src="/25.png" alt="25 for 25" width={90} height={90} />
       </div>
