@@ -6,6 +6,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Calendar, Loader } from 'lucide-react';
 import { StravaActivity } from '@/types/strava';
 import { getStravaActivities } from '@/lib/strava/api';
+import Image from 'next/image';
 
 interface DayStatus {
   completed: boolean;
@@ -194,8 +195,6 @@ const generateCalendarData = (startDate: number) => {
     <div className="mt-4">
       <Card className="w-full max-w-2xl">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-2xl font-bold">Streak Tracker</CardTitle>
-          <Calendar className="h-6 w-6 text-gray-500" />
         </CardHeader>
         <CardContent>
         <div className="mb-4">
@@ -289,8 +288,11 @@ const generateCalendarData = (startDate: number) => {
           <div className="mt-4 text-sm text-gray-600">
           Goal: Stay active and healthy by running at least 25 minutes every day!
           </div>
+          <div className="flex justify-center mt-4">
+            <Image src="/api_logo_pwrdBy_strava_stack_light.svg" alt="Powered by Strava" width={100} height={50} className="logo"/>
+          </div>
         </CardContent>
       </Card>
     </div>
-  );
+);
 }
