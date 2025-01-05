@@ -50,13 +50,27 @@ export function StreakTracker({ startTimestamp }: StreakTrackerProps) {
         return;
       }
 
+      const now = new Date().getTime();
+      const storedData = localStorage.getItem('stravaActivities');
+      if (storedData) {
+        const { activities, timestamp } = JSON.parse(storedData);
+        const expirary = 3 * 60 * 60 * 1000; // 3h
+  
+        if (now - timestamp < expirary) {
+          setActivities(activities);
+          setLoading(false);
+          return;
+        }
+      }
+  
       const data = await getStravaActivities(startTimestamp);
       setActivities(data);
+      localStorage.setItem('stravaActivities', JSON.stringify({ activities: data, timestamp: now }));
     } catch (err) {
       console.log(err);
       setError(err instanceof Error ? err.message : 'Failed to fetch activities');
       // Clear tokens if they're invalid
-      if (err instanceof Error) {
+      if (err instanceof Error && err.message.includes('Unauthorized')) {
         localStorage.removeItem('stravaAccessToken');
         localStorage.removeItem('stravaRefreshToken');
         localStorage.removeItem('stravaTokenExpiry');
