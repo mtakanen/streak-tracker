@@ -72,9 +72,13 @@ export function StreakTracker({ startTimestamp }: StreakTrackerProps) {
 
   const handleActivityTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = event.target;
-    setSelectedActivityTypes((prevSelected) =>
-      checked ? [...prevSelected, value] : prevSelected.filter((type) => type !== value)
-    );
+    if (value === 'Multi') {
+      setSelectedActivityTypes(checked ? Object.keys(activityTypeSymbols) : []);
+    } else {
+      setSelectedActivityTypes((prevSelected) =>
+        checked ? [...prevSelected, value] : prevSelected.filter((type) => type !== value)
+      );
+    }
   };
 
   const getDayStatus = (date: string): DayStatus => {
@@ -145,7 +149,7 @@ const generateCalendarData = (startDate: number) => {
   const getWeekNumber = (date: Date, startDate: number) => {
     const start = new Date(startDate * 1000); // Convert Unix timestamp to Date object
     const pastDays = (date.getTime() - start.getTime()) / 86400000;
-    return Math.ceil((pastDays + (start.getDay() === 0 ? 6 : start.getDay() - 1) + 1) / 7);
+    return Math.ceil((pastDays + (start.getDay() === 0 ? 6 : start.getDay() - 1) ) / 7);
   };
 
   if (loading) {
@@ -180,20 +184,48 @@ const generateCalendarData = (startDate: number) => {
           <Calendar className="h-6 w-6 text-gray-500" />
         </CardHeader>
         <CardContent>
-          <div className="mb-4">
-            {Object.keys(activityTypeSymbols).map((type) => (
-              <label key={type} className="inline-flex items-center mr-4">
-                <input
-                  type="checkbox"
-                  value={type}
-                  checked={selectedActivityTypes.includes(type)}
-                  onChange={handleActivityTypeChange}
-                  className="form-checkbox"
-                />
-                <span className="ml-2">{type}</span>
-              </label>
-            ))}
-          </div>        
+        <div className="mb-4">
+            <label className="inline-flex items-center mr-4">
+              <input
+                type="checkbox"
+                value="Run"
+                checked={selectedActivityTypes.includes('Run')}
+                onChange={handleActivityTypeChange}
+                className="form-checkbox"
+              />
+              <span className="ml-2">Run</span>
+            </label>
+            <label className="inline-flex items-center mr-4">
+              <input
+                type="checkbox"
+                value="Ride"
+                checked={selectedActivityTypes.includes('Ride')}
+                onChange={handleActivityTypeChange}
+                className="form-checkbox"
+              />
+              <span className="ml-2">Ride</span>
+            </label>
+            <label className="inline-flex items-center mr-4">
+              <input
+                type="checkbox"
+                value="Swim"
+                checked={selectedActivityTypes.includes('Swim')}
+                onChange={handleActivityTypeChange}
+                className="form-checkbox"
+              />
+              <span className="ml-2">Swim</span>
+            </label>
+            <label className="inline-flex items-center mr-4">
+              <input
+                type="checkbox"
+                value="Multi"
+                checked={selectedActivityTypes.length === Object.keys(activityTypeSymbols).length}
+                onChange={handleActivityTypeChange}
+                className="form-checkbox"
+              />
+              <span className="ml-2">Multi</span>
+            </label>
+          </div>         
           <div className="grid grid-cols-8 gap-2">
             <div></div>
             {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (

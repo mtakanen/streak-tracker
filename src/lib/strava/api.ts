@@ -22,13 +22,22 @@ export async function getStravaActivities(after: number): Promise<StravaActivity
 
     if (!response.ok) {
       console.log(response);
-      if (response.status === 429) {
-        throw new Error('Too many requests to Strava API');
+      if (response.status === 400) {
+        throw new Error('Strava API: 400 Bad request');
+      } else if (response.status === 401) {
+        throw new Error('Strava API: 401 Unauthorized');
+      } else if (response.status === 403) {
+        throw new Error('Strava API: 403 Forbidden');
+      } else if (response.status === 404) {
+        throw new Error('Strava API: 404 Not found');
+      } else if (response.status === 429) {
+        throw new Error('Strava API: 429 Too many requests');
+      } else if (response.status === 500) {
+        throw new Error('Strava API: 500 Internal server error');
       } else {
         throw new Error('Failed to fetch activities');
       }
     }
-
     const data: StravaActivity[] = await response.json();
     allActivities = allActivities.concat(data);
 

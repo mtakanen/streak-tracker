@@ -6,7 +6,7 @@ import { isoDateToUnixTimestamp } from '@/lib/utils';
 
 const HomePage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const startTimestamp = isoDateToUnixTimestamp('2024-12-06'); 
+  const startTimestamp = isoDateToUnixTimestamp('2025-01-01'); 
 
   useEffect(() => {
     const accessToken = localStorage.getItem('stravaAccessToken');
