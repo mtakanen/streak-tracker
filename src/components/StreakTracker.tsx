@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Calendar, Loader } from 'lucide-react';
+import { Card, CardHeader, CardContent } from '@/components/ui/card';
+import { Loader } from 'lucide-react';
 import { StravaActivity } from '@/types/strava';
 import { getStravaActivities } from '@/lib/strava/api';
 import Image from 'next/image';

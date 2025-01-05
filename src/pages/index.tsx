@@ -1,6 +1,5 @@
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
-import { getStravaAuthUrl } from '@/lib/strava/auth';
 import { StreakTracker } from '@/components/StreakTracker';
 import { isoDateToUnixTimestamp } from '@/lib/utils';
 import StravaConnectButton from '@/components/StravaConnectButton';
@@ -16,10 +15,6 @@ const HomePage = () => {
     }
   }, []);
 
-  const handleAuthorize = () => {
-    const authUrl = getStravaAuthUrl();
-    window.location.href = authUrl;
-  };
 
   return (
     <div className="mt-4 ml-4">
