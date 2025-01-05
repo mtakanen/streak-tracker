@@ -191,7 +191,7 @@ const generateCalendarData = (startDate: number) => {
   const today = new Date();
   const startDate = new Date(startTimestamp * 1000);
   return (
-    <div className="mt-8">
+    <div className="mt-4">
       <Card className="w-full max-w-2xl">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-2xl font-bold">Streak Tracker</CardTitle>
@@ -240,14 +240,12 @@ const generateCalendarData = (startDate: number) => {
               <span className="ml-2">Multi</span>
             </label>
           </div>         
-          <div className="grid grid-cols-8 gap-2">
-            <div></div>
+          <div className="grid grid-cols-7 gap-2">
             {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
               <div key={day} className="text-center font-bold">{day}</div>
             ))}
             {calendarData.map((week) => (
               <React.Fragment key={week.weekNumber}>
-                <div className="text-center font-bold">{`W${week.weekNumber}`}</div>
                 {week.days.map(({ date, status, streakLength }) => {
                   const isFutureDate = date > today;
                   const isBeforeStartDate = date < startDate;
