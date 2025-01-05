@@ -115,7 +115,7 @@ export function StreakTracker({ startTimestamp }: StreakTrackerProps) {
 
   const calculateStreakLength = (date: Date): number => {
     let streak = 0;
-    let currentDate = new Date(date);
+    const currentDate = new Date(date);
 
     while (true) {
       const dateString = currentDate.toISOString().split('T')[0];

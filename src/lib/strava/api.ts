@@ -8,9 +8,9 @@ export async function getStravaActivities(after: number): Promise<StravaActivity
     throw new Error('No access token found');
   }
 
+  const perPage = 30;
   let allActivities: StravaActivity[] = [];
   let page = 1;
-  let perPage = 30;
   let hasMoreActivities = true;
 
   while (hasMoreActivities) {
