@@ -248,6 +248,7 @@ const generateCalendarData = (startDate: number) => {
                 {week.days.map(({ date, status, streakLength }) => {
                   const isFutureDate = date > today;
                   const isBeforeStartDate = date < startDate;
+                  const isToday = date.toDateString() === today.toDateString();
                   return (
                     <div
                       key={date.toISOString()}
@@ -259,32 +260,52 @@ const generateCalendarData = (startDate: number) => {
                             : 'bg-red-100 border-red-500'
                       } border`}
                     >
-                      {!isFutureDate && !isBeforeStartDate && (
+                      {!isFutureDate && !isBeforeStartDate && streakLength > 0 && (
                         <div className="text-bold">
                           {streakLength}
                         </div>
                       )}
-                    <div>
-                      {status.activities.map((activity, index) => {
+                      <div>
+                        {status.activities.map((activity, index) => {
                           const mainType = subTypeToMainType[activity.type] || activity.type;
                           return (
                             <span key={index} title={activity.type}>
                               {activityTypeSymbols[mainType] || '❓'}
                             </span>
                           );
-                      })}
-                    </div>
+                        })}
+                      </div>
                       {!isFutureDate && !isBeforeStartDate && (
                         <div className="text-xs mt-1">
                           {status.duration}min
                         </div>
                       )}
-                      </div>
+                      <div className="mt-1">
+                        {status.activities.map((activity, index) => (
+                          <div key={index}>
+                            <a
+                              href={`https://www.strava.com/activities/${activity.id}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="small-link"
+                            >
+                              View on Strava
+                            </a>
+                          </div>
+                        ))}
+                     </div>
+                      {!isFutureDate && !isBeforeStartDate && !status.completed && isToday && (
+                        <div className="text-xs mt-1 text-red-500">
+                          Keep going! You can do it!
+                        </div>
+                      )}
+                    </div>
                   );
                 })}
               </React.Fragment>
             ))}
           </div>
+  
           <div className="mt-4 text-sm text-gray-600">
           Goal: Stay active and healthy by running at least 25 minutes every day!
           </div>

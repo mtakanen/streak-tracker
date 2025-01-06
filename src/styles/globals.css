@@ -53,3 +53,9 @@
   max-width: 100px;
   height: auto;
 }
+
+.small-link {
+  font-size: 0.875rem; /* Adjust the font size as needed */
+  color: #FC4C02; /* Strava orange color */
+  text-decoration: underline;
+}
