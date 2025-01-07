@@ -4,11 +4,12 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import { Clock, Trophy } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-
 import { Loader } from 'lucide-react';
+import Image from 'next/image';
+
 import { StravaActivity } from '@/types/strava';
 import { getStravaActivities } from '@/lib/strava/api';
-import Image from 'next/image';
+import { DAILY_GOAL } from '@/lib/strava/config';
 
 interface DayStatus {
   completed: boolean;
@@ -39,11 +40,37 @@ const subTypeToMainType: { [key: string]: string } = {
   BackcountrySki: 'Ski',
   // Add more sub-types and their main categories as needed
 };
+
+const ActivityModal = ({ day, activities, onClose }: { day: number, activities: StravaActivity[], onClose: () => void }) => (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div className="bg-white p-4 rounded-lg max-w-md w-full relative">
+      <h2 className="text-xl font-bold mb-4">Day {day} Activities</h2>
+      <button className="absolute top-2 right-2 text-gray-500" onClick={onClose}>X</button>
+      {activities.map(activity => (
+        <div key={activity.id} className="mb-2">
+          <div className="text-xs">{activityTypeSymbols[activity.type] || ''} {activity.name}: {Math.floor(activity.moving_time / 60)}min</div>
+          <a 
+            href={`https://www.strava.com/activities/${activity.id}`}
+            className="text-[#FC4C02] hover:underline text-xs block"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            View on Strava
+          </a>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+
 export function StreakTracker({ startTimestamp }: StreakTrackerProps) {
   const [activities, setActivities] = useState<StravaActivity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedActivity, setSelectedActivity] = useState('Run');
+  const [selectedDay, setSelectedDay] = useState<number | null>(null);
+  const [selectedDayActivities, setSelectedDayActivities] = useState<StravaActivity[]>([]);
 
   const fetchActivities = async (startTimestamp: number) => {
     try {
@@ -100,7 +127,7 @@ export function StreakTracker({ startTimestamp }: StreakTrackerProps) {
     );
   
     return {
-      completed: totalDuration >= 25,
+      completed: totalDuration >= DAILY_GOAL,
       duration: totalDuration,
       activities: dayActivities
     };
@@ -143,17 +170,14 @@ export function StreakTracker({ startTimestamp }: StreakTrackerProps) {
       return {
         day: 7 - i,
         minutes: status.duration,
-        activities: status.activities.map(activity => ({
-          id: activity.id,
-          type: activity.type,
-          duration: Math.floor(activity.moving_time / 60),
-        })),
+        activities: status.activities
       };
     });
   
     return {
       currentStreak,
       todayMinutes: todayStatus.duration,
+      completed: todayStatus.completed,
       longestStreak,
       lastSevenDays,
     };
@@ -185,7 +209,7 @@ export function StreakTracker({ startTimestamp }: StreakTrackerProps) {
   return (
     <Card className="w-full max-w-sm mx-auto">
       <CardHeader className="space-y-1">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-4">
           <CardTitle className="text-2xl font-bold">Streak Tracker</CardTitle>
         </div>
         
@@ -208,12 +232,15 @@ export function StreakTracker({ startTimestamp }: StreakTrackerProps) {
 
       <CardContent className="space-y-4">
         {/* Current Streak Display */}
-        <div className="text-center p-4 bg-green-50 rounded-lg">
-          <div className="text-4xl font-bold text-green-600">
+        <div className={`text-center p-4 rounded-lg ${streakData.completed == true ? 'bg-green-50' : 'bg-orange-50'}`}>
+          <div className={`text-4xl font-bold ${streakData.completed == true ? 'text-green-600' : 'text-orange-600'}`}>
             {streakData.currentStreak} days
           </div>
-          <div className="text-sm text-green-700">
-            {streakData.todayMinutes >= 25 ? 'Current Streak' : 'Keep going! Complete today to continue your streak!'}
+          <div className={`text-sm ${streakData.completed == true ? 'text-green-600' : 'text-orange-600'}`}>
+            Current Streak
+          </div>
+          <div className="text-sm text-orange-600">
+            {streakData.completed == false ? 'Keep going! Run today to continue your streak!' : ''}
           </div>
         </div>
 
@@ -230,41 +257,29 @@ export function StreakTracker({ startTimestamp }: StreakTrackerProps) {
             <div className="text-xs text-slate-600">Longest Streak</div>
           </div>
         </div>
-
         {/* Last 7 Days Timeline with Strava Links */}
         <div className="space-y-2 max-h-48 overflow-y-auto">
-        <div className="text-sm font-medium">Last 7 days</div>
-        <div className="flex gap-1">
-          {streakData.lastSevenDays.map((day, index) => (
-            <div
-              key={index}
-              className="flex-1 bg-green-100 rounded-md p-2 text-center"
-            >
-              <div className="text-xs text-green-800">Day {day.day}</div>
-              <div className="text-sm font-medium">{day.minutes}m</div>
-              {day.activities.map(activity => (
-                <div key={activity.id} className="mt-1">
-                    <div className="text-xs">
-                      {activityTypeSymbols[activity.type] || ''}
-                    </div>
-                  <a 
-                    href={`https://www.strava.com/activities/${activity.id}`}
-                    className="text-[#FC4C02] hover:underline text-xs block"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    View on Strava
-                  </a>
-                </div>
-              ))}
-            </div>
-          ))}
-      </div>
-    </div>
+          <div className="text-sm font-medium">Last 7 days</div>
+          <div className="flex gap-1">
+            {streakData.lastSevenDays.map((day, index) => (
+              <div
+                key={index}
+                className="flex-1 bg-green-100 rounded-md p-2 text-center cursor-pointer"
+                onClick={() => {
+                  setSelectedDay(day.day);
+                  setSelectedDayActivities(day.activities);
+                }}
+              >
+                <div className="text-xs text-green-800"><span style={{ whiteSpace: 'nowrap' }}>Day {day.day}</span></div>
+                <div className="text-sm font-medium">{day.minutes}min</div>
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* Goal Display */}
         <div className="text-sm text-center text-slate-600 pt-2">
-          Goal: Stay active and healthy by running at least <span style={{ whiteSpace: 'nowrap' }}>25 minutes</span> every day!
+          Goal: Stay active and healthy by running at least <span style={{ whiteSpace: 'nowrap' }}>{DAILY_GOAL} minutes</span> every day!
         </div>
 
         {/* Strava Attribution */}
@@ -272,6 +287,13 @@ export function StreakTracker({ startTimestamp }: StreakTrackerProps) {
           <Image src="/api_logo_pwrdBy_strava_stack_light.svg" alt="Powered by Strava" width={100} height={50} className="logo"/>
         </div>
       </CardContent>
+      {selectedDay !== null && (
+        <ActivityModal
+          day={selectedDay}
+          activities={selectedDayActivities}
+          onClose={() => setSelectedDay(null)}
+        />
+      )}
     </Card>
   );
 };

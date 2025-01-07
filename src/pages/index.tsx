@@ -25,7 +25,7 @@ const HomePage = () => {
       ) : (
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Welcome to Streak Tracker!</h1>
-          <p className="mb-2">This app tracks your streak using your Strava activities.</p>
+          <p className="mb-2">App tracks your streak using your Strava activities.</p>
           <p className="mb-4">Please connect with Strava to get started.</p>
           <div className="flex justify-center">
             <StravaConnectButton />
