@@ -2,7 +2,9 @@
 
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { Card, CardHeader, CardContent } from '@/components/ui/card';
+import { Clock, Trophy } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+
 import { Loader } from 'lucide-react';
 import { StravaActivity } from '@/types/strava';
 import { getStravaActivities } from '@/lib/strava/api';
@@ -41,7 +43,7 @@ export function StreakTracker({ startTimestamp }: StreakTrackerProps) {
   const [activities, setActivities] = useState<StravaActivity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedActivityTypes, setSelectedActivityTypes] = useState<string[]>(['Run']);
+  const [selectedActivity, setSelectedActivity] = useState('Run');
 
   const fetchActivities = async (startTimestamp: number) => {
     try {
@@ -85,87 +87,78 @@ export function StreakTracker({ startTimestamp }: StreakTrackerProps) {
     fetchActivities(startTimestamp);
   }, [startTimestamp]);
 
-  const handleActivityTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { value, checked } = event.target;
-    if (value === 'Multi') {
-      setSelectedActivityTypes(checked ? Object.keys(activityTypeSymbols) : []);
-    } else {
-      setSelectedActivityTypes((prevSelected) =>
-        checked ? [...prevSelected, value] : prevSelected.filter((type) => type !== value)
-      );
-    }
-  };
+
 
   const getDayStatus = (date: string): DayStatus => {
     const dayActivities = activities.filter(activity => {
       const mainType = subTypeToMainType[activity.type] || activity.type;
-    return activity.start_date.startsWith(date) && selectedActivityTypes.includes(mainType);
-  });
+      return activity.start_date.startsWith(date) && (selectedActivity === 'Multi' || selectedActivity === mainType);
+    });
   
-
     const totalDuration = dayActivities.reduce((sum, activity) =>
       sum + Math.floor(activity.moving_time / 60), 0
     );
-
+  
     return {
       completed: totalDuration >= 25,
       duration: totalDuration,
       activities: dayActivities
     };
   };
+  
 
-  const calculateStreakLength = (date: Date): number => {
+
+  const calculateStreakLength = (currentDate: Date): number => {
     let streak = 0;
-    const currentDate = new Date(date);
-
+  
     while (true) {
       const dateString = currentDate.toISOString().split('T')[0];
       const status = getDayStatus(dateString);
-
       if (status.completed) {
         streak++;
+      } else if (dateString === new Date().toISOString().split('T')[0]) {
+        // If today is not completed, do not increment the streak
+        currentDate.setDate(currentDate.getDate() - 1);
+        continue;
       } else {
         break;
       }
-
+  
       currentDate.setDate(currentDate.getDate() - 1);
     }
-
+  
     return streak;
   };
 
-const generateCalendarData = (startDate: number) => {
-    const weeks = [];
-    const today = new Date();
-    const numWeeks = getWeekNumber(today, startDate);
-    const start = new Date(startDate * 1000); // Convert Unix timestamp to Date object
-    const dayOffset = (start.getDay() === 0 ? 6 : start.getDay() - 1); // Adjust for Monday start
+  const calculateStreakData = () => {
+    const today = new Date().toISOString().split('T')[0];
+    const todayStatus = getDayStatus(today);
+    const currentStreak = calculateStreakLength(new Date());
+    const longestStreak = Math.max(currentStreak, ...activities.map(activity => calculateStreakLength(new Date(activity.start_date))));
+    const lastSevenDays = Array.from({ length: 7 }, (_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const dateString = date.toISOString().split('T')[0];
+      const status = getDayStatus(dateString);
+      return {
+        day: 7 - i,
+        minutes: status.duration,
+        activities: status.activities.map(activity => ({
+          id: activity.id,
+          type: activity.type,
+          duration: Math.floor(activity.moving_time / 60),
+        })),
+      };
+    });
   
-    for (let week = 1; week <= numWeeks; week++) {
-      const days = [];
-      for (let day = 0; day < 7; day++) {
-        const calendarDate = new Date(start);  
-        calendarDate.setDate(start.getDate() + (week - 1) * 7 + day - dayOffset);
-        const dataDate =  new Date(start);
-        dataDate.setFullYear(calendarDate.getFullYear());
-        dataDate.setMonth(calendarDate.getMonth());
-        dataDate.setDate(calendarDate.getDate()); // Add 1 day to get the correct date
-        const dateString = dataDate.toISOString().split('T')[0];
-        const dayStatus = getDayStatus(dateString);
-        const streakLength = calculateStreakLength(dataDate);
-        days.push({ date: calendarDate, status: dayStatus, streakLength });
-      }
-      weeks.push({ weekNumber: week, days });
-    }
-  
-    return weeks;
+    return {
+      currentStreak,
+      todayMinutes: todayStatus.duration,
+      longestStreak,
+      lastSevenDays,
+    };
   };
 
-  const getWeekNumber = (date: Date, startDate: number) => {
-    const start = new Date(startDate * 1000); // Convert Unix timestamp to Date object
-    const pastDays = (date.getTime() - start.getTime()) / 86400000;
-    return Math.ceil((pastDays + (start.getDay() === 0 ? 6 : start.getDay() - 1) ) / 7);
-  };
 
   if (loading) {
     return (
@@ -188,132 +181,98 @@ const generateCalendarData = (startDate: number) => {
     );
   }
 
-  const calendarData = generateCalendarData(startTimestamp);
-  const today = new Date();
-  const startDate = new Date(startTimestamp * 1000);
+  const streakData = calculateStreakData();
   return (
-    <div className="mt-4">
-      <Card className="w-full max-w-2xl">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-        </CardHeader>
-        <CardContent>
-        <div className="mb-4">
-            <label className="inline-flex items-center mr-4">
-              <input
-                type="checkbox"
-                value="Run"
-                checked={selectedActivityTypes.includes('Run')}
-                onChange={handleActivityTypeChange}
-                className="form-checkbox"
-              />
-              <span className="ml-2">Run</span>
-            </label>
-            <label className="inline-flex items-center mr-4">
-              <input
-                type="checkbox"
-                value="Ride"
-                checked={selectedActivityTypes.includes('Ride')}
-                onChange={handleActivityTypeChange}
-                className="form-checkbox"
-              />
-              <span className="ml-2">Ride</span>
-            </label>
-            <label className="inline-flex items-center mr-4">
-              <input
-                type="checkbox"
-                value="Swim"
-                checked={selectedActivityTypes.includes('Swim')}
-                onChange={handleActivityTypeChange}
-                className="form-checkbox"
-              />
-              <span className="ml-2">Swim</span>
-            </label>
-            <label className="inline-flex items-center mr-4">
-              <input
-                type="checkbox"
-                value="Multi"
-                checked={selectedActivityTypes.length === Object.keys(activityTypeSymbols).length}
-                onChange={handleActivityTypeChange}
-                className="form-checkbox"
-              />
-              <span className="ml-2">Multi</span>
-            </label>
-          </div>         
-          <div className="grid grid-cols-7 gap-2">
-            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
-              <div key={day} className="text-center font-bold">{day}</div>
-            ))}
-            {calendarData.map((week) => (
-              <React.Fragment key={week.weekNumber}>
-                {week.days.map(({ date, status, streakLength }) => {
-                  const isFutureDate = date > today;
-                  const isBeforeStartDate = date < startDate;
-                  const isToday = date.toDateString() === today.toDateString();
-                  return (
-                    <div
-                      key={date.toISOString()}
-                      className={`p-2 rounded-lg text-center ${
-                        isFutureDate || isBeforeStartDate
-                          ? 'bg-white border-gray-300'
-                          : status.completed 
-                            ? 'bg-green-100 border-green-500' 
-                            : 'bg-red-100 border-red-500'
-                      } border`}
-                    >
-                      {!isFutureDate && !isBeforeStartDate && streakLength > 0 && (
-                        <div className="text-bold">
-                          {streakLength}
-                        </div>
-                      )}
-                      <div>
-                        {status.activities.map((activity, index) => {
-                          const mainType = subTypeToMainType[activity.type] || activity.type;
-                          return (
-                            <span key={index} title={activity.type}>
-                              {activityTypeSymbols[mainType] || '❓'}
-                            </span>
-                          );
-                        })}
-                      </div>
-                      {!isFutureDate && !isBeforeStartDate && (
-                        <div className="text-xs mt-1">
-                          {status.duration}min
-                        </div>
-                      )}
-                      <div className="mt-1">
-                        {status.activities.map((activity, index) => (
-                          <div key={index}>
-                            <a
-                              href={`https://www.strava.com/activities/${activity.id}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="small-link"
-                            >
-                              View on Strava
-                            </a>
-                          </div>
-                        ))}
-                     </div>
-                      {!isFutureDate && !isBeforeStartDate && !status.completed && isToday && (
-                        <div className="text-xs mt-1 text-red-500">
-                          Keep going! You can do it!
-                        </div>
-                      )}
+    <Card className="w-full max-w-sm mx-auto">
+      <CardHeader className="space-y-1">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-2xl font-bold">Streak Tracker</CardTitle>
+        </div>
+        
+        <div className="flex gap-2 p-1 bg-slate-100 rounded-lg">
+          {['Run', 'Ride', 'Swim', 'Multi'].map((activity) => (
+            <button
+              key={activity}
+              onClick={() => setSelectedActivity(activity)}
+              className={`px-3 py-1 rounded-md capitalize ${
+                selectedActivity === activity 
+                  ? 'bg-white shadow-sm' 
+                  : 'hover:bg-white/60'
+              }`}
+            >
+              {activity}
+            </button>
+          ))}
+        </div>
+      </CardHeader>
+
+      <CardContent className="space-y-4">
+        {/* Current Streak Display */}
+        <div className="text-center p-4 bg-green-50 rounded-lg">
+          <div className="text-4xl font-bold text-green-600">
+            {streakData.currentStreak} days
+          </div>
+          <div className="text-sm text-green-700">
+            {streakData.todayMinutes >= 25 ? 'Current Streak' : 'Keep going! Complete today to continue your streak!'}
+          </div>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="p-3 bg-slate-50 rounded-lg text-center">
+            <Clock className="w-5 h-5 mx-auto mb-1" />
+            <div className="text-xl font-bold">{streakData.todayMinutes}min</div>
+            <div className="text-xs text-slate-600">Today</div>
+          </div>
+          <div className="p-3 bg-slate-50 rounded-lg text-center">
+            <Trophy className="w-5 h-5 mx-auto mb-1" />
+            <div className="text-xl font-bold">{streakData.longestStreak}</div>
+            <div className="text-xs text-slate-600">Longest Streak</div>
+          </div>
+        </div>
+
+        {/* Last 7 Days Timeline with Strava Links */}
+        <div className="space-y-2 max-h-48 overflow-y-auto">
+        <div className="text-sm font-medium">Last 7 days</div>
+        <div className="flex gap-1">
+          {streakData.lastSevenDays.map((day, index) => (
+            <div
+              key={index}
+              className="flex-1 bg-green-100 rounded-md p-2 text-center"
+            >
+              <div className="text-xs text-green-800">Day {day.day}</div>
+              <div className="text-sm font-medium">{day.minutes}m</div>
+              {day.activities.map(activity => (
+                <div key={activity.id} className="mt-1">
+                    <div className="text-xs">
+                      {activityTypeSymbols[activity.type] || ''}
                     </div>
-                  );
-                })}
-              </React.Fragment>
-            ))}
-          </div>
-  
-          <div className="mt-4 text-sm text-gray-600">
-          Goal: Stay active and healthy by running at least 25 minutes every day!
-          </div>
-          <div className="flex justify-center mt-4">
-            <Image src="/api_logo_pwrdBy_strava_stack_light.svg" alt="Powered by Strava" width={100} height={50} className="logo"/>
-          </div>
-        </CardContent>
-      </Card>
+                  <a 
+                    href={`https://www.strava.com/activities/${activity.id}`}
+                    className="text-[#FC4C02] hover:underline text-xs block"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    View on Strava
+                  </a>
+                </div>
+              ))}
+            </div>
+          ))}
+      </div>
     </div>
-);
-}
+
+        {/* Goal Display */}
+        <div className="text-sm text-center text-slate-600 pt-2">
+          Goal: Stay active and healthy by running at least <span style={{ whiteSpace: 'nowrap' }}>25 minutes</span> every day!
+        </div>
+
+        {/* Strava Attribution */}
+        <div className="flex justify-center mt-4">
+          <Image src="/api_logo_pwrdBy_strava_stack_light.svg" alt="Powered by Strava" width={100} height={50} className="logo"/>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
