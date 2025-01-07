@@ -2,16 +2,15 @@ import { StravaActivity } from '@/types/strava';
 
 const ATHLETE_ACTIVITIES_URL = 'https://www.strava.com/api/v3/athlete/activities';
 
-export async function getStravaActivities(after: number): Promise<StravaActivity[]> {
+export async function getStravaActivities(after: number, perPage: number): Promise<StravaActivity[]> {
   const token = localStorage.getItem('stravaAccessToken');
   if (!token) {
     throw new Error('No access token found');
   }
 
-  const perPage = 30;
-  let allActivities: StravaActivity[] = [];
   let page = 1;
   let hasMoreActivities = true;
+  let allActivities: StravaActivity[] = [];
 
   while (hasMoreActivities) {
     const response = await fetch(`${ATHLETE_ACTIVITIES_URL}?after=${after}&per_page=${perPage}&page=${page}`, {

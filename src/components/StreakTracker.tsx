@@ -19,7 +19,7 @@ interface DayStatus {
 }
 
 interface StreakTrackerProps {
-  startTimestamp: number; // Unix timestamp
+  fromTimestamp: number; // Unix timestamp
 }
 
 const activityTypeSymbols: { [key: string]: string } = {
@@ -65,7 +65,7 @@ const ActivityModal = ({ activities, onClose }: { activities: StravaActivity[], 
 );
 
 
-export function StreakTracker({ startTimestamp }: StreakTrackerProps) {
+export function StreakTracker({ fromTimestamp }: StreakTrackerProps) {
   const [activities, setActivities] = useState<StravaActivity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -73,7 +73,7 @@ export function StreakTracker({ startTimestamp }: StreakTrackerProps) {
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [selectedDayActivities, setSelectedDayActivities] = useState<StravaActivity[]>([]);
 
-  const fetchActivities = async (startTimestamp: number) => {
+  const fetchActivities = async (fromTimestamp: number) => {
     try {
       const token = localStorage.getItem('stravaAccessToken');
       if (!token) {
@@ -83,20 +83,32 @@ export function StreakTracker({ startTimestamp }: StreakTrackerProps) {
 
       const now = new Date().getTime();
       const storedData = localStorage.getItem('stravaActivities');
+      let allActivities: StravaActivity[] = [];
+      let lastFetchedTimestamp = fromTimestamp;
+      let pageSize = 30;
+
       if (storedData) {
         const { activities, timestamp } = JSON.parse(storedData);
         const expirary = 3 * 60 * 60 * 1000; // 3h
   
         if (now - timestamp < expirary) {
+          // these should be fresh enough
           setActivities(activities);
           setLoading(false);
           return;
         }
-      }
+        allActivities = activities;
+        lastFetchedTimestamp = Math.max(...activities.map((activity: StravaActivity) => new Date(activity.start_date).getTime()));
+
+      } else {
+        // We don't have any stored data, so fetch all activities in bigger chunks
+        pageSize = 100;
+      }  
   
-      const data = await getStravaActivities(startTimestamp);
-      setActivities(data);
-      localStorage.setItem('stravaActivities', JSON.stringify({ activities: data, timestamp: now }));
+      const fetchedActivities = await getStravaActivities(lastFetchedTimestamp, pageSize);
+      allActivities = [...allActivities, ...fetchedActivities];
+      setActivities(allActivities);
+      localStorage.setItem('stravaActivities', JSON.stringify({ activities: allActivities, timestamp: now }));
     } catch (err) {
       console.log(err);
       setError(err instanceof Error ? err.message : 'Failed to fetch activities');
@@ -112,8 +124,8 @@ export function StreakTracker({ startTimestamp }: StreakTrackerProps) {
   };
 
   useEffect(() => {
-    fetchActivities(startTimestamp);
-  }, [startTimestamp]);
+    fetchActivities(fromTimestamp);
+  }, [fromTimestamp]);
 
 
 
@@ -136,33 +148,35 @@ export function StreakTracker({ startTimestamp }: StreakTrackerProps) {
   
 
 
-  const calculateStreakLength = (currentDate: Date): number => {
+  const calculateStreakLength = (date: Date): { length: number, startDate: Date }  => {
     let streak = 0;
-  
+    const currentDate = new Date(date);
+    let streakStartDate = new Date(date);
+
     while (true) {
       const dateString = dateToIsoDate(currentDate);
       const status = getDayStatus(dateString);
       if (status.completed) {
         streak++;
-      } else if (dateString === dateToIsoDate(new Date())) {
-        // If today is not completed, do not increment the streak
-        currentDate.setDate(currentDate.getDate() - 1);
-        continue;
       } else {
+        // If the day is not completed, break the streak
+        streakStartDate = new Date(currentDate);
         break;
       }
-  
       currentDate.setDate(currentDate.getDate() - 1);
     }
   
-    return streak;
+    return { length: streak, startDate: streakStartDate };
   };
 
   const calculateStreakData = () => {
     const today = dateToIsoDate(new Date());
     const todayStatus = getDayStatus(today);
-    const currentStreak = calculateStreakLength(new Date());
-    const longestStreak = Math.max(currentStreak, ...activities.map(activity => calculateStreakLength(new Date(activity.start_date))));
+    const currentStreakData = calculateStreakLength(new Date());
+    const longestStreakData = activities.reduce((maxStreak, activity) => {
+      const streakData = calculateStreakLength(new Date(activity.start_date));
+      return streakData.length > maxStreak.length ? streakData : maxStreak;
+    }, { length: 0, startDate: new Date() });
     const lastSevenDays = Array.from({ length: 7 }, (_, i) => {
       const date = new Date();
       date.setDate(date.getDate() - i);
@@ -177,10 +191,12 @@ export function StreakTracker({ startTimestamp }: StreakTrackerProps) {
     });
   
     return {
-      currentStreak,
+      currentStreak: currentStreakData.length,
+      currentStreakStartDate: currentStreakData.startDate,
       todayMinutes: todayStatus.duration,
       completed: todayStatus.completed,
-      longestStreak,
+      longestStreak: longestStreakData.length,
+      longestStreakStartDate: longestStreakData.startDate,
       lastSevenDays,
     };
   };
@@ -244,6 +260,7 @@ export function StreakTracker({ startTimestamp }: StreakTrackerProps) {
           <div className="text-sm text-orange-600">
             {!streakData.completed ? 'Keep going! Run today to continue your streak!' : ''}
           </div>
+          <div className="text-xs text-slate-600">started on {dateToIsoDate(streakData.currentStreakStartDate)}</div>
         </div>
 
         {/* Stats Grid */}
@@ -257,6 +274,7 @@ export function StreakTracker({ startTimestamp }: StreakTrackerProps) {
             <Trophy className="w-5 h-5 mx-auto mb-1" />
             <div className="text-xl font-bold">{streakData.longestStreak}</div>
             <div className="text-xs text-slate-600">longest streak</div>
+            <div className="text-xs text-slate-600">started on {dateToIsoDate(streakData.longestStreakStartDate)}</div>
           </div>
         </div>
         {/* Last 7 Days Timeline with Strava Links */}
