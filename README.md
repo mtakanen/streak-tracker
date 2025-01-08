@@ -1,5 +1,5 @@
 # streak-tracker
-Next js app for tracking running streak from Strava activities
+Next.js/React app for tracking running streak from user's Strava activities.
 
 ## Setup
 ```
