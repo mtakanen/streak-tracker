@@ -44,10 +44,10 @@ const subTypeToMainType: { [key: string]: string } = {
   // Add more sub-types and their main categories as needed
 };
 
-const ActivityModal = ({ activities, onClose }: { activities: StravaActivity[], onClose: () => void }) => (
+const ActivityModal = ({ activities, weekday, onClose }: { activities: StravaActivity[], weekday: string, onClose: () => void }) => (
   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
     <div className="bg-white p-4 rounded-lg max-w-md w-full relative">
-      <h2 className="text-xl font-bold mb-4">{dateToIsoDate(new Date(activities[0].start_date))}</h2>
+      <h2 className="text-xl font-bold mb-4">{weekday} {new Date(activities[0].start_date).toLocaleDateString()}</h2>
       <button className="absolute top-2 right-2 text-gray-500" onClick={onClose}>X</button>
       {activities.map(activity => (
         <div key={activity.id} className="mb-2">
@@ -73,6 +73,7 @@ export function StreakTracker({ fromTimestamp }: StreakTrackerProps) {
   const [error, setError] = useState<string | null>(null);
   const [selectedActivity, setSelectedActivity] = useState('Run');
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
+  const [selectedWeekday, setSelectedWeekday] = useState<string>();
   const [selectedDayActivities, setSelectedDayActivities] = useState<StravaActivity[]>([]);
   const router = useRouter();
   const STRAVA_AUTH_URL = getStravaAuthUrl();
@@ -208,13 +209,15 @@ export function StreakTracker({ fromTimestamp }: StreakTrackerProps) {
       const streakData = calculateStreakLength(new Date(activity.start_date));
       return streakData.length > maxStreak.length ? streakData : maxStreak;
     }, { length: 0, startDate: new Date() });
+    const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const lastSevenDays = Array.from({ length: 7 }, (_, i) => {
       const date = new Date();
       date.setDate(date.getDate() - i);
       const dateString = dateToIsoDate(date);
       const status = getDayStatus(dateString);
       return {
-        day: 7 - i,
+        index: 7 - i,
+        weekday: weekdays[date.getDay()],
         minutes: status.duration,
         completed: status.duration >= DAILY_GOAL,
         activities: status.activities
@@ -310,7 +313,7 @@ export function StreakTracker({ fromTimestamp }: StreakTrackerProps) {
         </div>
         {/* Last 7 Days Timeline with Strava Links */}
         <div className="space-y-2 max-h-48 overflow-y-auto">
-          <div className="text-sm font-medium">last 7 days</div>
+          <div className="text-sm font-medium">Last 7 days</div>
           <div className="flex gap-1">
             {streakData.lastSevenDays.map((day, index) => (
               <div
@@ -318,13 +321,14 @@ export function StreakTracker({ fromTimestamp }: StreakTrackerProps) {
                 className={`flex-1 rounded-md p-2 text-center cursor-pointer ${day.completed ? 'bg-green-100' : 'bg-orange-100'}`}
                 onClick={() => {
                   if (day.minutes >= DAILY_GOAL) {
-                    setSelectedDay(day.day);
+                    setSelectedDay(day.index);
+                    setSelectedWeekday(day.weekday);
                     setSelectedDayActivities(day.activities);
                   }
                 }}
                 style={{ cursor: day.minutes >= DAILY_GOAL ? 'pointer' : 'not-allowed' }}      
               >
-                <div className="text-xs text-green-800"><span style={{ whiteSpace: 'nowrap' }}>Day {day.day}</span></div>
+                <div className="text-xs text-green-800"><span style={{ whiteSpace: 'nowrap' }}>{day.weekday}</span></div>
                 <div className="text-sm font-medium">{day.minutes}min</div>
               </div>
             ))}
@@ -344,6 +348,7 @@ export function StreakTracker({ fromTimestamp }: StreakTrackerProps) {
       {selectedDay !== null && (
         <ActivityModal
           activities={selectedDayActivities}
+          weekday={selectedWeekday || ''}
           onClose={() => setSelectedDay(null)}
         />
       )}
