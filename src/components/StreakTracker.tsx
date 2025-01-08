@@ -142,7 +142,7 @@ export function StreakTracker({ fromTimestamp, isAuthenticated }: StreakTrackerP
         localStorage.removeItem('stravaAccessToken');
         localStorage.removeItem('stravaRefreshToken');
         localStorage.removeItem('stravaTokenExpiry');
-        router.push('/index');
+        router.push('/');
       } else {
         setError(err instanceof Error ? err.message : 'Failed to fetch activities');
       }

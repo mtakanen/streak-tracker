@@ -1,12 +1,6 @@
 import axios from 'axios';
 
-import { StravaActivity } from '@/types/strava';
-
-interface StravaTokenData {
-  access_token: string;
-  refresh_token: string;
-  expires_in: number;
-}
+import { StravaActivity, StravaTokenData } from '@/types/strava';
 
 const ATHLETE_ACTIVITIES_URL = 'https://www.strava.com/api/v3/athlete/activities';
 const STRAVA_CLIENT_ID = process.env.NEXT_PUBLIC_STRAVA_CLIENT_ID;

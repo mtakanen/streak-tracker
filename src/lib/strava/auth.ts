@@ -7,6 +7,5 @@ export function getStravaAuthUrl(): string {
   const responseType = 'code';
   const approvalPrompt = 'auto';
   const stravaAuthUrl = `${STRAVA_AUTH_URL}?client_id=${STRAVA_CLIENT_ID}&response_type=${responseType}&redirect_uri=${STRAVA_REDIRECT_URI}&scope=${scope}&approval_prompt=${approvalPrompt}`;
-  console.log('Strava auth URL:', stravaAuthUrl); // Debugging log
   return stravaAuthUrl;
 }

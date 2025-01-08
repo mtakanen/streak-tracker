@@ -1,16 +1,24 @@
-'use client';
-
-import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Loader } from 'lucide-react';
+import { StravaTokenData } from '@/types/strava';
+
+const STRAVA_CALLBACK_PAGE = '/api/strava/callback';
 
 export default function AuthCallback() {
   const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const router = useRouter();
+  const hasHandledCallback = useRef(false);
 
   useEffect(() => {
+    const code = searchParams.get('code');
+    if (!code || hasHandledCallback.current) {
+      return;
+    }
+
     const handleCallback = async () => {
       const code = searchParams.get('code');
       console.log('AuthCallback received code:', code); // Debugging log
@@ -20,19 +28,12 @@ export default function AuthCallback() {
       }
 
       try {
-        const response = await fetch('/api/strava/callback', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ code })
-        });
-
-        if (!response.ok) {
+        const response = await axios.post<StravaTokenData>(STRAVA_CALLBACK_PAGE, { code })
+        if (response.status !== 200) {
           throw new Error('Failed to exchange code');
         }
 
-        const data = await response.json();
+        const data = response.data;
         console.log('Received data:', data); // Debugging log
 
         // Store tokens
@@ -49,6 +50,8 @@ export default function AuthCallback() {
     };
 
     handleCallback();
+    hasHandledCallback.current = true;
+
   }, [searchParams, router]);
 
   if (error) {

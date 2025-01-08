@@ -13,3 +13,10 @@ export interface TokenResponse {
     refresh_token: string;
     expires_at: number;
 }
+
+export interface StravaTokenData {
+    access_token: string;
+    refresh_token: string;
+    expires_in: number;
+  }
+  
