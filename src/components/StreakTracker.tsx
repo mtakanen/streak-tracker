@@ -2,13 +2,15 @@
 
 import React from 'react';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { Clock, Trophy } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Loader } from 'lucide-react';
 import Image from 'next/image';
 
 import { StravaActivity } from '@/types/strava';
-import { getStravaActivities } from '@/lib/strava/api';
+import { getStravaActivities, refreshStravaToken } from '@/lib/strava/api';
+import { getStravaAuthUrl } from '@/lib/strava/auth';
 import { DAILY_GOAL } from '@/lib/strava/config';
 import { dateToIsoDate } from '@/lib/utils';
 
@@ -20,6 +22,7 @@ interface DayStatus {
 
 interface StreakTrackerProps {
   fromTimestamp: number; // Unix timestamp
+  isAuthenticated: boolean;
 }
 
 const activityTypeSymbols: { [key: string]: string } = {
@@ -65,23 +68,47 @@ const ActivityModal = ({ activities, onClose }: { activities: StravaActivity[], 
 );
 
 
-export function StreakTracker({ fromTimestamp }: StreakTrackerProps) {
+export function StreakTracker({ fromTimestamp, isAuthenticated }: StreakTrackerProps) {
   const [activities, setActivities] = useState<StravaActivity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedActivity, setSelectedActivity] = useState('Run');
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [selectedDayActivities, setSelectedDayActivities] = useState<StravaActivity[]>([]);
+  const router = useRouter();
+  const STRAVA_AUTH_URL = getStravaAuthUrl();
 
   const fetchActivities = async (fromTimestamp: number) => {
     try {
-      const token = localStorage.getItem('stravaAccessToken');
-      if (!token) {
+      let token = localStorage.getItem('stravaAccessToken');
+      const tokenExpiry = localStorage.getItem('stravaTokenExpiry');
+      const refreshToken = localStorage.getItem('stravaRefreshToken');
+
+      if (!token || !tokenExpiry || !refreshToken) {
         setLoading(false);
+        window.location.href = STRAVA_AUTH_URL; // Redirect to Strava authorization URL if no token
         return;
       }
 
       const now = new Date().getTime();
+      if (now >= parseInt(tokenExpiry, 10)) {
+        // Token has expired, try to refresh it
+        const newTokenData = await refreshStravaToken(refreshToken);
+        if (newTokenData) {
+          token = newTokenData.access_token;
+          localStorage.setItem('stravaAccessToken', newTokenData.access_token);
+          localStorage.setItem('stravaRefreshToken', newTokenData.refresh_token);
+          localStorage.setItem('stravaTokenExpiry', (now + newTokenData.expires_in * 1000).toString());
+        } else {
+          // Refresh token is invalid, redirect to Strava authorization URL
+          localStorage.removeItem('stravaAccessToken');
+          localStorage.removeItem('stravaRefreshToken');
+          localStorage.removeItem('stravaTokenExpiry');
+          window.location.href = STRAVA_AUTH_URL;
+          return;
+        }
+      }
+
       const storedData = localStorage.getItem('stravaActivities');
       let allActivities: StravaActivity[] = [];
       let lastFetchedTimestamp = fromTimestamp;
@@ -89,8 +116,7 @@ export function StreakTracker({ fromTimestamp }: StreakTrackerProps) {
 
       if (storedData) {
         const { activities, timestamp } = JSON.parse(storedData);
-        const expirary = 3 * 60 * 60 * 1000; // 3h
-  
+        const expirary = 15 * 60 * 1000; // 15min
         if (now - timestamp < expirary) {
           // these should be fresh enough
           setActivities(activities);
@@ -98,7 +124,7 @@ export function StreakTracker({ fromTimestamp }: StreakTrackerProps) {
           return;
         }
         allActivities = activities;
-        lastFetchedTimestamp = Math.max(...activities.map((activity: StravaActivity) => new Date(activity.start_date).getTime()));
+        lastFetchedTimestamp = Math.max(...activities.map((activity: StravaActivity) => new Date(activity.start_date).getTime() / 1000));
 
       } else {
         // We don't have any stored data, so fetch all activities in bigger chunks
@@ -111,21 +137,26 @@ export function StreakTracker({ fromTimestamp }: StreakTrackerProps) {
       localStorage.setItem('stravaActivities', JSON.stringify({ activities: allActivities, timestamp: now }));
     } catch (err) {
       console.log(err);
-      setError(err instanceof Error ? err.message : 'Failed to fetch activities');
-      // Clear tokens if they're invalid
-      if (err instanceof Error && err.message.includes('Unauthorized')) {
+      if (err instanceof Error && err.message.includes('401')) {
+        // Clear tokens if they're invalid and redirect to login page
         localStorage.removeItem('stravaAccessToken');
         localStorage.removeItem('stravaRefreshToken');
         localStorage.removeItem('stravaTokenExpiry');
+        router.push('/index');
+      } else {
+        setError(err instanceof Error ? err.message : 'Failed to fetch activities');
       }
+
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchActivities(fromTimestamp);
-  }, [fromTimestamp]);
+    if (isAuthenticated) {
+      fetchActivities(fromTimestamp);
+    }
+  }, [fromTimestamp, isAuthenticated]);
 
 
 
@@ -158,6 +189,9 @@ export function StreakTracker({ fromTimestamp }: StreakTrackerProps) {
       const status = getDayStatus(dateString);
       if (status.completed) {
         streak++;
+      } else if (dateToIsoDate(currentDate) === dateToIsoDate(new Date())) {
+        currentDate.setDate(currentDate.getDate() - 1);
+        continue;
       } else {
         // If the day is not completed, break the streak
         streakStartDate = new Date(currentDate);

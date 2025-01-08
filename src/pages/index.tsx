@@ -21,7 +21,7 @@ const HomePage = () => {
         <Image priority src="/25.png" alt="25 for 25" width={90} height={90} />
       </div>
       {isAuthenticated ? (
-        <StreakTracker fromTimestamp={fromTimestamp} />
+        <StreakTracker fromTimestamp={fromTimestamp} isAuthenticated={isAuthenticated}/>
       ) : (
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Welcome to Streak Tracker!</h1>

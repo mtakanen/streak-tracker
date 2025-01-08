@@ -1,6 +1,35 @@
+import axios from 'axios';
+
 import { StravaActivity } from '@/types/strava';
 
+interface StravaTokenData {
+  access_token: string;
+  refresh_token: string;
+  expires_in: number;
+}
+
 const ATHLETE_ACTIVITIES_URL = 'https://www.strava.com/api/v3/athlete/activities';
+const STRAVA_CLIENT_ID = process.env.NEXT_PUBLIC_STRAVA_CLIENT_ID;
+const STRAVA_CLIENT_SECRET = process.env.NEXT_PUBLIC_STRAVA_CLIENT_SECRET;
+
+export async function refreshStravaToken(refreshToken: string): Promise<StravaTokenData | null> {
+  try {
+    const response = await axios.post<StravaTokenData>('https://www.strava.com/oauth/token', null, {
+      params: {
+        client_id: STRAVA_CLIENT_ID,
+        client_secret: STRAVA_CLIENT_SECRET,
+        grant_type: 'refresh_token',
+        refresh_token: refreshToken,
+      },
+    });
+
+    /**const data: StravaTokenData = response.data;*/
+    return response.data;
+  } catch (error) {
+    console.error('Failed to refresh Strava token:', error);
+    return null;
+  }
+}
 
 export async function getStravaActivities(after: number, perPage: number): Promise<StravaActivity[]> {
   const token = localStorage.getItem('stravaAccessToken');
@@ -13,13 +42,18 @@ export async function getStravaActivities(after: number, perPage: number): Promi
   let allActivities: StravaActivity[] = [];
 
   while (hasMoreActivities) {
-    const response = await fetch(`${ATHLETE_ACTIVITIES_URL}?after=${after}&per_page=${perPage}&page=${page}`, {
+    const response = await axios.get<StravaActivity[]>(ATHLETE_ACTIVITIES_URL, {
+      params: {
+        after,
+        page,
+        per_page: perPage,
+      },
       headers: {
         'Authorization': `Bearer ${token}`,
       },
     });
 
-    if (!response.ok) {
+    if (response.status !== 200) {
       console.log(response);
       if (response.status === 400) {
         throw new Error('Strava API: 400 Bad request');
@@ -37,7 +71,7 @@ export async function getStravaActivities(after: number, perPage: number): Promi
         throw new Error('Failed to fetch activities');
       }
     }
-    const data: StravaActivity[] = await response.json();
+    const data: StravaActivity[] = response.data;
     allActivities = allActivities.concat(data);
 
     if (data.length == 0) {

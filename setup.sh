@@ -6,8 +6,10 @@ npm install @/components/ui lucide-react @radix-ui/react-slot \
     class-variance-authority clsx tailwind-merge \
     @radix-ui/react-alert-dialog \
     @hookform/resolvers \
-    date-fns
+    date-fns \
+    axios
 
+npm install --save-dev @types/axios
 
 # Install shadcn UI components
 echo "Installing shadcn UI components..."
