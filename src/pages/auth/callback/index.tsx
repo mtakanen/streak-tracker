@@ -21,7 +21,6 @@ export default function AuthCallback() {
 
     const handleCallback = async () => {
       const code = searchParams.get('code');
-      console.log('AuthCallback received code:', code); // Debugging log
       if (!code) {
         setError('No authorization code received');
         return;
@@ -32,10 +31,7 @@ export default function AuthCallback() {
         if (response.status !== 200) {
           throw new Error('Failed to exchange code');
         }
-
         const data = response.data;
-        console.log('Received data:', data); // Debugging log
-
         // Store tokens
         localStorage.setItem('stravaAccessToken', data.access_token);
         localStorage.setItem('stravaRefreshToken', data.refresh_token);

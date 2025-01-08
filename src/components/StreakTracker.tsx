@@ -22,7 +22,6 @@ interface DayStatus {
 
 interface StreakTrackerProps {
   fromTimestamp: number; // Unix timestamp
-  isAuthenticated: boolean;
 }
 
 const activityTypeSymbols: { [key: string]: string } = {
@@ -68,7 +67,7 @@ const ActivityModal = ({ activities, onClose }: { activities: StravaActivity[], 
 );
 
 
-export function StreakTracker({ fromTimestamp, isAuthenticated }: StreakTrackerProps) {
+export function StreakTracker({ fromTimestamp }: StreakTrackerProps) {
   const [activities, setActivities] = useState<StravaActivity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -153,10 +152,8 @@ export function StreakTracker({ fromTimestamp, isAuthenticated }: StreakTrackerP
   };
 
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchActivities(fromTimestamp);
-    }
-  }, [fromTimestamp, isAuthenticated]);
+    fetchActivities(fromTimestamp);
+  }, [fromTimestamp]);
 
 
 

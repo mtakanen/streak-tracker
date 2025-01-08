@@ -12,9 +12,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   console.log('POST /api/strava/callback code:', code);
-  console.log('Client ID:', process.env.NEXT_PUBLIC_STRAVA_CLIENT_ID);
-  console.log('Client Secret:', process.env.NEXT_PUBLIC_STRAVA_CLIENT_SECRET);
-
   try {
     const response = await fetch('https://www.strava.com/oauth/token', {
       method: 'POST',
@@ -36,7 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const data = await response.json();
-    console.log('Received data from Strava:', data);
+    /** console.log('Received data from Strava:', data); */
     res.status(200).json(data);
   } catch (error) {
     console.error('Error in /api/strava/callback:', error);
