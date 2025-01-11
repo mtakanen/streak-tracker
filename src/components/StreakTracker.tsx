@@ -1,6 +1,6 @@
 "use client";
 
-import React, { act } from 'react';
+import React from 'react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { Clock, Trophy } from 'lucide-react';
@@ -12,17 +12,13 @@ import { StravaActivity } from '@/types/strava';
 import { getStravaActivities, refreshStravaToken } from '@/lib/strava/api';
 import { getStravaAuthUrl } from '@/lib/strava/auth';
 import { DAILY_GOAL } from '@/lib/strava/config';
-import { dateToIsoDate, isoDateToUnixTimestamp } from '@/lib/utils';
+import { dateToIsoDate } from '@/lib/utils';
 
 interface DayStatus {
   date: Date;
   completed: boolean;
   duration: number;
   activities: StravaActivity[];
-}
-
-interface StreakTrackerProps {
-  fromTimestamp: number; // Unix timestamp
 }
 
 const activityTypeSymbols: { [key: string]: string } = {
@@ -69,14 +65,33 @@ const ActivityModal = ({ activities, weekday, onClose }: { activities: StravaAct
 
 
 const StreakTracker = () => {
-  //const [activities, setActivities] = useState<StravaActivity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedActivity, setSelectedActivity] = useState('Run');
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [selectedWeekday, setSelectedWeekday] = useState<string>();
   const [selectedDayActivities, setSelectedDayActivities] = useState<StravaActivity[]>([]);
-  const [streakData, setStreakData] = useState<any>(null);
+
+  interface RecentDays {
+    index: number;
+    start_date: Date;
+    weekday: string;
+    minutes: number;
+    completed: boolean;
+    activities: StravaActivity[];
+  }
+
+  interface StreakData {
+    currentStreak: number;
+    currentStreakStartDate: Date;
+    todayMinutes: number;
+    completed: boolean;
+    longestStreak: number;
+    longestStreakStartDate: Date;
+    lastSevenDays: RecentDays[];
+  }
+
+  const [streakData, setStreakData] = useState<StreakData | null>(null);
   const router = useRouter();
   const STRAVA_AUTH_URL = getStravaAuthUrl();
 
@@ -91,7 +106,7 @@ const StreakTracker = () => {
     expires_in: number;
   }
 
-  const fetchActivities = async (fromTimestamp: number): Promise<StravaActivity[]> => {
+  const fetchActivities = React.useCallback(async (fromTimestamp: number): Promise<StravaActivity[]> => {
       let activities: StravaActivity[] = [];
       try {
         let token = localStorage.getItem('stravaAccessToken');
@@ -130,7 +145,6 @@ const StreakTracker = () => {
           const { activities, timestamp }: StoredData = JSON.parse(storedData);
           const expirary = 5 * 60 * 1000; // 15min
           if (now - timestamp < expirary) {
-            console.log('Using stored activities');
             // these should be fresh enough
             return activities;
           }  
@@ -138,7 +152,7 @@ const StreakTracker = () => {
           // We don't have any stored data, so fetch all activities in bigger chunks
           pageSize = 100;
         }  
-        console.log('Fetching activities from:', new Date(fromTimestamp * 1000));
+        // console.log('Fetching activities from:', new Date(fromTimestamp * 1000));
         const fetchedActivities: StravaActivity[] = await getStravaActivities(fromTimestamp, pageSize);
         activities = [...activities, ...fetchedActivities];
         localStorage.setItem('stravaActivities', JSON.stringify({ activities: activities, timestamp: now }));
@@ -158,7 +172,7 @@ const StreakTracker = () => {
         setLoading(false);
       }
       return activities;
-    };
+    }, []);
 
   const getDayStatus = (activities: StravaActivity[], date: Date): DayStatus => {
     const dateString = dateToIsoDate(date);
@@ -184,7 +198,7 @@ const StreakTracker = () => {
   const calculateStreakLength = (activities: StravaActivity[], date: Date): 
     { length: number, startDate: Date }  => {
     let streak = 0;
-    let activityDate = new Date(date);
+    const activityDate = new Date(date);
     let streakStartDate = new Date(date);
     const todayString = dateToIsoDate(new Date())
     while (true) {
@@ -208,9 +222,9 @@ const StreakTracker = () => {
 
 
   const initStreaks = (activities: StravaActivity[]) => {
-    console.log('initStreaks');
+    // console.log('initStreaks');
     const today = new Date();
-    console.log(activities.length)
+    // console.log(activities.length)
     const currentStreakUpdatedAt = new Date(localStorage.getItem('currentStreakUpdatedAt') || new Date());
     const { length: currentStreak, startDate: currentStreakStartDate } = calculateStreakLength(activities, today);
     let {length: longestStreak, startDate: longestStreakStartDate}  = activities.reduce((maxStreak, activity) => {
@@ -224,15 +238,14 @@ const StreakTracker = () => {
     return { currentStreak, longestStreak, currentStreakStartDate, currentStreakUpdatedAt, longestStreakStartDate };
   };
   
-  const updateStreaks = (lastSevenDays: any[]) => {
-    console.log('updateStreaks');
+  const updateStreaks = (lastSevenDays: RecentDays[]) => {
+    // console.log('updateStreaks');
     let currentStreak = parseInt(localStorage.getItem('currentStreak') || '0', 10);
     let longestStreak = parseInt(localStorage.getItem('longestStreak') || '0', 10);
     let currentStreakStartDate = new Date(localStorage.getItem('currentStreakStartDate') || new Date());
     let longestStreakStartDate = new Date(localStorage.getItem('longestStreakStartDate') || new Date());
     let currentStreakUpdatedAt = new Date(localStorage.getItem('currentStreakUpdatedAt') || new Date());
     const today = new Date();
-    const todayString = dateToIsoDate(today);
     const todayStatus = lastSevenDays[0];
 
     if (todayStatus.completed && currentStreakUpdatedAt.getDate() < today.getDate()) {
@@ -241,7 +254,7 @@ const StreakTracker = () => {
     } 
 
     for (let i = 1; i < lastSevenDays.length; i++) {
-      if (lastSevenDays[i].date < today && !lastSevenDays[i].completed) {
+      if (lastSevenDays[i].start_date < today && !lastSevenDays[i].completed) {
         currentStreak = 0;
         currentStreakStartDate = new Date();
         break;
@@ -257,44 +270,51 @@ const StreakTracker = () => {
     return { currentStreak, longestStreak, currentStreakStartDate, currentStreakUpdatedAt, longestStreakStartDate };
   };
 
-  const calculateStreakData = (activities: StravaActivity[], initializing: boolean) => {
-    const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const lastSevenDays = Array.from({ length: 7 }, (_, i) => {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      const status = getDayStatus(activities, date);
+  /**
+   * Calculates streak data based on the provided activities and initialization status.
+   *
+   * @param {StravaActivity[]} activities - An array of Strava activities.
+   * @param {boolean} initializing - A flag indicating whether the streaks are being initialized.
+   * @returns {StreakData} An object containing the current streak, longest streak, today's minutes, completion status, and data for the last seven days.
+   */
+  const calculateStreakData = React.useCallback((activities: StravaActivity[], initializing: boolean) => {
+      const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const lastSevenDays: RecentDays[] = Array.from({ length: 7 }, (_, i) => {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        const status = getDayStatus(activities, date);
+        return {
+          index: 7 - i,
+          start_date: status.date,
+          weekday: weekdays[date.getDay()],
+          minutes: status.duration,
+          completed: status.duration >= DAILY_GOAL,
+          activities: status.activities
+        };
+      });
+  
+      const streaks = initializing ? initStreaks(activities) : updateStreaks(lastSevenDays);
+      const currentStreak = streaks.currentStreak;
+      const longestStreak = streaks.longestStreak;
+      const currentStreakStartDate = streaks.currentStreakStartDate;
+      const currentStreakUpdatedAt = streaks.currentStreakUpdatedAt;
+      const longestStreakStartDate = streaks.longestStreakStartDate;
+      localStorage.setItem('currentStreak', currentStreak.toString());
+      localStorage.setItem('longestStreak', longestStreak.toString());
+      localStorage.setItem('currentStreakStartDate', currentStreakStartDate.toISOString());
+      localStorage.setItem('currentStreakUpdatedAt', currentStreakUpdatedAt.toISOString());
+      localStorage.setItem('longestStreakStartDate', longestStreakStartDate.toISOString());
+  
       return {
-        index: 7 - i,
-        start_date: status.date,
-        weekday: weekdays[date.getDay()],
-        minutes: status.duration,
-        completed: status.duration >= DAILY_GOAL,
-        activities: status.activities
+        currentStreak,
+        currentStreakStartDate,
+        todayMinutes: lastSevenDays[0].minutes,
+        completed: lastSevenDays[0].completed,
+        longestStreak,
+        longestStreakStartDate,
+        lastSevenDays
       };
-    });
-
-    const streaks = initializing ? initStreaks(activities) : updateStreaks(lastSevenDays);
-    const currentStreak = streaks.currentStreak;
-    const longestStreak = streaks.longestStreak;
-    const currentStreakStartDate = streaks.currentStreakStartDate;
-    const currentStreakUpdatedAt = streaks.currentStreakUpdatedAt;
-    const longestStreakStartDate = streaks.longestStreakStartDate;
-    localStorage.setItem('currentStreak', currentStreak.toString());
-    localStorage.setItem('longestStreak', longestStreak.toString());
-    localStorage.setItem('currentStreakStartDate', currentStreakStartDate.toISOString());
-    localStorage.setItem('currentStreakUpdatedAt', currentStreakUpdatedAt.toISOString());
-    localStorage.setItem('longestStreakStartDate', longestStreakStartDate.toISOString());
-
-    return {
-      currentStreak,
-      currentStreakStartDate,
-      todayMinutes: lastSevenDays[0].minutes,
-      completed: lastSevenDays[0].completed,
-      longestStreak,
-      longestStreakStartDate,
-      lastSevenDays
-    };
-  };
+    }, []);
 
   useEffect(() => {
     const longestStreak = localStorage.getItem('longestStreak');
@@ -303,14 +323,11 @@ const StreakTracker = () => {
     const month = 30 * 24 * 60 * 60 * 1000;
     const fromTimestamp = initialize ? (Date.now() - month) / 1000 : (Date.now() - week) / 1000;
 
-    console.log('from: ' +new Date(fromTimestamp * 1000));
     fetchActivities(fromTimestamp).then((activities) => {
-      console.log('Activities fetched:', activities);
       const streaks = calculateStreakData(activities, initialize);
-      console.log('Streak data calculated:', streaks); 
       setStreakData(streaks);
     });
-  }, []);
+  }, [fetchActivities, calculateStreakData]);
   
   if (loading) {
     return (
@@ -437,7 +454,7 @@ const StreakTracker = () => {
             alt="Powered by Strava" 
             width={100} 
             height={50} 
-            className="h-[36px]"           
+            className="logo"           
           />
         </div>
       </CardContent>

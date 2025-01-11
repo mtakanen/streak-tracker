@@ -2,11 +2,9 @@ import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import StreakTracker from '@/components/StreakTracker';
 import StravaConnectButton from '@/components/StravaConnectButton';
-import { isoDateToUnixTimestamp } from '@/lib/utils';
 
 const HomePage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const fromTimestamp = isoDateToUnixTimestamp('2024-10-01');
 
   useEffect(() => {
     const accessToken = localStorage.getItem('stravaAccessToken');
