@@ -5,68 +5,16 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { Clock, Trophy } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Loader } from 'lucide-react';
+import { ActivityModal, LoadingModal } from '@/components/ui/modal';
 import Image from 'next/image';
 
-import { StravaActivity } from '@/types/strava';
+import { StravaTokenData, StravaActivity, DayStatus, RecentDays, StreakData, LocalActivities } from '@/types/strava';
 import { getStravaActivities, refreshStravaToken } from '@/lib/strava/api';
 import { getStravaAuthUrl } from '@/lib/strava/auth';
 import { DAILY_GOAL, INITIAL_LOAD_MONTHS } from '@/lib/strava/config';
 import { dateToIsoDate } from '@/lib/utils';
 
 const STORAGE_VERSION = '1.1'
-
-interface DayStatus {
-  date: Date;
-  completed: boolean;
-  duration: number;
-  activities: StravaActivity[];
-}
-
-const activityTypeSymbols: { [key: string]: string } = {
-  Run: '👟',
-  Ride: '🚲',
-  Swim: '🏊‍♂️',
-  Walk: '🚶‍♂️',
-  Ski: '🎿',
-  Skate: '⛸️',
-  // Add more activity types and symbols as needed
-};
-
-const LoadingModal = ({ isOpen }: { isOpen: boolean }) => {
-  if (!isOpen) return null;
-  return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-        <Loader className="animate-spin mx-auto mb-4" />
-        <p>Loading activities...</p>
-      </div>
-    </div>
-  );
-};
-
-const ActivityModal = ({ activities, weekday, onClose }: { activities: StravaActivity[], weekday: string, onClose: () => void }) => (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-    <div className="bg-white p-4 rounded-lg max-w-md w-full relative">
-      <h2 className="text-xl font-bold mb-4">{weekday} {new Date(activities[0].start_date).toLocaleDateString()}</h2>
-      <button className="absolute top-2 right-2 text-gray-500" onClick={onClose}>X</button>
-      {activities.map(activity => (
-        <div key={activity.id} className="mb-2">
-          <div className="text-xs">{activityTypeSymbols[activity.type] || ''} {activity.name} {Math.floor(activity.moving_time / 60)}min</div>
-          <a 
-            href={`https://www.strava.com/activities/${activity.id}`}
-            className="text-[#FC4C02] hover:underline text-xs block"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            View on Strava
-          </a>
-        </div>
-      ))}
-    </div>
-  </div>
-);
-
 
 const StreakTracker = () => {
   const [loading, setLoading] = useState(true);
@@ -75,40 +23,10 @@ const StreakTracker = () => {
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [selectedWeekday, setSelectedWeekday] = useState<string>();
   const [selectedDayActivities, setSelectedDayActivities] = useState<StravaActivity[]>([]);
-
-  interface RecentDays {
-    index: number;
-    start_date: Date;
-    weekday: string;
-    minutes: number;
-    completed: boolean;
-    activities: StravaActivity[];
-  }
-
-  interface StreakData {
-    currentStreak: number;
-    currentStreakStartDate: Date;
-    todayMinutes: number;
-    completed: boolean;
-    longestStreak: number;
-    longestStreakStartDate: Date;
-    lastSevenDays: RecentDays[];
-  }
-
   const [streakData, setStreakData] = useState<StreakData | null>(null);
   const router = useRouter();
   const STRAVA_AUTH_URL = getStravaAuthUrl();
 
-  interface LocalActivities {
-    activities: StravaActivity[];
-    timestamp: number;
-  }
-
-  interface TokenData {
-    access_token: string;
-    refresh_token: string;
-    expires_in: number;
-  }
 
   const invalidateLocalStorage = () => {
     const storedVersion = localStorage.getItem('storageVersion');
@@ -134,7 +52,7 @@ const StreakTracker = () => {
         const now = new Date().getTime();
         if (now >= parseInt(tokenExpiry, 10)) {
           // Token has expired, try to refresh it
-          const newTokenData: TokenData | null = await refreshStravaToken(refreshToken);
+          const newTokenData: StravaTokenData | null = await refreshStravaToken(refreshToken);
           if (newTokenData) {
             token = newTokenData.access_token;
             localStorage.setItem('stravaAccessToken', newTokenData.access_token);
@@ -336,7 +254,7 @@ const StreakTracker = () => {
   }, [fetchActivities, calculateStreakData]);
   
   if (loading) {
-    return <LoadingModal isOpen={loading} />;
+    return <LoadingModal isOpen={loading} text="Loading activities"/>;
   }
 
   if (error) {
@@ -355,7 +273,7 @@ const StreakTracker = () => {
 
   return (
     <>
-      <LoadingModal isOpen={loading} />
+      <LoadingModal isOpen={loading} text="Loading activities" />
       <Card className="w-full max-w-sm mx-auto">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-between mb-4">

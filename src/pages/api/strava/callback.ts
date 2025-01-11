@@ -1,5 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
+const TOKEN_URL = 'https://www.strava.com/oauth/token';
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method Not Allowed' });
@@ -13,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   console.log('POST /api/strava/callback code:', code);
   try {
-    const response = await fetch('https://www.strava.com/oauth/token', {
+    const response = await fetch(TOKEN_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
