@@ -11,7 +11,7 @@ import Image from 'next/image';
 import { StravaActivity } from '@/types/strava';
 import { getStravaActivities, refreshStravaToken } from '@/lib/strava/api';
 import { getStravaAuthUrl } from '@/lib/strava/auth';
-import { DAILY_GOAL } from '@/lib/strava/config';
+import { DAILY_GOAL, INITIAL_LOAD_MONTHS } from '@/lib/strava/config';
 import { dateToIsoDate } from '@/lib/utils';
 
 const STORAGE_VERSION = '1.0'
@@ -155,14 +155,14 @@ const StreakTracker = () => {
   
         if (storedData) {
           const { activities, timestamp }: LocalActivities = JSON.parse(storedData);
-          const expirary = 1 * 60 * 1000; // 1min
+          const expirary = 12 * 60 * 1000; // 12min
           if (now - timestamp < expirary) {
             // these should be fresh enough
             return activities;
           }  
         } else {
           // We don't have any stored data, so fetch all activities in bigger chunks
-          pageSize = 100;
+          pageSize = 150;
         }  
         // console.log('Fetching activities from:', new Date(fromTimestamp * 1000));
         const fetchedActivities: StravaActivity[] = await getStravaActivities(fromTimestamp, pageSize);
@@ -327,7 +327,7 @@ const StreakTracker = () => {
     const initialize = longestStreak === null || longestStreak === '0';
     const week = 7 * 24 * 60 * 60 * 1000;
     const month = 30 * 24 * 60 * 60 * 1000;
-    const fromTimestamp = initialize ? (Date.now() - month) / 1000 : (Date.now() - week) / 1000;
+    const fromTimestamp = initialize ? (Date.now() - INITIAL_LOAD_MONTHS * month) / 1000 : (Date.now() - week) / 1000;
 
     fetchActivities(fromTimestamp).then((activities) => {
       const streaks = calculateStreakData(activities, initialize);
