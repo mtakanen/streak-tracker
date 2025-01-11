@@ -14,6 +14,8 @@ import { getStravaAuthUrl } from '@/lib/strava/auth';
 import { DAILY_GOAL } from '@/lib/strava/config';
 import { dateToIsoDate } from '@/lib/utils';
 
+const STORAGE_VERSION = '1.0'
+
 interface DayStatus {
   date: Date;
   completed: boolean;
@@ -95,6 +97,14 @@ const StreakTracker = () => {
     refresh_token: string;
     expires_in: number;
   }
+
+  const invalidateLocalStorage = () => {
+    const storedVersion = localStorage.getItem('storageVersion');
+    if (storedVersion !== STORAGE_VERSION) {
+      localStorage.clear();
+      localStorage.setItem('storageVersion', STORAGE_VERSION);
+    }
+  };
 
   const fetchActivities = React.useCallback(async (fromTimestamp: number): Promise<StravaActivity[]> => {
       let activities: StravaActivity[] = [];
@@ -246,7 +256,7 @@ const StreakTracker = () => {
     for (let i = 1; i < lastSevenDays.length; i++) {
       if (lastSevenDays[i].start_date < today && !lastSevenDays[i].completed) {
         currentStreak = 0;
-        currentStreakStartDate = new Date();
+        currentStreakStartDate = new Date(0); // epoch
         break;
       }
     }
@@ -255,8 +265,6 @@ const StreakTracker = () => {
       longestStreak = currentStreak;
       longestStreakStartDate = currentStreakStartDate;
     }
-
-
     return { currentStreak, longestStreak, currentStreakStartDate, currentStreakUpdatedAt, longestStreakStartDate };
   };
 
@@ -307,6 +315,7 @@ const StreakTracker = () => {
     }, []);
 
   useEffect(() => {
+    invalidateLocalStorage();
     const longestStreak = localStorage.getItem('longestStreak');
     const initialize = longestStreak === null || longestStreak === '0';
     const week = 7 * 24 * 60 * 60 * 1000;
