@@ -33,6 +33,18 @@ const activityTypeSymbols: { [key: string]: string } = {
   // Add more activity types and symbols as needed
 };
 
+const LoadingModal = ({ isOpen }: { isOpen: boolean }) => {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+        <Loader className="animate-spin mx-auto mb-4" />
+        <p>Loading activities...</p>
+      </div>
+    </div>
+  );
+};
+
 const ActivityModal = ({ activities, weekday, onClose }: { activities: StravaActivity[], weekday: string, onClose: () => void }) => (
   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
     <div className="bg-white p-4 rounded-lg max-w-md w-full relative">
@@ -143,7 +155,7 @@ const StreakTracker = () => {
   
         if (storedData) {
           const { activities, timestamp }: LocalActivities = JSON.parse(storedData);
-          const expirary = 5 * 60 * 1000; // 15min
+          const expirary = 1 * 60 * 1000; // 1min
           if (now - timestamp < expirary) {
             // these should be fresh enough
             return activities;
@@ -292,24 +304,19 @@ const StreakTracker = () => {
       });
   
       const streaks = initializing ? initStreaks(activities) : updateStreaks(lastSevenDays);
-      const currentStreak = streaks.currentStreak;
-      const longestStreak = streaks.longestStreak;
-      const currentStreakStartDate = streaks.currentStreakStartDate;
-      const currentStreakUpdatedAt = streaks.currentStreakUpdatedAt;
-      const longestStreakStartDate = streaks.longestStreakStartDate;
-      localStorage.setItem('currentStreak', currentStreak.toString());
-      localStorage.setItem('longestStreak', longestStreak.toString());
-      localStorage.setItem('currentStreakStartDate', currentStreakStartDate.toISOString());
-      localStorage.setItem('currentStreakUpdatedAt', currentStreakUpdatedAt.toISOString());
-      localStorage.setItem('longestStreakStartDate', longestStreakStartDate.toISOString());
+      localStorage.setItem('currentStreak', streaks.currentStreak.toString());
+      localStorage.setItem('longestStreak', streaks.longestStreak.toString());
+      localStorage.setItem('currentStreakStartDate', streaks.currentStreakStartDate.toISOString());
+      localStorage.setItem('currentStreakUpdatedAt', streaks.currentStreakUpdatedAt.toISOString());
+      localStorage.setItem('longestStreakStartDate', streaks.longestStreakStartDate.toISOString());
   
       return {
-        currentStreak,
-        currentStreakStartDate,
+        currentStreak: streaks.currentStreak,
+        currentStreakStartDate: streaks.currentStreakStartDate,
         todayMinutes: lastSevenDays[0].minutes,
         completed: lastSevenDays[0].completed,
-        longestStreak,
-        longestStreakStartDate,
+        longestStreak: streaks.longestStreak,
+        longestStreakStartDate: streaks.longestStreakStartDate,
         lastSevenDays
       };
     }, []);
@@ -329,14 +336,7 @@ const StreakTracker = () => {
   }, [fetchActivities, calculateStreakData]);
   
   if (loading) {
-    return (
-      <Card>
-        <CardContent>
-          <Loader className="animate-spin" />
-          <p>Loading activities...</p>
-        </CardContent>
-      </Card>
-    );
+    return <LoadingModal isOpen={loading} />;
   }
 
   if (error) {
@@ -353,119 +353,121 @@ const StreakTracker = () => {
     return null; // Render nothing if streakData is not yet available
   }
 
-
   return (
-    <Card className="w-full max-w-sm mx-auto">
-      <CardHeader className="space-y-1">
-        <div className="flex items-center justify-between mb-4">
-          <CardTitle className="text-2xl font-bold">Streak Tracker</CardTitle>
-        </div>
-        {/*
-        <div className="flex gap-2 p-1 bg-slate-100 rounded-lg">
-          {['Run', 'Ride', 'Swim', 'Any'].map((activity) => (
-            <button
-              key={activity}
-              onClick={() => setSelectedActivity(activity)}
-              className={`px-3 py-1 rounded-md capitalize ${
-                selectedActivity === activity 
-                  ? 'bg-white shadow-sm' 
-                  : 'hover:bg-white/60'
-              }`}
-            >
-              {activity}
-            </button>
-          ))}
-        </div>
-        */}
-      </CardHeader>
-
-      <CardContent className="space-y-4">
-        {/* Current Streak Display */}
-        <div className={`text-center p-4 rounded-lg ${streakData.completed ? 'bg-green-50' : 'bg-orange-50'}`}>
-          <div className={`text-4xl font-bold ${streakData.completed ? 'text-green-600' : 'text-orange-600'}`}>
-            {streakData.currentStreak} days
+    <>
+      <LoadingModal isOpen={loading} />
+      <Card className="w-full max-w-sm mx-auto">
+        <CardHeader className="space-y-1">
+          <div className="flex items-center justify-between mb-4">
+            <CardTitle className="text-2xl font-bold">Streak Tracker</CardTitle>
           </div>
-          <div className={`text-sm ${streakData.completed ? 'text-green-600' : 'text-orange-600'}`}>
-            current streak
-          </div>
-          {/* TODO: do not show this message if the streak is broken */}
-          <div className="text-sm text-orange-600">
-            {streakData.currentStreak > 0 && !streakData.completed ? 'Keep going! Run today to continue your streak!' : ''}
-          </div>
-          <div className="text-xs text-slate-600">
-            {streakData.currentStreak > 0 ? `started on ${dateToIsoDate(streakData.currentStreakStartDate)}` : 'Go running!'}
-          </div>
-        </div>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="p-3 bg-slate-50 rounded-lg text-center">
-            <Clock className="w-5 h-5 mx-auto mb-1" />
-            <div className="text-xl font-bold">{streakData.todayMinutes}min</div>
-            <div className="text-xs text-slate-600">today</div>
-          </div>
-          <div className="p-3 bg-slate-50 rounded-lg text-center">
-            <Trophy className="w-5 h-5 mx-auto mb-1" />
-            <div className="text-xl font-bold">{streakData.longestStreak}</div>
-            <div className="text-xs text-slate-600">longest streak</div>
-            <div className="text-xs text-slate-600">
-            {streakData.longestStreak > 0 ? `started on ${dateToIsoDate(streakData.longestStreakStartDate)}` : ''}</div>
-          </div>
-        </div>
-        {/* Last 7 Days Timeline with Strava Links */}
-        <div className="space-y-2 max-h-48 overflow-y-auto">
-          <div className="text-sm font-medium">Last 7 days</div>
-          <div className="flex gap-1">
-            {streakData.lastSevenDays.map((day: {
-              index: number;
-              weekday: string;
-              minutes: number;
-              completed: boolean;
-              activities: StravaActivity[];
-            }, index: number) => (
-              <div
-              key={index}
-              className={`flex-1 rounded-md p-2 text-center cursor-pointer ${day.completed ? 'bg-green-100' : 'bg-orange-100'}`}
-              onClick={() => {
-                if (day.minutes >= DAILY_GOAL) {
-                setSelectedDay(day.index);
-                setSelectedWeekday(day.weekday);
-                setSelectedDayActivities(day.activities);
-                }
-              }}
-              style={{ cursor: day.minutes >= DAILY_GOAL ? 'pointer' : 'not-allowed' }}      
+          {/*
+          <div className="flex gap-2 p-1 bg-slate-100 rounded-lg">
+            {['Run', 'Ride', 'Swim', 'Any'].map((activity) => (
+              <button
+                key={activity}
+                onClick={() => setSelectedActivity(activity)}
+                className={`px-3 py-1 rounded-md capitalize ${
+                  selectedActivity === activity 
+                    ? 'bg-white shadow-sm' 
+                    : 'hover:bg-white/60'
+                }`}
               >
-              <div className="text-xs text-green-800"><span style={{ whiteSpace: 'nowrap' }}>{day.weekday}</span></div>
-              <div className="text-sm font-medium">{day.minutes}min</div>
-              </div>
+                {activity}
+              </button>
             ))}
           </div>
-        </div>
+          */}
+        </CardHeader>
 
-        {/* Goal Display */}
-        <div className="text-sm text-center text-slate-600 pt-2">
-          Goal: Stay active and healthy by running at least <span style={{ whiteSpace: 'nowrap' }}>{DAILY_GOAL} minutes</span> every day!
-        </div>
+        <CardContent className="space-y-4">
+          {/* Current Streak Display */}
+          <div className={`text-center p-4 rounded-lg ${streakData.completed ? 'bg-green-50' : 'bg-orange-50'}`}>
+            <div className={`text-4xl font-bold ${streakData.completed ? 'text-green-600' : 'text-orange-600'}`}>
+              {streakData.currentStreak} days
+            </div>
+            <div className={`text-sm ${streakData.completed ? 'text-green-600' : 'text-orange-600'}`}>
+              current streak
+            </div>
+            {/* TODO: do not show this message if the streak is broken */}
+            <div className="text-sm text-orange-600">
+              {streakData.currentStreak > 0 && !streakData.completed ? 'Keep going! Run today to continue your streak!' : ''}
+            </div>
+            <div className="text-xs text-slate-600">
+              {streakData.currentStreak > 0 ? `started on ${dateToIsoDate(streakData.currentStreakStartDate)}` : 'Go running!'}
+            </div>
+          </div>
 
-        {/* Strava Attribution */}
-        <div className="flex justify-center mt-4">
-          <Image 
-            src="/api_logo_pwrdBy_strava_stack_light.svg" 
-            alt="Powered by Strava" 
-            width={100} 
-            height={50} 
-            className="logo"           
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="p-3 bg-slate-50 rounded-lg text-center">
+              <Clock className="w-5 h-5 mx-auto mb-1" />
+              <div className="text-xl font-bold">{streakData.todayMinutes}min</div>
+              <div className="text-xs text-slate-600">today</div>
+            </div>
+            <div className="p-3 bg-slate-50 rounded-lg text-center">
+              <Trophy className="w-5 h-5 mx-auto mb-1" />
+              <div className="text-xl font-bold">{streakData.longestStreak}</div>
+              <div className="text-xs text-slate-600">longest streak</div>
+              <div className="text-xs text-slate-600">
+              {streakData.longestStreak > 0 ? `started on ${dateToIsoDate(streakData.longestStreakStartDate)}` : ''}</div>
+            </div>
+          </div>
+          {/* Last 7 Days Timeline with Strava Links */}
+          <div className="space-y-2 max-h-48 overflow-y-auto">
+            <div className="text-sm font-medium">Last 7 days</div>
+            <div className="flex gap-1">
+              {streakData.lastSevenDays.map((day: {
+                index: number;
+                weekday: string;
+                minutes: number;
+                completed: boolean;
+                activities: StravaActivity[];
+              }, index: number) => (
+                <div
+                key={index}
+                className={`flex-1 rounded-md p-2 text-center cursor-pointer ${day.completed ? 'bg-green-100' : 'bg-orange-100'}`}
+                onClick={() => {
+                  if (day.minutes >= DAILY_GOAL) {
+                  setSelectedDay(day.index);
+                  setSelectedWeekday(day.weekday);
+                  setSelectedDayActivities(day.activities);
+                  }
+                }}
+                style={{ cursor: day.minutes >= DAILY_GOAL ? 'pointer' : 'not-allowed' }}      
+                >
+                <div className="text-xs text-green-800"><span style={{ whiteSpace: 'nowrap' }}>{day.weekday}</span></div>
+                <div className="text-sm font-medium">{day.minutes}min</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Goal Display */}
+          <div className="text-sm text-center text-slate-600 pt-2">
+            Goal: Stay active and healthy by running at least <span style={{ whiteSpace: 'nowrap' }}>{DAILY_GOAL} minutes</span> every day!
+          </div>
+
+          {/* Strava Attribution */}
+          <div className="flex justify-center mt-4">
+            <Image 
+              src="/api_logo_pwrdBy_strava_stack_light.svg" 
+              alt="Powered by Strava" 
+              width={100} 
+              height={50} 
+              className="logo"           
+            />
+          </div>
+        </CardContent>
+        {selectedDay !== null && (
+          <ActivityModal
+            activities={selectedDayActivities}
+            weekday={selectedWeekday || ''}
+            onClose={() => setSelectedDay(null)}
           />
-        </div>
-      </CardContent>
-      {selectedDay !== null && (
-        <ActivityModal
-          activities={selectedDayActivities}
-          weekday={selectedWeekday || ''}
-          onClose={() => setSelectedDay(null)}
-        />
-      )}
-    </Card>
+        )}
+      </Card>
+    </>
   );
 };
 
