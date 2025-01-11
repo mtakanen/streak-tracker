@@ -31,16 +31,6 @@ const activityTypeSymbols: { [key: string]: string } = {
   // Add more activity types and symbols as needed
 };
 
-const subTypeToMainType: { [key: string]: string } = {
-  TrailRun: 'Run',
-  VirtualRun: 'Run',
-  VirtualRide : 'Ride',
-  NordicSki: 'Ski',
-  AlpineSki: 'Ski',
-  BackcountrySki: 'Ski',
-  // Add more sub-types and their main categories as needed
-};
-
 const ActivityModal = ({ activities, weekday, onClose }: { activities: StravaActivity[], weekday: string, onClose: () => void }) => (
   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
     <div className="bg-white p-4 rounded-lg max-w-md w-full relative">
@@ -67,7 +57,7 @@ const ActivityModal = ({ activities, weekday, onClose }: { activities: StravaAct
 const StreakTracker = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedActivity, setSelectedActivity] = useState('Run');
+  // const [selectedActivity, setSelectedActivity] = useState('Run');
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [selectedWeekday, setSelectedWeekday] = useState<string>();
   const [selectedDayActivities, setSelectedDayActivities] = useState<StravaActivity[]>([]);
@@ -177,8 +167,8 @@ const StreakTracker = () => {
   const getDayStatus = (activities: StravaActivity[], date: Date): DayStatus => {
     const dateString = dateToIsoDate(date);
     const dayActivities = activities.filter(activity => {
-      const mainType = subTypeToMainType[activity.type] || activity.type;
-      return activity.start_date.startsWith(dateString) && (selectedActivity === 'Any' || selectedActivity === mainType);
+      // const mainType = subTypeToMainType[activity.type] || activity.type;
+      return activity.start_date.startsWith(dateString) && activity.type === 'Run';
     });
   
     const totalDuration = dayActivities.reduce((sum, activity) =>
@@ -361,7 +351,7 @@ const StreakTracker = () => {
         <div className="flex items-center justify-between mb-4">
           <CardTitle className="text-2xl font-bold">Streak Tracker</CardTitle>
         </div>
-        
+        {/*
         <div className="flex gap-2 p-1 bg-slate-100 rounded-lg">
           {['Run', 'Ride', 'Swim', 'Any'].map((activity) => (
             <button
@@ -377,6 +367,7 @@ const StreakTracker = () => {
             </button>
           ))}
         </div>
+        */}
       </CardHeader>
 
       <CardContent className="space-y-4">
