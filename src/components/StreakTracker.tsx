@@ -14,7 +14,7 @@ import { getStravaAuthUrl } from '@/lib/strava/auth';
 import { DAILY_GOAL, INITIAL_LOAD_MONTHS } from '@/lib/strava/config';
 import { dateToIsoDate } from '@/lib/utils';
 
-const STORAGE_VERSION = '1.0'
+const STORAGE_VERSION = '1.1'
 
 interface DayStatus {
   date: Date;
