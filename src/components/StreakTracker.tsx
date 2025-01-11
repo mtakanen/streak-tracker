@@ -87,7 +87,7 @@ const StreakTracker = () => {
   const router = useRouter();
   const STRAVA_AUTH_URL = getStravaAuthUrl();
 
-  interface StoredData {
+  interface LocalActivities {
     activities: StravaActivity[];
     timestamp: number;
   }
@@ -142,7 +142,7 @@ const StreakTracker = () => {
         let pageSize = 30;
   
         if (storedData) {
-          const { activities, timestamp }: StoredData = JSON.parse(storedData);
+          const { activities, timestamp }: LocalActivities = JSON.parse(storedData);
           const expirary = 5 * 60 * 1000; // 15min
           if (now - timestamp < expirary) {
             // these should be fresh enough
@@ -253,7 +253,7 @@ const StreakTracker = () => {
       currentStreakUpdatedAt = today
     } 
 
-    for (let i = 1; i < lastSevenDays.length; i++) {
+    for (let i = 0; i < lastSevenDays.length; i++) {
       if (lastSevenDays[i].start_date < today && !lastSevenDays[i].completed) {
         currentStreak = 0;
         currentStreakStartDate = new Date(0); // epoch
