@@ -14,7 +14,7 @@ import { getStravaAuthUrl } from '@/lib/strava/auth';
 import { DAILY_GOAL, INITIAL_LOAD_MONTHS } from '@/lib/strava/config';
 import { dateToIsoDate } from '@/lib/utils';
 
-const STORAGE_VERSION = '1.1'
+const STORAGE_VERSION = '1.0'
 
 const StreakTracker = () => {
   const [loading, setLoading] = useState(true);
@@ -73,7 +73,7 @@ const StreakTracker = () => {
   
         if (storedData) {
           const { activities, timestamp }: LocalActivities = JSON.parse(storedData);
-          const expirary = 12 * 60 * 1000; // 12min
+          const expirary = 1 * 60 * 1000; // 1min
           if (now - timestamp < expirary) {
             // these should be fresh enough
             return activities;
@@ -176,6 +176,7 @@ const StreakTracker = () => {
     let longestStreakStartDate = new Date(localStorage.getItem('longestStreakStartDate') || new Date());
     let currentStreakUpdatedAt = new Date(localStorage.getItem('currentStreakUpdatedAt') || new Date());
     const today = new Date();
+    const todayString = dateToIsoDate(new Date())
     const todayStatus = lastSevenDays[0];
 
     if (todayStatus.completed && currentStreakUpdatedAt.getDate() < today.getDate()) {
@@ -184,7 +185,13 @@ const StreakTracker = () => {
     } 
 
     for (let i = 0; i < lastSevenDays.length; i++) {
-      if (lastSevenDays[i].start_date < today && !lastSevenDays[i].completed) {
+      // console.log(lastSevenDays[i])
+      // never break streak from today's data 
+      if (dateToIsoDate(lastSevenDays[i].start_date) === todayString) {
+        continue
+      }
+      if (!lastSevenDays[i].completed) {
+        console.log('streak broken!');
         currentStreak = 0;
         currentStreakStartDate = new Date(0); // epoch
         break;
@@ -212,7 +219,7 @@ const StreakTracker = () => {
         date.setDate(date.getDate() - i);
         const status = getDayStatus(activities, date);
         return {
-          index: 7 - i,
+          index: i,
           start_date: status.date,
           weekday: weekdays[date.getDay()],
           minutes: status.duration,
