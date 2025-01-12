@@ -2,8 +2,7 @@ import axios from 'axios';
 import { useEffect, useState, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
-import { LoadingModal } from '@/components/ui/modal';
-import StreakTracker from '@/components/StreakTracker';
+import { Loader } from 'lucide-react';
 import { StravaTokenData } from '@/types/strava';
 
 const STRAVA_CALLBACK_PAGE = '/api/strava/callback';
@@ -61,12 +60,12 @@ export default function AuthCallback() {
       </Card>
     );
   }
-
-
   return (
-    <>
-      <LoadingModal isOpen={true} text="Authenticating" />
-      <StreakTracker />
-    </>
+    <Card>
+      <CardContent>
+        <Loader className="animate-spin" />
+        <p>Authenticating...</p>
+      </CardContent>
+    </Card>
   );
 };
