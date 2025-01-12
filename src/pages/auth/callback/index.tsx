@@ -54,12 +54,12 @@ export default function AuthCallback() {
     return (
       <Card>
         <CardContent>
+          <h1>OH NOES</h1>
           <p>Error: {error}</p>
         </CardContent>
       </Card>
     );
   }
-
   return (
     <Card>
       <CardContent>
@@ -68,4 +68,4 @@ export default function AuthCallback() {
       </CardContent>
     </Card>
   );
-}
+};

@@ -12,4 +12,16 @@ export const isoDateToUnixTimestamp = (isoDate: string): number => {
 
 export const dateToIsoDate = (date: Date): string => {
   return date.toISOString().split('T')[0];
-}
+};
+
+/*
+const subTypeToMainType: { [key: string]: string; } = {
+  TrailRun: 'Run',
+  VirtualRun: 'Run',
+  VirtualRide: 'Ride',
+  NordicSki: 'Ski',
+  AlpineSki: 'Ski',
+  BackcountrySki: 'Ski',
+  // Add more sub-types and their main categories as needed
+};
+*/
