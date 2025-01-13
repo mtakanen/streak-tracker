@@ -9,11 +9,17 @@ import { invalidateLocalStorage } from '@/lib/utils';
 const HomePage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [profilePicture, setProfilePicture] = useState<string | null>(null);
 
   useEffect(() => {
     const accessToken = localStorage.getItem('stravaAccessToken');
     if (accessToken) {
       setIsAuthenticated(true);
+    }
+    const athleteData = localStorage.getItem('stravaAthlete');
+    if (athleteData) {
+      const athlete = JSON.parse(athleteData);
+      setProfilePicture(athlete.profile_medium);
     }
   }, []);
 
@@ -22,9 +28,13 @@ const HomePage = () => {
       <div className="relative">
         <button
           onClick={() => setDropdownOpen(!dropdownOpen)}
-          className="absolute top right-4 bg-gray-200 p-2 rounded-md"
+          className="absolute top right-4 p-2 rounded-md focus:outline-none"
         >
-          Menu
+          {profilePicture ? (
+                <Image src={profilePicture} alt="Profile" width={32} height={32} className="w-8 h-8 rounded-full" />
+              ) : (
+                'Menu'
+              )}
         </button>
         {dropdownOpen && (
           <div className="absolute top-12 right-4 bg-white border border-gray-300 rounded-md shadow-lg">
