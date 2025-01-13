@@ -7,14 +7,12 @@ import { Clock, Trophy } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { ActivityModal, LoadingModal } from '@/components/ui/modal';
 import Image from 'next/image';
-
 import { StravaTokenData, StravaActivity, DayStatus, RecentDays, StreakData, LocalActivities } from '@/types/strava';
 import { getStravaActivities, refreshStravaToken } from '@/lib/strava/api';
 import { getStravaAuthUrl } from '@/lib/strava/auth';
 import { DAILY_GOAL, INITIAL_LOAD_MONTHS } from '@/lib/strava/config';
-import { dateToIsoDate } from '@/lib/utils';
+import { dateToIsoDate, invalidateLocalStorage } from '@/lib/utils';
 
-const STORAGE_VERSION = '1.0'
 
 const StreakTracker = () => {
   const [loading, setLoading] = useState(true);
@@ -28,13 +26,7 @@ const StreakTracker = () => {
   const STRAVA_AUTH_URL = getStravaAuthUrl();
 
 
-  const invalidateLocalStorage = () => {
-    const storedVersion = localStorage.getItem('storageVersion');
-    if (storedVersion !== STORAGE_VERSION) {
-      localStorage.clear();
-      localStorage.setItem('storageVersion', STORAGE_VERSION);
-    }
-  };
+
 
   const fetchActivities = React.useCallback(async (fromTimestamp: number): Promise<StravaActivity[]> => {
       let activities: StravaActivity[] = [];
@@ -247,7 +239,7 @@ const StreakTracker = () => {
     }, []);
 
   useEffect(() => {
-    invalidateLocalStorage();
+    invalidateLocalStorage(false);
     const longestStreak = localStorage.getItem('longestStreak');
     const initialize = longestStreak === null || longestStreak === '0';
     const week = 7 * 24 * 60 * 60 * 1000;
@@ -281,6 +273,7 @@ const StreakTracker = () => {
   return (
     <>
       <LoadingModal isOpen={loading} text="Loading activities" />
+
       <Card className="w-full max-w-sm mx-auto">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-between mb-4">
