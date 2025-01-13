@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
   
 import StreakTracker from '@/components/StreakTracker';
@@ -10,6 +10,8 @@ const HomePage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
+  const [firstName, setFirstName] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const accessToken = localStorage.getItem('stravaAccessToken');
@@ -20,8 +22,22 @@ const HomePage = () => {
     if (athleteData) {
       const athlete = JSON.parse(athleteData);
       setProfilePicture(athlete.profile_medium);
+      setFirstName(athlete.firstname);
     }
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [dropdownRef]);
 
   const handleLogout = () => {
     invalidateLocalStorage(true);
@@ -43,12 +59,13 @@ const HomePage = () => {
           }
         </button>
         {dropdownOpen && (
-          <div className="absolute top-12 right-4 bg-white border border-gray-300 rounded-md shadow-lg">
+          <div ref={dropdownRef} className="absolute top-12 right-4 bg-white border border-gray-300 rounded-md shadow-lg">
             <ul className="py-2 ml-2 mr-2">
-              <li className="">
-              <Link href="/support">
-                <span className='mr-2 font-bold'>?</span> Support 
-              </Link>
+              <li className='mb-2'>{firstName}</li>
+              <li>
+                <Link href="/support">
+                  <span className='mr-2 font-bold'>?</span> Support 
+                </Link>
               </li>
               <li>
               <Link href="/">
@@ -58,7 +75,7 @@ const HomePage = () => {
                       handleLogout()
                       }
                       className="w-full text-left py-2 flex items-center"
-                    ><span className="mr-2">🔐</span> Logout 
+                    ><span className="mr-2">🔐</span> Log out 
                     </button>
                 )}
               </Link>
