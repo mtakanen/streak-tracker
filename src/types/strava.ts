@@ -18,6 +18,13 @@ export interface StravaTokenData {
     access_token: string;
     refresh_token: string;
     expires_in: number;
+    athlete: {
+        id: number;
+        username: string;
+        firstname: string;
+        lastname: string;
+        profile_medium: string;
+    };       
 }
 
 export interface DayStatus {

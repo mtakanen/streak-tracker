@@ -36,7 +36,7 @@ export default function AuthCallback() {
         localStorage.setItem('stravaAccessToken', data.access_token);
         localStorage.setItem('stravaRefreshToken', data.refresh_token);
         localStorage.setItem('stravaTokenExpiry', (Date.now() + (data.expires_in * 1000)).toString());
-
+        localStorage.setItem('stravaAthlete', JSON.stringify(data.athlete));
         // Redirect to home
         router.push('/');
       } catch (err) {
