@@ -142,12 +142,36 @@ const StreakTracker = () => {
     return { length: streak, startDate: streakStartDate };
   };
 
+  const isValidLastSevenDays = (data: RecentDays[]) => {
+    if (!Array.isArray(data) || data.length !== 7) {
+      return false;
+    }
+    /*
+    for (let i = 0; i < data.length; i++) {
+      if (typeof data[i].start_date !== 'object') {
+        console.log('Invalid start date:', data[i].start);
+      } else if (typeof data[i].completed !== 'boolean') {
+        console.log('Invalid completed status:', data[i].completed);
+      } else if (typeof data[i].minutes !== 'number') {
+        console.log('Invalid minutes:', data[i].minutes);
+      } else if (!Array.isArray(data[i].activities)) {
+        console.log('Invalid activities:', data[i].activities);
+      }
+    }
+    */
+    return data.every(day => 
+      day && 
+      typeof day.start_date === 'object' && 
+      typeof day.completed === 'boolean' && 
+      typeof day.minutes === 'number' && 
+      Array.isArray(day.activities)
+    );
+  };
 
   const initStreaks = (activities: StravaActivity[]) => {
     // console.log('initStreaks');
     const today = new Date();
     // console.log(activities.length)
-    const currentStreakUpdatedAt = new Date(localStorage.getItem('currentStreakUpdatedAt') || new Date());
     const { length: currentStreak, startDate: currentStreakStartDate } = calculateStreakLength(activities, today);
     let {length: longestStreak, startDate: longestStreakStartDate}  = activities.reduce((maxStreak, activity) => {
       const streakData = calculateStreakLength(activities, new Date(activity.start_date));
@@ -157,6 +181,8 @@ const StreakTracker = () => {
       longestStreak = currentStreak;
       longestStreakStartDate = currentStreakStartDate;
     }
+    const currentStreakUpdatedAt = new Date(currentStreakStartDate);
+    currentStreakUpdatedAt.setDate(currentStreakUpdatedAt.getDate() + currentStreak - 1);
     return { currentStreak, longestStreak, currentStreakStartDate, currentStreakUpdatedAt, longestStreakStartDate };
   };
   
@@ -170,29 +196,32 @@ const StreakTracker = () => {
     const today = new Date();
     const todayString = dateToIsoDate(new Date())
     const todayStatus = lastSevenDays[0];
+    if (!isValidLastSevenDays(lastSevenDays)) {
+      console.error('Invalid lastSevenDays data:', lastSevenDays);
+    } else {
+      if (todayStatus.completed && currentStreakUpdatedAt.getDate() < today.getDate()) {
+        currentStreak++;
+        currentStreakUpdatedAt = today
+      } 
 
-    if (todayStatus.completed && currentStreakUpdatedAt.getDate() < today.getDate()) {
-      currentStreak++;
-      currentStreakUpdatedAt = today
-    } 
-
-    for (let i = 0; i < lastSevenDays.length; i++) {
-      // console.log(lastSevenDays[i])
-      // never break streak from today's data 
-      if (dateToIsoDate(lastSevenDays[i].start_date) === todayString) {
-        continue
+      for (let i = 0; i < lastSevenDays.length; i++) {
+        // console.log(lastSevenDays[i])
+        // never break streak from today's data 
+        if (dateToIsoDate(lastSevenDays[i].start_date) === todayString) {
+          continue
+        }
+        if (!lastSevenDays[i].completed) {
+          console.log('streak broken!');
+          currentStreak = 0;
+          currentStreakStartDate = new Date(0); // epoch
+          break;
+        }
       }
-      if (!lastSevenDays[i].completed) {
-        console.log('streak broken!');
-        currentStreak = 0;
-        currentStreakStartDate = new Date(0); // epoch
-        break;
-      }
-    }
 
-    if (currentStreak > longestStreak) {
-      longestStreak = currentStreak;
-      longestStreakStartDate = currentStreakStartDate;
+      if (currentStreak > longestStreak) {
+        longestStreak = currentStreak;
+        longestStreakStartDate = currentStreakStartDate;
+      }
     }
     return { currentStreak, longestStreak, currentStreakStartDate, currentStreakUpdatedAt, longestStreakStartDate };
   };
