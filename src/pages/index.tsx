@@ -23,6 +23,13 @@ const HomePage = () => {
     }
   }, []);
 
+  const handleLogout = () => {
+    invalidateLocalStorage(true);
+    setIsAuthenticated(false);
+    setProfilePicture(null);
+    setDropdownOpen(false);
+    }
+
   return (
     <div className="p-4">
       <div className="relative">
@@ -31,30 +38,29 @@ const HomePage = () => {
           className="absolute top right-4 p-2 rounded-md focus:outline-none"
         >
           {profilePicture ? (
-                <Image src={profilePicture} alt="Profile" width={32} height={32} className="w-8 h-8 rounded-full" />
-              ) : (
-                'Menu'
-              )}
+              <Image src={profilePicture} alt="Profile" width={32} height={32} className="w-8 h-8 rounded-full" />
+            ) : ('☰')
+          }
         </button>
         {dropdownOpen && (
           <div className="absolute top-12 right-4 bg-white border border-gray-300 rounded-md shadow-lg">
             <ul className="py-2 ml-2 mr-2">
-              <li className="mb-2">
+              <li className="">
               <Link href="/support">
-                Support
+                <span className='mr-2 font-bold'>?</span> Support 
               </Link>
               </li>
               <li>
               <Link href="/">
-                <button
-                onClick={() => {
-                  invalidateLocalStorage(true);
-                  setIsAuthenticated(false);
-                }}
-                className="w-full text-left py-2"
-                >
-                Logout
-                </button>
+                {isAuthenticated && (
+                    <button
+                      onClick={() =>
+                      handleLogout()
+                      }
+                      className="w-full text-left py-2 flex items-center"
+                    ><span className="mr-2">🔐</span> Logout 
+                    </button>
+                )}
               </Link>
               </li>
               {/* Add more menu items here if needed */}
