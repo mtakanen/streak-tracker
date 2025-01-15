@@ -106,9 +106,9 @@ const StreakTracker = () => {
     const totalDuration = dayActivities.reduce((sum, activity) =>
       sum + Math.floor(activity.moving_time / 60), 0
     );
-  
+    const startDate = dayActivities.length > 0 ? dayActivities[0].start_date : dateString;
     return {
-      date: date,
+      date: new Date(startDate),
       completed: totalDuration >= DAILY_GOAL,
       duration: totalDuration,
       activities: dayActivities
@@ -127,7 +127,7 @@ const StreakTracker = () => {
       const status = getDayStatus(activities, activityDate);
       if (status.completed) {
         streak++;
-        streakStartDate = new Date(activityDate); // Update streakStartDate to the current activityDate
+        streakStartDate = status.date;
       } else if (dateToIsoDate(activityDate) === todayString) {
         // current day is not completed yet, keep the streak
         activityDate.setDate(activityDate.getDate() - 1);
@@ -146,10 +146,9 @@ const StreakTracker = () => {
     if (!Array.isArray(data) || data.length !== 7) {
       return false;
     }
-    /*
     for (let i = 0; i < data.length; i++) {
       if (typeof data[i].start_date !== 'object') {
-        console.log('Invalid start date:', data[i].start);
+        console.log('Invalid start date:', data[i].start_date);
       } else if (typeof data[i].completed !== 'boolean') {
         console.log('Invalid completed status:', data[i].completed);
       } else if (typeof data[i].minutes !== 'number') {
@@ -158,7 +157,6 @@ const StreakTracker = () => {
         console.log('Invalid activities:', data[i].activities);
       }
     }
-    */
     return data.every(day => 
       day && 
       typeof day.start_date === 'object' && 
@@ -169,7 +167,7 @@ const StreakTracker = () => {
   };
 
   const initStreaks = (activities: StravaActivity[]) => {
-    // console.log('initStreaks');
+    console.log('initStreaks');
     const today = new Date();
     // console.log(activities.length)
     const { length: currentStreak, startDate: currentStreakStartDate } = calculateStreakLength(activities, today);
@@ -182,12 +180,12 @@ const StreakTracker = () => {
       longestStreakStartDate = currentStreakStartDate;
     }
     const currentStreakUpdatedAt = new Date(currentStreakStartDate);
-    currentStreakUpdatedAt.setDate(currentStreakUpdatedAt.getDate() + currentStreak - 1);
+    currentStreakUpdatedAt.setDate(currentStreakUpdatedAt.getDate() + currentStreak);
     return { currentStreak, longestStreak, currentStreakStartDate, currentStreakUpdatedAt, longestStreakStartDate };
   };
   
   const updateStreaks = (lastSevenDays: RecentDays[]) => {
-    // console.log('updateStreaks');
+    console.log('updateStreaks');
     let currentStreak = parseInt(localStorage.getItem('currentStreak') || '0', 10);
     let longestStreak = parseInt(localStorage.getItem('longestStreak') || '0', 10);
     let currentStreakStartDate = new Date(localStorage.getItem('currentStreakStartDate') || new Date());
