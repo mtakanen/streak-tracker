@@ -1,5 +1,5 @@
 import axios from 'axios';
-
+import { AxiosError }  from 'axios';
 import { StravaActivity, StravaTokenData } from '@/types/strava';
 
 const ATHLETE_ACTIVITIES_URL = 'https://www.strava.com/api/v3/athlete/activities';
@@ -17,10 +17,23 @@ export async function refreshStravaToken(refreshToken: string): Promise<StravaTo
       },
     });
 
-    /**const data: StravaTokenData = response.data;*/
-    return response.data;
+    if (response.status === 200) {
+      return response.data;
+    } else {
+      console.error('Failed to refresh token:', response.status, response.statusText);
+      return null;
+    }
   } catch (error) {
-    console.error('Failed to refresh Strava token:', error);
+    if (axios.isAxiosError(error as any) && (error as AxiosError).response) {
+      const axiosError = error as AxiosError;
+      console.error('Error refreshing token:', axiosError.response?.status, axiosError.response?.data);
+    } else {
+      if (error instanceof Error) {
+        console.error('Error refreshing token:', error.message);
+      } else {
+        console.error('Error refreshing token:', error);
+      }
+    }
     return null;
   }
 }

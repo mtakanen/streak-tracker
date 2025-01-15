@@ -22,11 +22,10 @@ const StreakTracker = () => {
   const [selectedWeekday, setSelectedWeekday] = useState<string>();
   const [selectedDayActivities, setSelectedDayActivities] = useState<StravaActivity[]>([]);
   const [streakData, setStreakData] = useState<StreakData | null>(null);
+  const [redirected, setRedirected] = useState(false);
+
   const router = useRouter();
   const STRAVA_AUTH_URL = getStravaAuthUrl();
-
-
-
 
   const fetchActivities = React.useCallback(async (fromTimestamp: number): Promise<StravaActivity[]> => {
       let activities: StravaActivity[] = [];
@@ -36,9 +35,7 @@ const StreakTracker = () => {
         const refreshToken = localStorage.getItem('stravaRefreshToken');
   
         if (!token || !tokenExpiry || !refreshToken) {
-          setLoading(false);
-          window.location.href = STRAVA_AUTH_URL; // Redirect to Strava authorization URL if no token
-          return [];
+          throw new Error('No valid tokens found. Redirecting to authorization.');
         }
   
         const now = new Date().getTime();
@@ -55,8 +52,7 @@ const StreakTracker = () => {
             localStorage.removeItem('stravaAccessToken');
             localStorage.removeItem('stravaRefreshToken');
             localStorage.removeItem('stravaTokenExpiry');
-            window.location.href = STRAVA_AUTH_URL;
-            return [];
+            throw new Error('Token refresh failed. Redirecting to authorization.');
           }
         }
   
@@ -94,7 +90,7 @@ const StreakTracker = () => {
         setLoading(false);
       }
       return activities;
-    }, []);
+    }, [router]);
 
   const getDayStatus = (activities: StravaActivity[], date: Date): DayStatus => {
     const dateString = dateToIsoDate(date);
@@ -265,20 +261,45 @@ const StreakTracker = () => {
       };
     }, []);
 
-  useEffect(() => {
-    invalidateLocalStorage(false);
-    const longestStreak = localStorage.getItem('longestStreak');
-    const initialize = longestStreak === null || longestStreak === '0';
-    const week = 7 * 24 * 60 * 60 * 1000;
-    const month = 30 * 24 * 60 * 60 * 1000;
-    const fromTimestamp = initialize ? (Date.now() - INITIAL_LOAD_MONTHS * month) / 1000 : (Date.now() - week) / 1000;
+  const fetchData = React.useCallback(async () => {
+    try {
+      const longestStreak = localStorage.getItem('longestStreak');
+      const initialize = longestStreak === null || longestStreak === '0';
+      const week = 7 * 24 * 60 * 60 * 1000;
+      const month = 30 * 24 * 60 * 60 * 1000;
+      const fromTimestamp = initialize ? (Date.now() - INITIAL_LOAD_MONTHS * month) / 1000 : (Date.now() - week) / 1000;
 
-    fetchActivities(fromTimestamp).then((activities) => {
+      const activities = await fetchActivities(fromTimestamp);
+      if (activities.length === 0) {
+        // Handle case where no activities are returned
+        
+        if (!redirected) {
+          setRedirected(true);
+          window.location.href = STRAVA_AUTH_URL; // Redirect to Strava authorization URL
+        } else {
+          setError('No activities found. Go running first and come back!');
+        }
+        return;
+      }
+
       const streaks = calculateStreakData(activities, initialize);
       setStreakData(streaks);
-    });
-  }, [fetchActivities, calculateStreakData]);
-  
+    } catch (err) {
+      console.error('Error fetching data:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch data');
+      if (err instanceof Error && err.message.includes('token')) {
+        window.location.href = STRAVA_AUTH_URL; // Redirect to Strava authorization URL if token error
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchActivities]);
+
+  useEffect(() => {
+    invalidateLocalStorage(false);
+    fetchData();
+  }, [fetchData]);
+
   if (loading) {
     return <LoadingModal isOpen={loading} text="Loading activities"/>;
   }
