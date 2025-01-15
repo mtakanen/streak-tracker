@@ -24,7 +24,7 @@ export async function refreshStravaToken(refreshToken: string): Promise<StravaTo
       return null;
     }
   } catch (error) {
-    if (axios.isAxiosError(error as any) && (error as AxiosError).response) {
+    if (axios.isAxiosError(error) && (error as AxiosError).response) {
       const axiosError = error as AxiosError;
       console.error('Error refreshing token:', axiosError.response?.status, axiosError.response?.data);
     } else {
