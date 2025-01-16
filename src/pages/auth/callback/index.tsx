@@ -2,12 +2,14 @@ import axios from 'axios';
 import { useEffect, useState, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
-import { Loader } from 'lucide-react';
+// import { Loader } from 'lucide-react';
 import { StravaTokenData } from '@/types/strava';
+import { LoadingModal } from '@/components/ui/modal';
 
 const STRAVA_CALLBACK_PAGE = '/api/strava/callback';
 
 export default function AuthCallback() {
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -42,6 +44,8 @@ export default function AuthCallback() {
       } catch (err) {
         console.error('Error during authentication:', err); // Debugging log
         setError(err instanceof Error ? err.message : 'Authentication failed');
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -50,22 +54,19 @@ export default function AuthCallback() {
 
   }, [searchParams, router]);
 
-  if (error) {
-    return (
-      <Card>
-        <CardContent>
-          <h1>OH NOES</h1>
-          <p>Error: {error}</p>
-        </CardContent>
-      </Card>
-    );
-  }
   return (
-    <Card>
-      <CardContent>
-        <Loader className="animate-spin" />
-        <p>Authenticating...</p>
-      </CardContent>
-    </Card>
+    <>
+      <LoadingModal isOpen={loading} text="Authenticating..." />
+      {error && (
+        <Card>
+          <CardContent>
+            <h1>OH NOES</h1>
+            <p>Error: {error}</p>
+          </CardContent>
+        </Card>
+      )}
+    </>
   );
 };
+
+

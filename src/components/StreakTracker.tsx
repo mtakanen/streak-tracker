@@ -7,11 +7,11 @@ import { Clock, Trophy } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { ActivityModal, LoadingModal } from '@/components/ui/modal';
 import Image from 'next/image';
-import { StravaTokenData, StravaActivity, DayStatus, RecentDays, StreakData, LocalActivities } from '@/types/strava';
+import { StravaTokenData, StravaActivity, RecentDays, StreakData, LocalActivities } from '@/types/strava';
 import { getStravaActivities, refreshStravaToken } from '@/lib/strava/api';
 import { getStravaAuthUrl } from '@/lib/strava/auth';
 import { DAILY_GOAL, INITIAL_LOAD_MONTHS } from '@/lib/strava/config';
-import { dateToIsoDate, invalidateLocalStorage } from '@/lib/utils';
+import { getDayStatus, calculateStreakLength, dateToIsoDate, invalidateLocalStorage } from '@/lib/utils';
 
 
 const StreakTracker = () => {
@@ -35,7 +35,7 @@ const StreakTracker = () => {
         const refreshToken = localStorage.getItem('stravaRefreshToken');
   
         if (!token || !tokenExpiry || !refreshToken) {
-          throw new Error('No valid tokens found. Redirecting to authorization.');
+          throw new Error('No valid access token found. Redirecting to authorization.');
         }
   
         const now = new Date().getTime();
@@ -52,7 +52,7 @@ const StreakTracker = () => {
             localStorage.removeItem('stravaAccessToken');
             localStorage.removeItem('stravaRefreshToken');
             localStorage.removeItem('stravaTokenExpiry');
-            throw new Error('Token refresh failed. Redirecting to authorization.');
+            throw new Error('Refresh token invalid. Redirecting to authorization.');
           }
         }
   
@@ -76,67 +76,23 @@ const StreakTracker = () => {
         localStorage.setItem('stravaActivities', JSON.stringify({ activities: activities, timestamp: now }));
       } catch (err) {
         console.log(err);
-        if (err instanceof Error && err.message.includes('401')) {
+        if (err instanceof Error && (err.message.includes('401') || err.message.includes('token'))) {
           // Clear tokens if they're invalid and redirect to login page
+          console.log(err.message);
           localStorage.removeItem('stravaAccessToken');
           localStorage.removeItem('stravaRefreshToken');
           localStorage.removeItem('stravaTokenExpiry');
-          router.push('/');
+          window.location.href = STRAVA_AUTH_URL; // Redirect to Strava authorization URL if token error
         } else {
           setError(err instanceof Error ? err.message : 'Failed to fetch activities');
+          throw err;
         }
-  
       } finally {
         setLoading(false);
       }
       return activities;
     }, [router]);
 
-  const getDayStatus = (activities: StravaActivity[], date: Date): DayStatus => {
-    const dateString = dateToIsoDate(date);
-    const dayActivities = activities.filter(activity => {
-      // const mainType = subTypeToMainType[activity.type] || activity.type;
-      return activity.start_date.startsWith(dateString) && activity.type === 'Run';
-    });
-  
-    const totalDuration = dayActivities.reduce((sum, activity) =>
-      sum + Math.floor(activity.moving_time / 60), 0
-    );
-    const startDate = dayActivities.length > 0 ? dayActivities[0].start_date : dateString;
-    return {
-      date: new Date(startDate),
-      completed: totalDuration >= DAILY_GOAL,
-      duration: totalDuration,
-      activities: dayActivities
-    };
-  };
-  
-
-
-  const calculateStreakLength = (activities: StravaActivity[], date: Date): 
-    { length: number, startDate: Date }  => {
-    let streak = 0;
-    const activityDate = new Date(date);
-    let streakStartDate = new Date(date);
-    const todayString = dateToIsoDate(new Date())
-    while (true) {
-      const status = getDayStatus(activities, activityDate);
-      if (status.completed) {
-        streak++;
-        streakStartDate = status.date;
-      } else if (dateToIsoDate(activityDate) === todayString) {
-        // current day is not completed yet, keep the streak
-        activityDate.setDate(activityDate.getDate() - 1);
-        continue;
-      } else {
-        // day not completed, break the streak
-        break;
-      }
-      activityDate.setDate(activityDate.getDate() - 1);
-    }
-  
-    return { length: streak, startDate: streakStartDate };
-  };
 
   const isValidLastSevenDays = (data: RecentDays[]) => {
     if (!Array.isArray(data) || data.length !== 7) {
@@ -166,7 +122,7 @@ const StreakTracker = () => {
     console.log('initStreaks');
     const today = new Date();
     // console.log(activities.length)
-    const { length: currentStreak, startDate: currentStreakStartDate } = calculateStreakLength(activities, today);
+    const { length: currentStreak, startDate: currentStreakStartDate, lastDate: currentStreakUpdatedAt } = calculateStreakLength(activities, today);
     let {length: longestStreak, startDate: longestStreakStartDate}  = activities.reduce((maxStreak, activity) => {
       const streakData = calculateStreakLength(activities, new Date(activity.start_date));
       return streakData.length > maxStreak.length ? streakData : maxStreak;
@@ -175,8 +131,6 @@ const StreakTracker = () => {
       longestStreak = currentStreak;
       longestStreakStartDate = currentStreakStartDate;
     }
-    const currentStreakUpdatedAt = new Date(currentStreakStartDate);
-    currentStreakUpdatedAt.setDate(currentStreakUpdatedAt.getDate() + currentStreak);
     return { currentStreak, longestStreak, currentStreakStartDate, currentStreakUpdatedAt, longestStreakStartDate };
   };
   
@@ -272,7 +226,6 @@ const StreakTracker = () => {
       const activities = await fetchActivities(fromTimestamp);
       if (activities.length === 0) {
         // Handle case where no activities are returned
-        
         if (!redirected) {
           setRedirected(true);
           window.location.href = STRAVA_AUTH_URL; // Redirect to Strava authorization URL
@@ -286,9 +239,10 @@ const StreakTracker = () => {
       setStreakData(streaks);
     } catch (err) {
       console.error('Error fetching data:', err);
-      setError(err instanceof Error ? err.message : 'Failed to fetch data');
       if (err instanceof Error && err.message.includes('token')) {
         window.location.href = STRAVA_AUTH_URL; // Redirect to Strava authorization URL if token error
+      } else {
+        setError(err instanceof Error ? err.message : 'Failed to fetch activities');
       }
     } finally {
       setLoading(false);
