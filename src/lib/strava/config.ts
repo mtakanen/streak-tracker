@@ -10,4 +10,4 @@ export const STRAVA_CONFIG = {
 };
 
 export const DAILY_GOAL = 25;
-export const INITIAL_LOAD_MONTHS = 1;
+export const INITIAL_LOAD_MONTHS = 12;
