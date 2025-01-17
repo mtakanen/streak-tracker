@@ -22,7 +22,6 @@ const StreakTracker = () => {
   const [selectedWeekday, setSelectedWeekday] = useState<string>();
   const [selectedDayActivities, setSelectedDayActivities] = useState<StravaActivity[]>([]);
   const [streakData, setStreakData] = useState<StreakData | null>(null);
-  const [redirected, setRedirected] = useState(false);
 
   const router = useRouter();
   const STRAVA_AUTH_URL = getStravaAuthUrl();
@@ -153,7 +152,6 @@ const StreakTracker = () => {
       } 
 
       for (let i = 0; i < lastSevenDays.length; i++) {
-        // console.log(lastSevenDays[i])
         // never break streak from today's data 
         if (dateToIsoDate(lastSevenDays[i].start_date) === todayString) {
           continue
@@ -219,18 +217,24 @@ const StreakTracker = () => {
     try {
       const longestStreak = localStorage.getItem('longestStreak');
       const initialize = longestStreak === null || longestStreak === '0';
+
       const week = 7 * 24 * 60 * 60 * 1000;
       const month = 30 * 24 * 60 * 60 * 1000;
       const fromTimestamp = initialize ? (Date.now() - INITIAL_LOAD_MONTHS * month) / 1000 : (Date.now() - week) / 1000;
 
       const activities = await fetchActivities(fromTimestamp);
+      const redirectedFlag = localStorage.getItem('redirected');
+      // FIXME: this is a hack to prevent infinite loop
+       if (redirectedFlag) {
+        localStorage.removeItem('redirected');
+      }
       if (activities.length === 0) {
         // Handle case where no activities are returned
-        if (!redirected) {
-          setRedirected(true);
+        if (!redirectedFlag) {
+          localStorage.setItem('redirected', '1');
           window.location.href = STRAVA_AUTH_URL; // Redirect to Strava authorization URL
         } else {
-          setError('No activities found. Go running first and come back!');
+          setError('No activities found from your Strava account. Go running and come back!');
         }
         return;
       }
@@ -250,8 +254,8 @@ const StreakTracker = () => {
   }, [fetchActivities]);
 
   useEffect(() => {
-    invalidateLocalStorage(false);
-    fetchData();
+      invalidateLocalStorage(false);
+      fetchData();
   }, [fetchData]);
 
   if (loading) {
