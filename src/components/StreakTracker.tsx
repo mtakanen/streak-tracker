@@ -60,7 +60,7 @@ const StreakTracker = () => {
   
         if (storedData) {
           const { activities, timestamp }: LocalActivities = JSON.parse(storedData);
-          const expirary = 1 * 60 * 1000; // 1min
+          const expirary = 5 * 60 * 1000; // 5min
           if (now - timestamp < expirary) {
             // these should be fresh enough
             return activities;
@@ -69,7 +69,6 @@ const StreakTracker = () => {
           // We don't have any stored data, so fetch all activities in bigger chunks
           pageSize = 150;
         }  
-        // console.log('Fetching activities from:', new Date(fromTimestamp * 1000));
         const fetchedActivities: StravaActivity[] = await getStravaActivities(fromTimestamp, pageSize);
         activities = [...activities, ...fetchedActivities];
         localStorage.setItem('stravaActivities', JSON.stringify({ activities: activities, timestamp: now }));
