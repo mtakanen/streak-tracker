@@ -91,14 +91,16 @@ const HomePage = () => {
         )}
       </div>
       <div className="flex justify-center mb-4">
-        <Image priority src="/25.png" alt="25 for 25" width={90} height={90} />
+        <Link href="/">
+          <Image priority src="/25.png" alt="25 for 25" width={90} height={90} />
+        </Link>
       </div>
 
       {isAuthenticated ? (
         <StreakTracker />
       ) : (
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Welcome to Streak Tracker!</h1>
+          <h1 className="text-2xl font-bold mb-4">Welcome to normi.run</h1>
           <p className="mb-2">App tracks your streak using your Strava activities.</p>
           <p className="mb-4">Please connect with Strava to get started.</p>
           <div className="flex justify-center">

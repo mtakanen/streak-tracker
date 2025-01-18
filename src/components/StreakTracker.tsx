@@ -282,9 +282,10 @@ const StreakTracker = () => {
 
       <Card className="w-full max-w-sm mx-auto">
         <CardHeader className="space-y-1">
-          <div className="flex items-center justify-between mb-4">
-            <CardTitle className="text-2xl font-bold">Streak Tracker</CardTitle>
+        <div className="flex items-center justify-between mb-2">
+            <CardTitle className="text-slate-600 text-xl">Normi Run</CardTitle>
           </div>
+
           {/*
           <div className="flex gap-2 p-1 bg-slate-100 rounded-lg">
             {['Run', 'Ride', 'Swim', 'Any'].map((activity) => (
@@ -369,7 +370,7 @@ const StreakTracker = () => {
 
           {/* Goal Display */}
           <div className="text-sm text-center text-slate-600 pt-2">
-            Goal: Stay active and healthy by running at least <span style={{ whiteSpace: 'nowrap' }}>{DAILY_GOAL} minutes</span> every day!
+            Normi: Stay active and healthy by running at least <span style={{ whiteSpace: 'nowrap' }}>{DAILY_GOAL} minutes</span> every day!
           </div>
 
           {/* Strava Attribution */}
