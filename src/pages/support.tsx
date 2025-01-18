@@ -40,7 +40,7 @@ const SupportPage = () => {
             </p>
             <ul className="list-disc list-inside mt-2 text-gray-700"></ul>
             <li>To find your initial streak Normi Run reads your Strava activities up to one year</li>
-            <li>Normi Run caches up to one week of your Strava data in your browser's local storage</li>
+            <li>Normi Run caches up to one week of your Strava data in your browser local storage</li>
             <li>Normi Run does not write anything to your Strava account</li>
             <li>Normi Run does not share your data with third parties</li>
             <li>Normi Run does not use cookies or tracking scripts</li>
