@@ -1,7 +1,7 @@
 // src/lib/utils.ts
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { DayStatus, StravaActivity } from '@/types/strava';
+import { DayStatus, RecentDays, StravaActivity } from '@/types/strava';
 import { DAILY_GOAL } from '@/lib/strava/config';
 const STORAGE_VERSION = '1.0';
 
@@ -75,6 +75,29 @@ export const calculateStreakLength = (activities: StravaActivity[], toDate: Date
 
   return { length: streak, startDate: streakStartDate, lastDate: streakLastDate };
 };
+
+export function updateCurrentStreak(lastSevenDays: RecentDays[], refDate: Date, currentStreakUpdatedAt: Date, currentStreak: number, currentStreakStartDate: Date) {
+  const todayString = dateToIsoDate(new Date());
+  const todayStatus = lastSevenDays[0];
+  if (todayStatus.completed && currentStreakUpdatedAt.getDate() < refDate.getDate()) {
+    currentStreak++;
+    currentStreakUpdatedAt = refDate;
+  }
+
+  for (let i = 0; i < lastSevenDays.length; i++) {
+    // never break streak from today's data 
+    if (dateToIsoDate(lastSevenDays[i].start_date) === todayString) {
+      continue;
+    }
+    if (!lastSevenDays[i].completed) {
+      console.log('streak broken!');
+      currentStreak = 0;
+      currentStreakStartDate = new Date(0); // epoch
+      break;
+    }
+  }
+  return { currentStreakUpdatedAt, currentStreak, currentStreakStartDate };
+}
 
 /*
 const subTypeToMainType: { [key: string]: string; } = {
