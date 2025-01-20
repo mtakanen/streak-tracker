@@ -24,8 +24,6 @@ const handleUpdateActivityName = async (activityId: number, newName: string) => 
 
   try {
     await updateActivityName(activityId, newName, accessToken);
-    // Optionally, refetch activities to update the state
-    // fetchData();
   } catch (error) {
     console.error('Error updating activity name:', error);
   }
@@ -53,9 +51,13 @@ const ActivityModal = ({ activities, weekday, index, currentStreak, onClose }: {
               View on Strava
             </a>
             {index == 0 && activity.name !== newName && (
-              <button onClick={() => handleUpdateActivityName(activity.id, newName)}>
-                <div className=''> Update name: {newName}</div>
-              </button>
+                <button onClick={() => {
+                  handleUpdateActivityName(activity.id, newName);
+                  activity.name = newName; // Update the activity name locally to remove the button
+                  onClose(); // Close the modal
+                }}>
+                <div className="text-xs"> Update name: {newName}</div>
+                </button>
             )}
 
           </div>
