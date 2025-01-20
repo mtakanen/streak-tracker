@@ -1,8 +1,7 @@
-import { getDayStatus, calculateStreakLength, isoDateToUnixTimestamp, dateToIsoDate, invalidateLocalStorage } from './utils';
-import { StravaActivity } from '../types/strava';
 import 'jest-localstorage-mock';
-import { updateCurrentStreak } from './utils';
-import { RecentDays } from '../types/strava';
+
+import { getDayStatus, calculateStreakLength, isoDateToUnixTimestamp, dateToIsoDate, invalidateLocalStorage, updateCurrentStreak } from './utils';
+import { RecentDays, StravaActivity } from '../types/strava';
 
 describe('Utility Functions', () => {
     describe('isoDateToUnixTimestamp', () => {
@@ -105,7 +104,7 @@ describe('Utility Functions', () => {
             expect(dateToIsoDate(streak.lastDate)).toBe('2023-10-01');
         });
     });
-    
+
     describe('updateCurrentStreak', () => {
         it('should increment streak if today\'s activity is completed and updatedAt is before today', () => {
             const lastSevenDays: RecentDays[] = [
@@ -116,25 +115,41 @@ describe('Utility Functions', () => {
             const currentStreakUpdatedAt = new Date('2023-10-01T00:00:00Z');
             const currentStreak = 2;
             const currentStreakStartDate = new Date('2023-09-30T00:00:00Z');
-            const refDate = new Date('2023-10-02T00:00:00Z');
+            const currentDate = new Date('2023-10-02T00:00:00Z');
 
-            const result = updateCurrentStreak(lastSevenDays, refDate, currentStreakUpdatedAt, currentStreak, currentStreakStartDate);
+            const result = updateCurrentStreak(lastSevenDays, currentDate, currentStreakUpdatedAt, currentStreak, currentStreakStartDate);
             expect(result.currentStreak).toBe(3);
-            expect(dateToIsoDate(result.currentStreakUpdatedAt)).toBe(dateToIsoDate(refDate));
+            expect(dateToIsoDate(result.currentStreakUpdatedAt)).toBe(dateToIsoDate(currentDate));
+        });
+
+        it('should increment streak if past activities are completed and updatedAt is before', () => {
+            const lastSevenDays: RecentDays[] = [
+                { start_date: new Date('2023-10-02T00:00:00Z'), completed: true, index: 0, weekday: 'Monday', minutes: 60, activities: [] },
+                { start_date: new Date('2023-10-01T00:00:00Z'), completed: true, index: 1, weekday: 'Sunday', minutes: 60, activities: [] },
+                { start_date: new Date('2023-09-30T00:00:00Z'), completed: true, index: 2, weekday: 'Saturday', minutes: 60, activities: [] }
+
+            ];
+            const currentStreak = 1;
+            const currentStreakStartDate = new Date('2023-09-30T00:00:00Z');
+            const currentStreakUpdatedAt = new Date('2023-09-30T00:00:00Z');
+            const currentDate = new Date('2023-10-02T00:00:00Z');
+
+            const result = updateCurrentStreak(lastSevenDays, currentDate, currentStreakUpdatedAt, currentStreak, currentStreakStartDate);
+            expect(result.currentStreak).toBe(3);
+            expect(dateToIsoDate(result.currentStreakUpdatedAt)).toBe(dateToIsoDate(currentDate));
         });
 
         it('should not increment streak if today\'s activity is not completed', () => {
             const lastSevenDays: RecentDays[] = [
-                { start_date: new Date(), completed: false, index: 0, weekday: 'Monday', minutes: 60, activities: [] },
-                { start_date: new Date('2023-10-01T00:00:00Z'), completed: true, index: 1, weekday: 'Sunday', minutes: 60, activities: [] },
-                { start_date: new Date('2023-09-30T00:00:00Z'), completed: true, index: 2, weekday: 'Saturday', minutes: 60, activities: [] }
+                { start_date: new Date('2023-09-30T00:00:00Z'), completed: true, index: 0, weekday: 'Saturday', minutes: 60, activities: [] },
+                { start_date: new Date('2023-10-01T00:00:00Z'), completed: false, index: 1, weekday: 'Sunday', minutes: 6, activities: [] }
             ];
             const currentStreakUpdatedAt = new Date('2023-09-30T00:00:00Z');
             const currentStreak = 2;
             const currentStreakStartDate = new Date('2023-09-30T00:00:00Z');
-            const refDate = new Date('2023-10-02T00:00:00Z');
+            const currentDate = new Date('2023-10-01T00:00:00Z');
 
-            const result = updateCurrentStreak(lastSevenDays, refDate, currentStreakUpdatedAt, currentStreak, currentStreakStartDate);
+            const result = updateCurrentStreak(lastSevenDays, currentDate, currentStreakUpdatedAt, currentStreak, currentStreakStartDate);
             expect(result.currentStreak).toBe(2);
         });
 
@@ -147,25 +162,25 @@ describe('Utility Functions', () => {
             const currentStreakUpdatedAt = new Date('2023-09-30T00:00:00Z');
             const currentStreak = 2;
             const currentStreakStartDate = new Date('2023-09-30T00:00:00Z');
-            const refDate = new Date('2023-10-02T00:00:00Z');
+            const currentDate = new Date('2023-10-02T00:00:00Z');
 
-            const result = updateCurrentStreak(lastSevenDays, refDate, currentStreakUpdatedAt, currentStreak, currentStreakStartDate);
+            const result = updateCurrentStreak(lastSevenDays, currentDate, currentStreakUpdatedAt, currentStreak, currentStreakStartDate);
             expect(result.currentStreak).toBe(0);
             expect(result.currentStreakStartDate.getTime()).toBe(0); // epoch
         });
 
         it('should not reset streak if today\'s data is not completed but previous days are', () => {
             const lastSevenDays: RecentDays[] = [
-                { start_date: new Date(), completed: false, index: 0, weekday: 'Monday', minutes: 0, activities: [] },
+                { start_date: new Date('2023-09-30T00:00:00Z'), completed: true, index: 0, weekday: 'Saturday', minutes: 60, activities: [] },
                 { start_date: new Date('2023-10-01T00:00:00Z'), completed: true, index: 1, weekday: 'Sunday', minutes: 60, activities: [] },
-                { start_date: new Date('2023-09-30T00:00:00Z'), completed: true, index: 2, weekday: 'Saturday', minutes: 60, activities: [] }
+                { start_date: new Date('2023-10-02T00:00:00Z'), completed: false, index: 2, weekday: 'Monday', minutes: 0, activities: [] }
             ];
             const currentStreakUpdatedAt = new Date('2023-09-30T00:00:00Z');
-            const currentStreak = 2;
+            const currentStreak = 1;
             const currentStreakStartDate = new Date('2023-09-30T00:00:00Z');
-            const refDate = new Date('2023-10-02T00:00:00Z');
+            const currentDate = new Date('2023-10-02T00:00:00Z');
 
-            const result = updateCurrentStreak(lastSevenDays, refDate, currentStreakUpdatedAt, currentStreak, currentStreakStartDate);
+            const result = updateCurrentStreak(lastSevenDays, currentDate, currentStreakUpdatedAt, currentStreak, currentStreakStartDate);
             expect(result.currentStreak).toBe(2);
         });
     });

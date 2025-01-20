@@ -76,26 +76,26 @@ export const calculateStreakLength = (activities: StravaActivity[], toDate: Date
   return { length: streak, startDate: streakStartDate, lastDate: streakLastDate };
 };
 
-export function updateCurrentStreak(lastSevenDays: RecentDays[], refDate: Date, currentStreakUpdatedAt: Date, currentStreak: number, currentStreakStartDate: Date) {
-  const todayString = dateToIsoDate(new Date());
-  const todayStatus = lastSevenDays[0];
-  if (todayStatus.completed && currentStreakUpdatedAt.getDate() < refDate.getDate()) {
-    currentStreak++;
-    currentStreakUpdatedAt = refDate;
-  }
+export function updateCurrentStreak(lastSevenDays: RecentDays[], currentDate: Date, currentStreakUpdatedAt: Date, currentStreak: number, currentStreakStartDate: Date) {
+  const reversedDays = [...lastSevenDays].reverse();
+  for (let i = 0; i < reversedDays.length; i++) {
+    const dayStatus = reversedDays[i];
+    const dayString = dateToIsoDate(dayStatus.start_date);
 
-  for (let i = 0; i < lastSevenDays.length; i++) {
-    // never break streak from today's data 
-    if (dateToIsoDate(lastSevenDays[i].start_date) === todayString) {
+    if (dayStatus.completed && dayString > dateToIsoDate(currentStreakUpdatedAt)) {
+      currentStreak++;
+      currentStreakUpdatedAt = new Date(dayStatus.start_date);
+    } else if (!dayStatus.completed && dayString === dateToIsoDate(currentDate)) {
+      // If today's activity is not completed, do not increment the streak
       continue;
-    }
-    if (!lastSevenDays[i].completed) {
-      console.log('streak broken!');
+    } else if (!dayStatus.completed) {
       currentStreak = 0;
       currentStreakStartDate = new Date(0); // epoch
+      currentStreakUpdatedAt = new Date(0); // epoch
       break;
     }
   }
+
   return { currentStreakUpdatedAt, currentStreak, currentStreakStartDate };
 }
 
@@ -110,3 +110,27 @@ const subTypeToMainType: { [key: string]: string; } = {
   // Add more sub-types and their main categories as needed
 };
 */
+
+import axios from 'axios';
+
+export const updateActivityName = async (activityId: number, newName: string, accessToken: string): Promise<void> => {
+  try {
+    const response = await axios.put(
+      `https://www.strava.com/api/v3/activities/${activityId}`,
+      { name: newName },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    if (response.status !== 200) {
+      throw new Error('Failed to update activity name');
+    }
+
+    console.log('Activity name updated successfully');
+  } catch (error) {
+    console.error('Error updating activity name:', error);
+  }
+};
