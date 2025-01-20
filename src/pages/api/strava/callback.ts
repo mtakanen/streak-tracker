@@ -7,7 +7,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 
-  const { code } = req.body;
+  const { code, scope }  = req.body;
 
   if (!code) {
     return res.status(400).json({ message: 'Authorization code is required' });
@@ -35,8 +35,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const data = await response.json();
-    /** console.log('Received data from Strava:', data); */
-    res.status(200).json(data);
+    console.log('Received data from Strava:', data);
+
+    // Check if the scope field is present in the response
+    const grantedScope = data.scope || scope || 'No scope granted';
+    console.log('Granted scopes:', grantedScope);
+
+    res.status(200).json({ ...data, grantedScope });
   } catch (error) {
     console.error('Error in /api/strava/callback:', error);
     if (error instanceof Error) {

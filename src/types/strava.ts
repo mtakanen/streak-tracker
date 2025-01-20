@@ -24,7 +24,8 @@ export interface StravaTokenData {
         firstname: string;
         lastname: string;
         profile_medium: string;
-    };       
+    };
+    granted_scope: string;       
 }
 
 export interface DayStatus {
