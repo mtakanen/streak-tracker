@@ -1,6 +1,6 @@
 const STRAVA_CLIENT_ID = process.env.NEXT_PUBLIC_STRAVA_CLIENT_ID;
 const STRAVA_REDIRECT_URI = process.env.NEXT_PUBLIC_STRAVA_REDIRECT_URI;
-export const INITIAL_LOAD_MONTHS = parseInt(process.env.INITIAL_LOAD_MONTHS || '1', 1);
+export const INITIAL_LOAD_MONTHS = parseInt(process.env.INITIAL_LOAD_MONTHS || '1');
 
 const scope = 'activity:read_all,activity:write';
 
@@ -12,4 +12,3 @@ export const STRAVA_CONFIG = {
 };
 
 export const DAILY_GOAL = 25;
-
