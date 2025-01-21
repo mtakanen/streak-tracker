@@ -1,8 +1,13 @@
-import '../styles/globals.css';
-import type { AppProps } from 'next/app';
+import { AppProps } from 'next/app';
+import { ScopeProvider } from '@/context/ScopeContext';
+import '@/styles/globals.css';
 
 function MyApp({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />;
+  return (
+    <ScopeProvider>
+      <Component {...pageProps} />
+    </ScopeProvider>
+  );
 }
 
 export default MyApp;

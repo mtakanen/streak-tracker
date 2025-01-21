@@ -1,5 +1,8 @@
 import { Loader } from 'lucide-react';
 import { StravaActivity } from '@/types/strava';
+import { updateActivityName}  from '@/lib/utils';
+import { useScope } from '@/context/ScopeContext';
+import { StreakData } from '@/types/strava';
 
 const ACTIVITY_URL = 'https://www.strava.com/activities';
 
@@ -13,27 +16,67 @@ const activityTypeSymbols: { [key: string]: string } = {
   // Add more activity types and symbols as needed
 };
 
-const ActivityModal = ({ activities, weekday, onClose }: { activities: StravaActivity[], weekday: string, onClose: () => void }) => (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-    <div className="bg-white p-4 rounded-lg max-w-md w-full relative">
-      <h2 className="text-xl font-bold mb-4">{weekday} {new Date(activities[0].start_date).toLocaleDateString()}</h2>
-      <button className="absolute top-2 right-2 text-gray-500" onClick={onClose}>X</button>
+const handleUpdateActivityName = async (activityId: number, newName: string) => {
+  const accessToken = localStorage.getItem('stravaAccessToken');
+  if (!accessToken) {
+    console.error('No access token found');
+    return;
+  }
+
+  try {
+    await updateActivityName(activityId, newName, accessToken);
+  } catch (error) {
+    console.error('Error updating activity name:', error);
+  }
+};
+
+
+const ActivityModal = ({ activities, weekday, index, streakData, onClose }: { activities: StravaActivity[], weekday: string, index: number, streakData: StreakData, onClose: () => void }) => {
+  const { scope } = useScope();
+  let dayStreak = streakData.currentStreak - index;
+  if(!streakData.completed) {
+    dayStreak = dayStreak + 1;
+  }
+  const newName = 'Normi Run #' + dayStreak;
+  // console.log('Granted scope:', scope);
+  let allowedToRename = false;
+  if (scope && scope.includes('activity:write')) {
+    allowedToRename = true;
+  }
+  return (  
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center px-4">
+      <div className="bg-white p-4 rounded-lg max-w-md w-full sm:w-auto relative mx-4">
+      <h2 className="text-l font-bold mb-4">{weekday} {new Date(activities[0].start_date).toLocaleDateString()}</h2>
+      <button className="absolute top-2 right-2 text-gray-500" onClick={onClose}>&times;</button>
       {activities.map(activity => (
-        <div key={activity.id} className="mb-2">
-          <div className="text-xs">{activityTypeSymbols[activity.type] || ''} {activity.name} {Math.floor(activity.moving_time / 60)}min</div>
-          <a 
-            href={`${ACTIVITY_URL}/${activity.id}`}
-            className="text-[#FC4C02] hover:underline text-xs block"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            View on Strava
-          </a>
-        </div>
+      <div key={activity.id} className="mb-2">
+      <span className="text-xs whitespace-nowrap flex items-center">
+        {activityTypeSymbols[activity.type] || ''} {activity.name}
+        <a 
+          href={`${ACTIVITY_URL}/${activity.id}`}
+          className="text-[#FC4C02] underline ml-2"
+          target="_blank"
+        >
+        View on Strava
+        </a>
+      </span>
+      {allowedToRename && activity.name !== newName && (
+        <button onClick={() => {
+        handleUpdateActivityName(activity.id, newName);
+        activity.name = newName; // Update the activity name locally to remove the button
+        onClose(); // Close the modal
+        }}>
+        <div className="text-xs">✏️  <span>Rename:</span> <span className='italic'>{newName}</span></div>
+        </button>
+      )}
+      <div className="mt-2">
+      </div>
+      </div>
       ))}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 
 const LoadingModal = ({ isOpen, text }: { isOpen: boolean, text: string }) => {

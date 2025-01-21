@@ -2,9 +2,9 @@ import axios from 'axios';
 import { useEffect, useState, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
-// import { Loader } from 'lucide-react';
 import { StravaTokenData } from '@/types/strava';
 import { LoadingModal } from '@/components/ui/modal';
+import { useScope } from '@/context/ScopeContext';
 
 const STRAVA_CALLBACK_PAGE = '/api/strava/callback';
 
@@ -14,9 +14,12 @@ export default function AuthCallback() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const hasHandledCallback = useRef(false);
+  const { setScope } = useScope();
 
   useEffect(() => {
     const code = searchParams.get('code');
+    const scope = searchParams.get('scope');
+
     if (!code || hasHandledCallback.current) {
       return;
     }
@@ -29,7 +32,7 @@ export default function AuthCallback() {
       }
 
       try {
-        const response = await axios.post<StravaTokenData>(STRAVA_CALLBACK_PAGE, { code })
+        const response = await axios.post<StravaTokenData>(STRAVA_CALLBACK_PAGE, { code, scope })
         if (response.status !== 200) {
           throw new Error('Failed to exchange code');
         }
@@ -39,6 +42,8 @@ export default function AuthCallback() {
         localStorage.setItem('stravaRefreshToken', data.refresh_token);
         localStorage.setItem('stravaTokenExpiry', (Date.now() + (data.expires_in * 1000)).toString());
         localStorage.setItem('stravaAthlete', JSON.stringify(data.athlete));
+        // Set the scope in the global state
+        setScope(scope);
         // Redirect to home
         router.push('/');
       } catch (err) {
@@ -52,7 +57,7 @@ export default function AuthCallback() {
     handleCallback();
     hasHandledCallback.current = true;
 
-  }, [searchParams, router]);
+  }, [searchParams, router, setScope]);
 
   return (
     <>

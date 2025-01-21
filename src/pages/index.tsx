@@ -21,7 +21,6 @@ const HomePage = () => {
     const athleteData = localStorage.getItem('stravaAthlete');
     if (athleteData) {
       const athlete = JSON.parse(athleteData);
-      console.log(athlete.profile_medium);
       if (athlete.profile_medium && /^https?:\/\//.test(athlete.profile_medium)) {
         setProfilePicture(athlete.profile_medium);
       } else {

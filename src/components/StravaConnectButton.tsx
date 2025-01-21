@@ -1,10 +1,10 @@
 import React from 'react';
 import Image from 'next/image';
-import { STRAVA_CONFIG } from '@/lib/strava/config';
+import { getStravaAuthUrl } from '@/lib/strava/auth';
 
 const StravaConnectButton: React.FC = () => {
   return (
-    <a href={STRAVA_CONFIG.authUrl}>
+    <a href={getStravaAuthUrl()}>
       <Image src="/btn_strava_connectwith_orange.svg" alt="Connect with Strava" width={193} height={48} />
     </a>
   );

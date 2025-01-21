@@ -61,7 +61,7 @@ export async function getStravaActivities(after: number, perPage: number): Promi
     });
 
     if (response.status !== 200) {
-      console.log(response);
+      //console.log(response);
       if (response.status === 400) {
         throw new Error('Strava API: 400 Bad request');
       } else if (response.status === 401) {

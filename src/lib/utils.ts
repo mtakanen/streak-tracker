@@ -128,8 +128,6 @@ export const updateActivityName = async (activityId: number, newName: string, ac
     if (response.status !== 200) {
       throw new Error('Failed to update activity name');
     }
-
-    console.log('Activity name updated successfully');
   } catch (error) {
     console.error('Error updating activity name:', error);
   }

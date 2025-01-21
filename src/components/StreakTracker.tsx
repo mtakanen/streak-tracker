@@ -18,6 +18,7 @@ const StreakTracker = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   // const [selectedActivity, setSelectedActivity] = useState('Run');
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [selectedWeekday, setSelectedWeekday] = useState<string>();
   const [selectedDayActivities, setSelectedDayActivities] = useState<StravaActivity[]>([]);
@@ -93,7 +94,7 @@ const StreakTracker = () => {
 
 
   const initStreaks = (activities: StravaActivity[]) => {
-    console.log('initStreaks');
+    // console.log('initStreaks');
     const today = new Date();
     // console.log(activities.length)
     const { length: currentStreak, startDate: currentStreakStartDate, lastDate: currentStreakUpdatedAt } = calculateStreakLength(activities, today);
@@ -109,7 +110,7 @@ const StreakTracker = () => {
   };
   
   const updateStreaks = (lastSevenDays: RecentDays[]) => {
-    console.log('updateStreaks');
+    // console.log('updateStreaks');
     let currentStreak = parseInt(localStorage.getItem('currentStreak') || '0', 10);
     let longestStreak = parseInt(localStorage.getItem('longestStreak') || '0', 10);
     let currentStreakStartDate = new Date(localStorage.getItem('currentStreakStartDate') || new Date());
@@ -306,9 +307,10 @@ const StreakTracker = () => {
                 className={`flex-1 rounded-md p-2 text-center cursor-pointer ${day.completed ? 'bg-green-100' : 'bg-orange-100'}`}
                 onClick={() => {
                   if (day.minutes >= DAILY_GOAL) {
-                  setSelectedDay(day.index);
-                  setSelectedWeekday(day.weekday);
-                  setSelectedDayActivities(day.activities);
+                    setSelectedIndex(index);
+                    setSelectedDay(day.index);
+                    setSelectedWeekday(day.weekday);
+                    setSelectedDayActivities(day.activities);
                   }
                 }}
                 style={{ cursor: day.minutes >= DAILY_GOAL ? 'pointer' : 'not-allowed' }}      
@@ -340,6 +342,8 @@ const StreakTracker = () => {
           <ActivityModal
             activities={selectedDayActivities}
             weekday={selectedWeekday || ''}
+            index={selectedIndex || 0}
+            streakData={streakData}
             onClose={() => setSelectedDay(null)}
           />
         )}

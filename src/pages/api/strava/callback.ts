@@ -7,13 +7,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 
-  const { code } = req.body;
+  const { code }  = req.body;
 
   if (!code) {
     return res.status(400).json({ message: 'Authorization code is required' });
   }
 
-  console.log('POST /api/strava/callback code:', code);
+  // console.log('POST /api/strava/callback code:', code);
   try {
     const response = await fetch(TOKEN_URL, {
       method: 'POST',
@@ -35,7 +35,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const data = await response.json();
-    /** console.log('Received data from Strava:', data); */
+    //console.log('Received data from Strava:', data);
     res.status(200).json(data);
   } catch (error) {
     console.error('Error in /api/strava/callback:', error);
