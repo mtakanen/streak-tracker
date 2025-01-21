@@ -5,7 +5,6 @@ import Link from 'next/link';
 import StreakTracker from '@/components/StreakTracker';
 import StravaConnectButton from '@/components/StravaConnectButton';
 import { invalidateLocalStorage } from '@/lib/utils';
-import { useScope } from '@/context/ScopeContext';
 
 const HomePage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -13,7 +12,6 @@ const HomePage = () => {
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
   const [firstName, setFirstName] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { scope } = useScope();
 
   useEffect(() => {
     const accessToken = localStorage.getItem('stravaAccessToken');
@@ -23,7 +21,6 @@ const HomePage = () => {
     const athleteData = localStorage.getItem('stravaAthlete');
     if (athleteData) {
       const athlete = JSON.parse(athleteData);
-      console.log(athlete.profile_medium);
       if (athlete.profile_medium && /^https?:\/\//.test(athlete.profile_medium)) {
         setProfilePicture(athlete.profile_medium);
       } else {
@@ -31,8 +28,7 @@ const HomePage = () => {
       }
       setFirstName(athlete.firstname);
     }
-    console.log('Granted scope:', scope);
-  }, [scope]);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

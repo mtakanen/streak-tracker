@@ -19,7 +19,6 @@ export default function AuthCallback() {
   useEffect(() => {
     const code = searchParams.get('code');
     const scope = searchParams.get('scope');
-    console.log('scope:', scope);
 
     if (!code || hasHandledCallback.current) {
       return;
@@ -44,7 +43,7 @@ export default function AuthCallback() {
         localStorage.setItem('stravaTokenExpiry', (Date.now() + (data.expires_in * 1000)).toString());
         localStorage.setItem('stravaAthlete', JSON.stringify(data.athlete));
         // Set the scope in the global state
-        setScope(data.granted_scope);
+        setScope(scope);
         // Redirect to home
         router.push('/');
       } catch (err) {

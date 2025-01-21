@@ -94,7 +94,7 @@ const StreakTracker = () => {
 
 
   const initStreaks = (activities: StravaActivity[]) => {
-    console.log('initStreaks');
+    // console.log('initStreaks');
     const today = new Date();
     // console.log(activities.length)
     const { length: currentStreak, startDate: currentStreakStartDate, lastDate: currentStreakUpdatedAt } = calculateStreakLength(activities, today);
@@ -110,7 +110,7 @@ const StreakTracker = () => {
   };
   
   const updateStreaks = (lastSevenDays: RecentDays[]) => {
-    console.log('updateStreaks');
+    // console.log('updateStreaks');
     let currentStreak = parseInt(localStorage.getItem('currentStreak') || '0', 10);
     let longestStreak = parseInt(localStorage.getItem('longestStreak') || '0', 10);
     let currentStreakStartDate = new Date(localStorage.getItem('currentStreakStartDate') || new Date());

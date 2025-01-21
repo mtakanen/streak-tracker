@@ -38,7 +38,11 @@ const ActivityModal = ({ activities, weekday, index, streakData, onClose }: { ac
     dayStreak = dayStreak + 1;
   }
   const newName = 'Normi Run #' + dayStreak;
-  console.log('Granted scope:', scope);
+  // console.log('Granted scope:', scope);
+  let allowedToRename = false;
+  if (scope && scope.includes('activity:write')) {
+    allowedToRename = true;
+  }
   return (  
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center px-4">
       <div className="bg-white p-4 rounded-lg max-w-md w-full sm:w-auto relative mx-4">
@@ -49,15 +53,14 @@ const ActivityModal = ({ activities, weekday, index, streakData, onClose }: { ac
       <span className="text-xs whitespace-nowrap flex items-center">
         {activityTypeSymbols[activity.type] || ''} {activity.name}
         <a 
-        href={`${ACTIVITY_URL}/${activity.id}`}
-        className="text-[#FC4C02] underline ml-2"
-        target="_blank"
-        
+          href={`${ACTIVITY_URL}/${activity.id}`}
+          className="text-[#FC4C02] underline ml-2"
+          target="_blank"
         >
         View on Strava
         </a>
       </span>
-      {activity.name !== newName && (
+      {allowedToRename && activity.name !== newName && (
         <button onClick={() => {
         handleUpdateActivityName(activity.id, newName);
         activity.name = newName; // Update the activity name locally to remove the button
