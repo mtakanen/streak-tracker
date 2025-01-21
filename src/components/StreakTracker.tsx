@@ -343,7 +343,7 @@ const StreakTracker = () => {
             activities={selectedDayActivities}
             weekday={selectedWeekday || ''}
             index={selectedIndex || 0}
-            currentStreak={streakData.currentStreak}
+            streakData={streakData}
             onClose={() => setSelectedDay(null)}
           />
         )}

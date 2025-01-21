@@ -2,6 +2,7 @@ import { Loader } from 'lucide-react';
 import { StravaActivity } from '@/types/strava';
 import { updateActivityName}  from '@/lib/utils';
 import { useScope } from '@/context/ScopeContext';
+import { StreakData } from '@/types/strava';
 
 const ACTIVITY_URL = 'https://www.strava.com/activities';
 
@@ -30,9 +31,13 @@ const handleUpdateActivityName = async (activityId: number, newName: string) => 
 };
 
 
-const ActivityModal = ({ activities, weekday, index, currentStreak, onClose }: { activities: StravaActivity[], weekday: string, index: number, currentStreak: number, onClose: () => void }) => {
+const ActivityModal = ({ activities, weekday, index, streakData, onClose }: { activities: StravaActivity[], weekday: string, index: number, streakData: StreakData, onClose: () => void }) => {
   const { scope } = useScope();
-  const newName = 'Normi Run #' + (currentStreak - index);
+  let dayStreak = streakData.currentStreak - index;
+  if(!streakData.completed) {
+    dayStreak = dayStreak + 1;
+  }
+  const newName = 'Normi Run #' + dayStreak;
   console.log('Granted scope:', scope);
   return (  
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
