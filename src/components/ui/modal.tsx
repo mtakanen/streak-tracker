@@ -46,25 +46,28 @@ const ActivityModal = ({ activities, weekday, index, streakData, onClose }: { ac
         <button className="absolute top-2 right-2 text-gray-500" onClick={onClose}>X</button>
         {activities.map(activity => (
           <div key={activity.id} className="mb-2">
-            <div className="text-xs">{activityTypeSymbols[activity.type] || ''} {activity.name} {Math.floor(activity.moving_time / 60)}min</div>
-            <a 
-              href={`${ACTIVITY_URL}/${activity.id}`}
-              className="text-[#FC4C02] hover:underline text-xs block"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <span className="text-xs whitespace-nowrap flex items-center">
+              {activityTypeSymbols[activity.type] || ''} {activity.name}
+              <a 
+                href={`${ACTIVITY_URL}/${activity.id}`}
+                className="text-[#FC4C02] underline ml-2"
+                target="_blank"
+                
+              >
               View on Strava
-            </a>
+              </a>
+            </span>
             {activity.name !== newName && (
                 <button onClick={() => {
                   handleUpdateActivityName(activity.id, newName);
                   activity.name = newName; // Update the activity name locally to remove the button
                   onClose(); // Close the modal
                 }}>
-                <div className="text-xs"> Update name: {newName}</div>
+                <div className="text-xs">✏️  <span>Rename:</span> <span className='italic'>{newName}</span></div>
                 </button>
             )}
-
+            <div className="mt-2">
+            </div>
           </div>
         ))}
       </div>
