@@ -32,7 +32,7 @@ const handleUpdateActivityName = async (activityId: number, newName: string) => 
 
 const ActivityModal = ({ activities, weekday, index, currentStreak, onClose }: { activities: StravaActivity[], weekday: string, index: number, currentStreak: number, onClose: () => void }) => {
   const { scope } = useScope();
-  const newName = 'Normi Run #' + currentStreak
+  const newName = 'Normi Run #' + (currentStreak - index);
   console.log('Granted scope:', scope);
   return (  
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -50,7 +50,7 @@ const ActivityModal = ({ activities, weekday, index, currentStreak, onClose }: {
             >
               View on Strava
             </a>
-            {index == 0 && activity.name !== newName && (
+            {activity.name !== newName && (
                 <button onClick={() => {
                   handleUpdateActivityName(activity.id, newName);
                   activity.name = newName; // Update the activity name locally to remove the button
