@@ -3,7 +3,7 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { Clock, Trophy } from 'lucide-react';
+import { Clock, Milestone } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { ActivityModal, LoadingModal, MilestoneModal } from '@/components/ui/modal';
 import Image from 'next/image';
@@ -258,6 +258,17 @@ const StreakTracker = () => {
     return null; // Render nothing if streakData is not yet available
   }
 
+  function getNextMilestone(currentStreak: number): React.ReactNode {
+    const milestoneKeys = Object.keys(MILESTONES).map(Number).sort((a, b) => a - b);
+    for (const milestone of milestoneKeys) {
+      if (currentStreak < milestone) {
+        return `${milestone - currentStreak} days`;
+      }
+    }
+    return undefined;
+  }
+
+
   return (
     <>
       <LoadingModal isOpen={loading} text="Loading activities" />
@@ -313,11 +324,9 @@ const StreakTracker = () => {
               <div className="text-xs text-slate-600">today</div>
             </div>
             <div className="p-3 bg-slate-50 rounded-lg text-center">
-              <Trophy className="w-5 h-5 mx-auto mb-1" />
-              <div className="text-xl font-bold">{streakData.longestStreak}</div>
-              <div className="text-xs text-slate-600">longest streak</div>
-              <div className="text-xs text-slate-600">
-              {streakData.longestStreak > 0 ? `started on ${dateToIsoDate(streakData.longestStreakStartDate)}` : ''}</div>
+              <Milestone className="w-5 h-5 mx-auto mb-1" />
+              <div className="text-xl font-bold">{getNextMilestone(streakData.currentStreak)}</div>
+              <div className="text-xs text-slate-600">next milestone</div>
             </div>
           </div>
           {/* Last 7 Days Timeline with Strava Links */}
