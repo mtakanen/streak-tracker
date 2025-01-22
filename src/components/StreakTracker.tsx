@@ -12,6 +12,7 @@ import { getStravaActivities, refreshStravaToken } from '@/lib/strava/api';
 import { getStravaAuthUrl } from '@/lib/strava/auth';
 import { DAILY_GOAL, INITIAL_LOAD_MONTHS } from '@/lib/strava/config';
 import { getDayStatus, calculateStreakLength, dateToIsoDate, invalidateLocalStorage, updateCurrentStreak } from '@/lib/utils';
+import Realistic from 'react-canvas-confetti/dist/presets/realistic';
 
 
 const StreakTracker = () => {
@@ -206,9 +207,23 @@ const StreakTracker = () => {
     }
   }, [fetchActivities]);
 
+  function isMilestoneDay(streakData: StreakData) {
+    return streakData.completed;
+  }
+  
+  function Confetti() {
+    const confettiShownKey = `confettiShown_${dateToIsoDate(new Date())}`;
+    const confettiShown = localStorage.getItem(confettiShownKey);
+    if (streakData && isMilestoneDay(streakData) && !confettiShown) {
+      localStorage.setItem(confettiShownKey, 'true');
+      return <Realistic autorun={{ speed: 1, duration: 3 }}/>;
+    }
+  }
+
   useEffect(() => {
-      invalidateLocalStorage(false);
-      fetchData();
+    invalidateLocalStorage(false);
+    fetchData();
+
   }, [fetchData]);
 
   if (loading) {
@@ -348,6 +363,7 @@ const StreakTracker = () => {
           />
         )}
       </Card>
+      {<Confetti />}
     </>
   );
 };
