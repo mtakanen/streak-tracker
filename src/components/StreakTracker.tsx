@@ -5,12 +5,12 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { Clock, Trophy } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { ActivityModal, LoadingModal } from '@/components/ui/modal';
+import { ActivityModal, LoadingModal, MilestoneModal } from '@/components/ui/modal';
 import Image from 'next/image';
 import { StravaTokenData, StravaActivity, RecentDays, StreakData, LocalActivities } from '@/types/strava';
 import { getStravaActivities, refreshStravaToken } from '@/lib/strava/api';
 import { getStravaAuthUrl } from '@/lib/strava/auth';
-import { DAILY_GOAL, INITIAL_LOAD_MONTHS } from '@/lib/strava/config';
+import { DAILY_GOAL, INITIAL_LOAD_MONTHS, MILESTONES } from '@/lib/strava/config';
 import { getDayStatus, calculateStreakLength, dateToIsoDate, invalidateLocalStorage, updateCurrentStreak } from '@/lib/utils';
 import Realistic from 'react-canvas-confetti/dist/presets/realistic';
 
@@ -24,6 +24,7 @@ const StreakTracker = () => {
   const [selectedWeekday, setSelectedWeekday] = useState<string>();
   const [selectedDayActivities, setSelectedDayActivities] = useState<StravaActivity[]>([]);
   const [streakData, setStreakData] = useState<StreakData | null>(null);
+  const [showMilestoneModal, setShowMilestoneModal] = useState(false);
 
   const router = useRouter();
   const STRAVA_AUTH_URL = getStravaAuthUrl();
@@ -207,15 +208,22 @@ const StreakTracker = () => {
     }
   }, [fetchActivities]);
 
+  const handleCloseMilestoneModal = () => {
+    setShowMilestoneModal(false);
+  };
+
   function isMilestoneDay(streakData: StreakData) {
-    return streakData.completed;
+    if (streakData.completed && streakData.currentStreak in MILESTONES) {
+      return true;
+    }
+    return false;
   }
   
   function Confetti() {
-    const confettiShownKey = `confettiShown_${dateToIsoDate(new Date())}`;
-    const confettiShown = localStorage.getItem(confettiShownKey);
-    if (streakData && isMilestoneDay(streakData) && !confettiShown) {
-      localStorage.setItem(confettiShownKey, 'true');
+    // const confettiShownKey = `confettiShown_${dateToIsoDate(new Date())}`;
+    const confettiShown = false //localStorage.getItem(confettiShownKey);
+    if (!confettiShown) {
+      // localStorage.setItem(confettiShownKey, 'true');
       return <Realistic autorun={{ speed: 1, duration: 3 }}/>;
     }
   }
@@ -223,8 +231,14 @@ const StreakTracker = () => {
   useEffect(() => {
     invalidateLocalStorage(false);
     fetchData();
-
+    
   }, [fetchData]);
+
+  useEffect(() => {
+    if (streakData && isMilestoneDay(streakData)) {
+      setShowMilestoneModal(true);
+    }
+  }, [streakData]);
 
   if (loading) {
     return <LoadingModal isOpen={loading} text="Loading activities"/>;
@@ -321,14 +335,14 @@ const StreakTracker = () => {
                 key={index}
                 className={`flex-1 rounded-md p-2 text-center cursor-pointer ${day.completed ? 'bg-green-100' : 'bg-orange-100'}`}
                 onClick={() => {
-                  if (day.minutes >= DAILY_GOAL) {
+                  if (day.completed) {
                     setSelectedIndex(index);
                     setSelectedDay(day.index);
                     setSelectedWeekday(day.weekday);
                     setSelectedDayActivities(day.activities);
                   }
                 }}
-                style={{ cursor: day.minutes >= DAILY_GOAL ? 'pointer' : 'not-allowed' }}      
+                style={{ cursor: day.completed ? 'pointer' : 'not-allowed' }}      
                 >
                 <div className="text-xs text-green-800"><span style={{ whiteSpace: 'nowrap' }}>{day.weekday}</span></div>
                 <div className="text-sm font-medium">{day.minutes}min</div>
@@ -363,7 +377,15 @@ const StreakTracker = () => {
           />
         )}
       </Card>
-      {<Confetti />}
+      { showMilestoneModal && 
+        <>
+          <MilestoneModal 
+            milestone={MILESTONES[streakData.currentStreak]} 
+            onClose={handleCloseMilestoneModal}
+          />
+          <Confetti />
+        </>
+      } 
     </>
   );
 };
