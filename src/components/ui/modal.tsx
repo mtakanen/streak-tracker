@@ -46,7 +46,7 @@ const ActivityModal = ({ activities, weekday, index, streakData, onClose }: { ac
   return (  
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center px-4">
       <div className="bg-white p-4 rounded-lg max-w-md w-full sm:w-auto relative mx-4">
-      <h2 className="text-l font-bold mb-4">{weekday} {new Date(activities[0].start_date).toLocaleDateString()}</h2>
+      <h2 className="text-l font-bold mb-4">{weekday} {new Date(activities[0].start_date_local).toLocaleDateString()}</h2>
       <button className="absolute top-2 right-2 text-gray-500" onClick={onClose}>&times;</button>
       {activities.map(activity => (
       <div key={activity.id} className="mb-2">
@@ -91,4 +91,16 @@ const LoadingModal = ({ isOpen, text }: { isOpen: boolean, text: string }) => {
     );
 };
 
-export { ActivityModal, LoadingModal };
+const MilestoneModal = ({ milestone, onClose }: { milestone: string, onClose: () => void }) => {
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center px-4">
+          <div className="bg-white p-4 rounded-lg max-w-md w-full sm:w-auto relative mx-4">
+              <h2 className="text-l font-bold mb-4">Milestone Unlocked!</h2>
+              <button className="absolute top-2 right-2 text-gray-500" onClick={onClose}>&times;</button>
+              <p>{milestone}</p>
+          </div>
+        </div>
+    );
+}
+
+export { ActivityModal, LoadingModal, MilestoneModal };
