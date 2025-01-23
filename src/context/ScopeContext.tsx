@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 interface ScopeContextProps {
   scope: string | null;
@@ -8,7 +8,18 @@ interface ScopeContextProps {
 const ScopeContext = createContext<ScopeContextProps | undefined>(undefined);
 
 export const ScopeProvider = ({ children }: { children: ReactNode }) => {
-  const [scope, setScope] = useState<string | null>(null);
+  const [scope, setScope] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('scope');
+    }
+    return null;
+  });
+
+  useEffect(() => {
+    if (scope) {
+      localStorage.setItem('scope', scope);
+    }
+  }, [scope]);
 
   return (
     <ScopeContext.Provider value={{ scope, setScope }}>

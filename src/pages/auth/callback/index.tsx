@@ -44,6 +44,7 @@ export default function AuthCallback() {
         localStorage.setItem('stravaAthlete', JSON.stringify(data.athlete));
         // Set the scope in the global state
         setScope(scope);
+        localStorage.setItem('scope', scope || '');
         // Redirect to home
         router.push('/');
       } catch (err) {
@@ -56,7 +57,6 @@ export default function AuthCallback() {
 
     handleCallback();
     hasHandledCallback.current = true;
-
   }, [searchParams, router, setScope]);
 
   return (

@@ -38,7 +38,6 @@ const ActivityModal = ({ activities, weekday, index, streakData, onClose }: { ac
     dayStreak = dayStreak + 1;
   }
   const newName = 'Normi Run #' + dayStreak;
-  // console.log('Granted scope:', scope);
   let allowedToRename = false;
   if (scope && scope.includes('activity:write')) {
     allowedToRename = true;
