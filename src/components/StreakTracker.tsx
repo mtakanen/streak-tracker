@@ -328,7 +328,7 @@ const StreakTracker = () => {
             <div className="p-3 bg-slate-50 rounded-lg text-center">
               <Milestone className="w-5 h-5 mx-auto mb-1" />
               <div className="text-xl font-bold">{getNextMilestone(streakData.currentStreak)}</div>
-              <div className="text-xs text-slate-600">next milestone</div>
+              <div className="text-xs text-slate-600">until next milestone</div>
             </div>
           </div>
           {/* Last 7 Days Timeline with Strava Links */}
