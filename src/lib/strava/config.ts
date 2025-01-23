@@ -1,7 +1,9 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 const STRAVA_CLIENT_ID = process.env.NEXT_PUBLIC_STRAVA_CLIENT_ID;
 const STRAVA_REDIRECT_URI = process.env.NEXT_PUBLIC_STRAVA_REDIRECT_URI;
-export const INITIAL_LOAD_MONTHS = parseInt(process.env.INITIAL_LOAD_MONTHS || '12');
-
+export const getInitialLoadMonths = () => parseInt(process.env.NEXT_PUBLIC_INITIAL_LOAD_MONTHS || '12');
 const scope = 'activity:read_all,activity:write';
 
 export const STRAVA_CONFIG = {

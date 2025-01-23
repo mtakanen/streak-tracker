@@ -10,7 +10,7 @@ import Image from 'next/image';
 import { StravaTokenData, StravaActivity, RecentDays, StreakData, LocalActivities } from '@/types/strava';
 import { getStravaActivities, refreshStravaToken } from '@/lib/strava/api';
 import { getStravaAuthUrl } from '@/lib/strava/auth';
-import { MINIMUM_DURATION, INITIAL_LOAD_MONTHS, MILESTONES } from '@/lib/strava/config';
+import { MINIMUM_DURATION, getInitialLoadMonths, MILESTONES } from '@/lib/strava/config';
 import { getDayStatus, calculateStreakLength, dateToIsoDate, invalidateLocalStorage, updateCurrentStreak } from '@/lib/utils';
 import Realistic from 'react-canvas-confetti/dist/presets/realistic';
 
@@ -176,8 +176,8 @@ const StreakTracker = () => {
       const initialize = longestStreak === null || longestStreak === '0';
 
       const week = 7 * 24 * 60 * 60 * 1000;
-      const month = 30 * 24 * 60 * 60 * 1000;
-      const fromTimestamp = initialize ? (Date.now() - INITIAL_LOAD_MONTHS * month) / 1000 : (Date.now() - week) / 1000;
+      const month = 30.5 * 24 * 60 * 60 * 1000;
+      const fromTimestamp = initialize ? (Date.now() - getInitialLoadMonths() * month) / 1000 : (Date.now() - week) / 1000;
 
       const activities = await fetchActivities(fromTimestamp);
       const redirectedFlag = localStorage.getItem('redirected');

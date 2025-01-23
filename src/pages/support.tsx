@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { INITIAL_LOAD_MONTHS } from '@/lib/strava/config';
+import { getInitialLoadMonths } from '@/lib/strava/config';
 
 const SupportPage = () => {
   return (
@@ -31,7 +31,7 @@ const SupportPage = () => {
           <ul className="list-disc list-inside mt-2 text-gray-700">
             <li>normi.run currently supports only running activities</li>
             <li>Data synchronization with Strava may take a few minutes. Reload the page if needed</li>
-            <li>Maximum streak is limited to {INITIAL_LOAD_MONTHS*30} days</li>
+            <li>Maximum streak is limited to {getInitialLoadMonths()*30.5} days</li>
             <li>If you encounter any persistent issues, please contact the developer for assistance</li>
           </ul>
         </div>
