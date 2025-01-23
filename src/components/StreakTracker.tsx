@@ -10,7 +10,7 @@ import Image from 'next/image';
 import { StravaTokenData, StravaActivity, RecentDays, StreakData, LocalActivities } from '@/types/strava';
 import { getStravaActivities, refreshStravaToken } from '@/lib/strava/api';
 import { getStravaAuthUrl } from '@/lib/strava/auth';
-import { DAILY_GOAL, INITIAL_LOAD_MONTHS, MILESTONES } from '@/lib/strava/config';
+import { MINIMUM_DURATION, INITIAL_LOAD_MONTHS, MILESTONES } from '@/lib/strava/config';
 import { getDayStatus, calculateStreakLength, dateToIsoDate, invalidateLocalStorage, updateCurrentStreak } from '@/lib/utils';
 import Realistic from 'react-canvas-confetti/dist/presets/realistic';
 
@@ -148,7 +148,7 @@ const StreakTracker = () => {
           start_date_local: status.local_date,
           weekday: weekdays[currentDate.getDay()],
           minutes: status.duration,
-          completed: status.duration >= DAILY_GOAL,
+          completed: status.completed,
           activities: status.activities
         };
       });
@@ -364,7 +364,7 @@ const StreakTracker = () => {
 
           {/* Goal Display */}
           <div className="text-sm text-center text-slate-600 pt-2">
-            Normi: Stay active and healthy by running at least <span style={{ whiteSpace: 'nowrap' }}>{DAILY_GOAL} minutes</span> every day!
+            Normi: Stay active and healthy by running at least <span style={{ whiteSpace: 'nowrap' }}>{MINIMUM_DURATION} minutes</span> every day!
           </div>
 
           {/* Strava Attribution */}

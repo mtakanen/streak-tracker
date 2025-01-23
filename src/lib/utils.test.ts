@@ -56,6 +56,26 @@ describe('Utility Functions', () => {
             expect(status.completed).toBe(true);
             expect(status.duration).toBe(90); // 1.5 hours
         });
+        it('5k race day + warm-up, should return completed day status', () => {
+            const activities: StravaActivity[] = [
+                { id: 1, start_date_local: '2023-10-01T10:00:00Z', type: 'Run', moving_time: 19*60, distance: 5000, name: '5K Race' },
+                { id: 2, start_date_local: '2023-10-01T10:30:00Z', type: 'Run', moving_time: 5*60, distance: 1000, name: 'Warm-up' }
+            ];
+            const date = new Date('2023-10-01T00:00:00Z');
+            const status = getDayStatus(activities, date);
+            expect(status.completed).toBe(true);
+            expect(status.duration).toBe(24);         
+        });
+        it('5k race day, absolute minimum, should return completed day status', () => {
+            const activities: StravaActivity[] = [
+                { id: 1, start_date_local: '2023-10-01T10:00:00Z', type: 'Run', moving_time: 20*60, distance: 5000, name: '5K Race' },
+            ];
+            const date = new Date('2023-10-01T00:00:00Z');
+            const status = getDayStatus(activities, date);
+            expect(status.completed).toBe(true);
+            expect(status.duration).toBe(20);         
+        });
+
     });
     
     describe('calculateStreakLength', () => {

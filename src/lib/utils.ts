@@ -2,7 +2,7 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { DayStatus, RecentDays, StravaActivity } from '@/types/strava';
-import { DAILY_GOAL } from '@/lib/strava/config';
+import { MINIMUM_DURATION, GRACE_DURATION, GRACE_DISTANCE } from '@/lib/strava/config';
 const STORAGE_VERSION = '1.0';
 
 export function cn(...inputs: ClassValue[]) {
@@ -32,14 +32,19 @@ export const getDayStatus = (activities: StravaActivity[], localDate: Date): Day
     // const mainType = subTypeToMainType[activity.type] || activity.type;
     return activity.start_date_local.startsWith(dateString) && activity.type === 'Run';
   });
-
   const totalDuration = dayActivities.reduce((sum, activity) =>
     sum + Math.floor(activity.moving_time / 60), 0
+  );
+  const totalDistance = dayActivities.reduce((sum, activity) =>
+    sum + Math.floor(activity.distance / 1000), 0
+  );
+  const completed = (totalDuration >= MINIMUM_DURATION || 
+    (totalDuration >= GRACE_DURATION && totalDistance >= GRACE_DISTANCE)
   );
   const startDate = dayActivities.length > 0 ? dayActivities[0].start_date_local : dateString;
   return {
     local_date: new Date(startDate),
-    completed: totalDuration >= DAILY_GOAL,
+    completed: completed,
     duration: totalDuration,
     activities: dayActivities
   };

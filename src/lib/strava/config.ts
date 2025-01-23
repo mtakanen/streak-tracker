@@ -11,7 +11,11 @@ export const STRAVA_CONFIG = {
   authUrl: `https://www.strava.com/oauth/authorize?client_id=${STRAVA_CLIENT_ID}&response_type=code&redirect_uri=${STRAVA_REDIRECT_URI}&scope=${scope}&approval_prompt=auto`
 };
 
-export const DAILY_GOAL = 25;
+export const MINIMUM_DURATION = 25;
+export const GRACE_DURATION = 20;
+export const GRACE_DISTANCE = 5;
+  
+
 export const MILESTONES: { [key: number]: string; } = {
   1: "Ta-daa! 🎉 First run!",
   2: "Back-to-back run, 👌 it's a streak!",
