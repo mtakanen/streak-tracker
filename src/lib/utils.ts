@@ -26,19 +26,19 @@ export const invalidateLocalStorage = (force: boolean) => {
   };
 
 
-export const getDayStatus = (activities: StravaActivity[], date: Date): DayStatus => {
-  const dateString = dateToIsoDate(date);
+export const getDayStatus = (activities: StravaActivity[], localDate: Date): DayStatus => {
+  const dateString = dateToIsoDate(localDate);
   const dayActivities = activities.filter(activity => {
     // const mainType = subTypeToMainType[activity.type] || activity.type;
-    return activity.start_date.startsWith(dateString) && activity.type === 'Run';
+    return activity.start_date_local.startsWith(dateString) && activity.type === 'Run';
   });
 
   const totalDuration = dayActivities.reduce((sum, activity) =>
     sum + Math.floor(activity.moving_time / 60), 0
   );
-  const startDate = dayActivities.length > 0 ? dayActivities[0].start_date : dateString;
+  const startDate = dayActivities.length > 0 ? dayActivities[0].start_date_local : dateString;
   return {
-    date: new Date(startDate),
+    local_date: new Date(startDate),
     completed: totalDuration >= DAILY_GOAL,
     duration: totalDuration,
     activities: dayActivities
@@ -47,8 +47,9 @@ export const getDayStatus = (activities: StravaActivity[], date: Date): DayStatu
 
 
 
-export const calculateStreakLength = (activities: StravaActivity[], toDate: Date): 
+export const calculateStreakLength = (activities: StravaActivity[], toDate: Date):   
   { length: number, startDate: Date, lastDate: Date }  => {
+
   let streak = 0;
   const activityDate = new Date(toDate);
   let streakStartDate = new Date(toDate);
@@ -58,9 +59,9 @@ export const calculateStreakLength = (activities: StravaActivity[], toDate: Date
     const status = getDayStatus(activities, activityDate);
     if (status.completed) {
       streak++;
-      streakStartDate = status.date;
+      streakStartDate = status.local_date;
       if (streak === 1) {
-        streakLastDate = status.date;
+        streakLastDate = status.local_date;
       }
     } else if (dateToIsoDate(activityDate) === toDateString) {
       // current day is not completed yet, skip
@@ -76,15 +77,17 @@ export const calculateStreakLength = (activities: StravaActivity[], toDate: Date
   return { length: streak, startDate: streakStartDate, lastDate: streakLastDate };
 };
 
-export function updateCurrentStreak(lastSevenDays: RecentDays[], currentDate: Date, currentStreakUpdatedAt: Date, currentStreak: number, currentStreakStartDate: Date) {
+export function updateCurrentStreak(lastSevenDays: RecentDays[], currentDate: Date, 
+  currentStreakUpdatedAt: Date, currentStreak: number, currentStreakStartDate: Date) {
+  
   const reversedDays = [...lastSevenDays].reverse();
   for (let i = 0; i < reversedDays.length; i++) {
     const dayStatus = reversedDays[i];
-    const dayString = dateToIsoDate(dayStatus.start_date);
+    const dayString = dateToIsoDate(dayStatus.start_date_local);
 
     if (dayStatus.completed && dayString > dateToIsoDate(currentStreakUpdatedAt)) {
       currentStreak++;
-      currentStreakUpdatedAt = new Date(dayStatus.start_date);
+      currentStreakUpdatedAt = new Date(dayStatus.start_date_local);
     } else if (!dayStatus.completed && dayString === dateToIsoDate(currentDate)) {
       // If today's activity is not completed, do not increment the streak
       continue;

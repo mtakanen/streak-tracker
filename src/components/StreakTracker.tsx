@@ -63,7 +63,7 @@ const StreakTracker = () => {
   
         if (storedData) {
           const { activities, timestamp }: LocalActivities = JSON.parse(storedData);
-          const expirary = 5 * 60 * 1000; // 5min
+          const expirary = 1 * 60 * 1000; // 5min
           if (now - timestamp < expirary) {
             // these should be fresh enough
             return activities;
@@ -95,13 +95,11 @@ const StreakTracker = () => {
     }, [router]);
 
 
-  const initStreaks = (activities: StravaActivity[]) => {
+  const initStreaks = (activities: StravaActivity[], localDate: Date) => {
     // console.log('initStreaks');
-    const today = new Date();
-    // console.log(activities.length)
-    const { length: currentStreak, startDate: currentStreakStartDate, lastDate: currentStreakUpdatedAt } = calculateStreakLength(activities, today);
+    const { length: currentStreak, startDate: currentStreakStartDate, lastDate: currentStreakUpdatedAt } = calculateStreakLength(activities, localDate);
     let {length: longestStreak, startDate: longestStreakStartDate}  = activities.reduce((maxStreak, activity) => {
-      const streakData = calculateStreakLength(activities, new Date(activity.start_date));
+      const streakData = calculateStreakLength(activities, new Date(activity.start_date_local));
       return streakData.length > maxStreak.length ? streakData : maxStreak;
     }, { length: 0, startDate: new Date() });
     if (currentStreak > longestStreak) {
@@ -111,14 +109,18 @@ const StreakTracker = () => {
     return { currentStreak, longestStreak, currentStreakStartDate, currentStreakUpdatedAt, longestStreakStartDate };
   };
   
-  const updateStreaks = (lastSevenDays: RecentDays[]) => {
+  const updateStreaks = (lastSevenDays: RecentDays[], localDate: Date) => {
     // console.log('updateStreaks');
     let currentStreak = parseInt(localStorage.getItem('currentStreak') || '0', 10);
     let longestStreak = parseInt(localStorage.getItem('longestStreak') || '0', 10);
-    let currentStreakStartDate = new Date(localStorage.getItem('currentStreakStartDate') || new Date());
-    let longestStreakStartDate = new Date(localStorage.getItem('longestStreakStartDate') || new Date());
-    let currentStreakUpdatedAt = new Date(localStorage.getItem('currentStreakUpdatedAt') || new Date());
-    ({ currentStreakUpdatedAt, currentStreak, currentStreakStartDate } = updateCurrentStreak(lastSevenDays, new Date(), currentStreakUpdatedAt, currentStreak, currentStreakStartDate));
+    let currentStreakStartDate = new Date(localStorage.getItem('currentStreakStartDate') || localDate);
+    let longestStreakStartDate = new Date(localStorage.getItem('longestStreakStartDate') || localDate);
+    let currentStreakUpdatedAt = new Date(localStorage.getItem('currentStreakUpdatedAt') || localDate);
+    const updatedStreak = updateCurrentStreak(
+      lastSevenDays, localDate, currentStreakUpdatedAt, currentStreak, currentStreakStartDate);
+    currentStreakUpdatedAt = updatedStreak.currentStreakUpdatedAt;
+    currentStreak = updatedStreak.currentStreak;
+    currentStreakStartDate = updatedStreak.currentStreakStartDate;
 
     if (currentStreak > longestStreak) {
       longestStreak = currentStreak;
@@ -136,21 +138,21 @@ const StreakTracker = () => {
    */
   const calculateStreakData = React.useCallback((activities: StravaActivity[], initializing: boolean) => {
       const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const localDate = new Date(new Date().toLocaleString('en-US', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone }));
       const lastSevenDays: RecentDays[] = Array.from({ length: 7 }, (_, i) => {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        const status = getDayStatus(activities, date);
+        const currentDate = new Date(localDate);
+        currentDate.setDate(currentDate.getDate() - i);
+        const status = getDayStatus(activities, currentDate);
         return {
           index: i,
-          start_date: status.date,
-          weekday: weekdays[date.getDay()],
+          start_date_local: status.local_date,
+          weekday: weekdays[currentDate.getDay()],
           minutes: status.duration,
           completed: status.duration >= DAILY_GOAL,
           activities: status.activities
         };
       });
-  
-      const streaks = initializing ? initStreaks(activities) : updateStreaks(lastSevenDays);
+      const streaks = initializing ? initStreaks(activities, localDate) : updateStreaks(lastSevenDays, localDate);
       localStorage.setItem('currentStreak', streaks.currentStreak.toString());
       localStorage.setItem('longestStreak', streaks.longestStreak.toString());
       localStorage.setItem('currentStreakStartDate', streaks.currentStreakStartDate.toISOString());

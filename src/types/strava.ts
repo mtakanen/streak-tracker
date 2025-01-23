@@ -2,7 +2,7 @@
 export interface StravaActivity {
     id: number;
     type: string;
-    start_date: string;
+    start_date_local: string;
     moving_time: number;
     distance: number;
     name: string;
@@ -29,7 +29,7 @@ export interface StravaTokenData {
 }
 
 export interface DayStatus {
-    date: Date;
+    local_date: Date;
     completed: boolean;
     duration: number;
     activities: StravaActivity[];
@@ -37,7 +37,7 @@ export interface DayStatus {
 
 export interface RecentDays {
     index: number;
-    start_date: Date;
+    start_date_local: Date;
     weekday: string;
     minutes: number;
     completed: boolean;
