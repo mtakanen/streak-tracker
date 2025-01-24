@@ -1,8 +1,10 @@
+import React from 'react';
 import { Loader } from 'lucide-react';
 import { StravaActivity } from '@/types/strava';
 import { updateActivityName}  from '@/lib/utils';
 import { useScope } from '@/context/ScopeContext';
 import { StreakData } from '@/types/strava';
+import Realistic from 'react-canvas-confetti/dist/presets/realistic';
 
 const ACTIVITY_URL = 'https://www.strava.com/activities';
 
@@ -90,16 +92,39 @@ const LoadingModal = ({ isOpen, text }: { isOpen: boolean, text: string }) => {
     );
 };
 
-const MilestoneModal = ({ milestone, onClose }: { milestone: string, onClose: () => void }) => {
-    return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center px-4">
-          <div className="bg-white p-4 rounded-lg max-w-md w-full sm:w-auto relative mx-4">
-              <h2 className="text-l font-bold mb-4">Milestone Unlocked!</h2>
-              <button className="absolute top-2 right-2 text-gray-500" onClick={onClose}>&times;</button>
-              <p>{milestone}</p>
-          </div>
-        </div>
-    );
+function Confetti(size: string) {
+  if (size == 'major') {
+    return <Realistic autorun={{ speed: 1, duration: 3 }}/>;
+  } else {
+    // TODO: find minor confetti
+    // return <Realistic autorun={{ speed: 1, duration: 3 }}/>;
+  }
+}
+
+const MilestoneModal = ({ milestone, onClose }: { milestone: {text: string, size: string}, onClose: () => void }) => {
+ 
+  const [isVisible, setIsVisible] = React.useState(false);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 750); // 750 ms delay
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!isVisible) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center px-4">
+      <div className="bg-white p-4 rounded-lg max-w-md w-full sm:w-auto relative mx-4">
+        <h2 className="text-l font-bold mb-4">Milestone Unlocked!</h2>
+        <button className="absolute top-2 right-2 text-gray-500" onClick={onClose}>&times;</button>
+        <p>{milestone.text}</p>
+      </div>
+      {Confetti(milestone.size)}
+    </div>
+  );
 }
 
 export { ActivityModal, LoadingModal, MilestoneModal };

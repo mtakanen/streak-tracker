@@ -2,7 +2,8 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { DayStatus, RecentDays, StravaActivity } from '@/types/strava';
-import { MINIMUM_DURATION, GRACE_DURATION, GRACE_DISTANCE } from '@/lib/strava/config';
+import { MINIMUM_DURATION, GRACE_DURATION, GRACE_DISTANCE, MILESTONES } from '@/lib/strava/config';
+
 const STORAGE_VERSION = '1.0';
 
 export function cn(...inputs: ClassValue[]) {
@@ -140,3 +141,14 @@ export const updateActivityName = async (activityId: number, newName: string, ac
     console.error('Error updating activity name:', error);
   }
 };
+
+
+export const getNextMilestone = (currentStreak: number): string | undefined => {
+  const milestoneKeys: number[] = Object.keys(MILESTONES).map(Number).sort((a, b) => a - b);
+  for (const milestone of milestoneKeys) {
+    if (currentStreak < milestone) {
+      return `${milestone - currentStreak} days`;
+    }
+  }
+  return undefined;
+}

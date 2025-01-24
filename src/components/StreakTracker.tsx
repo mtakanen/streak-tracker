@@ -11,8 +11,7 @@ import { StravaTokenData, StravaActivity, RecentDays, StreakData, LocalActivitie
 import { getStravaActivities, refreshStravaToken } from '@/lib/strava/api';
 import { getStravaAuthUrl } from '@/lib/strava/auth';
 import { MINIMUM_DURATION, getInitialLoadMonths, MILESTONES } from '@/lib/strava/config';
-import { getDayStatus, calculateStreakLength, dateToIsoDate, invalidateLocalStorage, updateCurrentStreak } from '@/lib/utils';
-import Realistic from 'react-canvas-confetti/dist/presets/realistic';
+import { getDayStatus, calculateStreakLength, dateToIsoDate, invalidateLocalStorage, updateCurrentStreak, getNextMilestone } from '@/lib/utils';
 
 
 const StreakTracker = () => {
@@ -214,22 +213,7 @@ const StreakTracker = () => {
     setShowMilestoneModal(false);
   };
 
-  function isMilestoneDay(streakData: StreakData) {
-    if (streakData.completed && streakData.currentStreak in MILESTONES) {
-      return true;
-    }
-    return false;
-  }
   
-  function Confetti() {
-    // const confettiShownKey = `confettiShown_${dateToIsoDate(new Date())}`;
-    const confettiShown = false //localStorage.getItem(confettiShownKey);
-    if (!confettiShown) {
-      // localStorage.setItem(confettiShownKey, 'true');
-      return <Realistic autorun={{ speed: 1, duration: 3 }}/>;
-    }
-  }
-
   useEffect(() => {
     invalidateLocalStorage(false);
     fetchData();
@@ -237,7 +221,8 @@ const StreakTracker = () => {
   }, [fetchData]);
 
   useEffect(() => {
-    if (streakData && isMilestoneDay(streakData)) {
+    // setShowMilestoneModal(true); // dev only
+    if (streakData && streakData.completed && streakData.currentStreak in MILESTONES) {
       setShowMilestoneModal(true);
     }
   }, [streakData]);
@@ -258,16 +243,6 @@ const StreakTracker = () => {
 
   if (!streakData) {
     return null; // Render nothing if streakData is not yet available
-  }
-
-  function getNextMilestone(currentStreak: number): React.ReactNode {
-    const milestoneKeys = Object.keys(MILESTONES).map(Number).sort((a, b) => a - b);
-    for (const milestone of milestoneKeys) {
-      if (currentStreak < milestone) {
-        return `${milestone - currentStreak} days`;
-      }
-    }
-    return undefined;
   }
 
 
@@ -389,13 +364,10 @@ const StreakTracker = () => {
         )}
       </Card>
       { showMilestoneModal && 
-        <>
-          <MilestoneModal 
-            milestone={MILESTONES[streakData.currentStreak]} 
-            onClose={handleCloseMilestoneModal}
-          />
-          <Confetti />
-        </>
+        <MilestoneModal 
+          milestone={MILESTONES[streakData.currentStreak]} 
+          onClose={handleCloseMilestoneModal}
+        />
       } 
     </>
   );
