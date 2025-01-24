@@ -1,5 +1,7 @@
 import { AppProps } from 'next/app';
 import { ScopeProvider } from '@/context/ScopeContext';
+import { Analytics } from "@vercel/analytics/react"
+
 import '@/styles/globals.css';
 
 import { Geist, Geist_Mono } from "next/font/google";
@@ -19,6 +21,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <ScopeProvider>
       <div className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Component {...pageProps} />
+        <Analytics />
       </div>
       </ScopeProvider>
   );
