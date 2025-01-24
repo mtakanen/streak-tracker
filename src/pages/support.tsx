@@ -18,7 +18,7 @@ const SupportPage = () => {
           <ul className="list-disc list-inside mt-2 text-gray-700">
             <li>Log in to your Strava account to start tracking your run streak</li>
             <li>Check dashboard for your streak, upcoming milestone and the previous 7 days</li>
-            <li>Completed runs are marked green. Clicking any of those shows activity's name and link back to Strava</li>
+            <li>Completed runs are marked green. Clicking any of those shows activity&apos;s name and link back to Strava</li>
             <li>Streaks are calculated based on the daily 25 minutes minimum duration. 
                 Ensure the sum of daily moving time meet the goal to maintain your streak</li>
             <li>If you encounter any issues, log out from the menu and log in again</li>
