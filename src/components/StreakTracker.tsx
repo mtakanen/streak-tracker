@@ -308,7 +308,7 @@ const StreakTracker = () => {
           </div>
           {/* Last 7 Days Timeline with Strava Links */}
           <div className="space-y-2 max-h-48 overflow-y-auto">
-            <div className="text-sm font-medium">Last 7 days</div>
+            <div className="text-sm font-medium">Previous 7 days</div>
             <div className="flex gap-1">
               {streakData.lastSevenDays.map((day: {
                 index: number;
