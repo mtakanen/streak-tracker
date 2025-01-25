@@ -5,3 +5,6 @@ A Next.js app for tracking running streak from user's Strava activities.
 ```
 npm run dev -- -p 2525
 ```
+
+TODO: stats
+outdoor runs ? map

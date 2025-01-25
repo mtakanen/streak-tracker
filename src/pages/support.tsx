@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getInitialLoadMonths } from '@/lib/strava/config';
+import { INITIAL_LOAD_MONTHS } from '@/lib/strava/config';
 
 const SupportPage = () => {
   return (
@@ -16,10 +16,20 @@ const SupportPage = () => {
             Here are some instructions to help you get started:
           </p>
           <ul className="list-disc list-inside mt-2 text-gray-700">
-            <li>Log in to your Strava account to start tracking your run streak</li>
-            <li>Check dashboard for your streak, upcoming milestone and the previous 7 days</li>
+            <li>Log in to your Strava account to start tracking your run streak.
+            For that app requires to get access to your activities. On Strava Authorization page you must check at least: <span className='italic'>View data about your activities</span></li>
+            <li>If you want to track from your private activities, also check <span className='italic'>
+              View data about your private activities</span></li>
+            <li>App can rename activity back to Strava. If you wish to do that also check: <span className='italic'>
+              Upload your activities from Normi Run to Strava</span></li>
+          </ul>
+          <p className="mt-2 text-gray-700">
+            After you connect with Strava, you can start tracking your run streak:
+          </p>
+          <ul className="list-disc list-inside mt-2 text-gray-700">
+            <li>Dashboard shows your current streak, upcoming milestone and runs from the previous 7 days</li>
             <li>Completed runs are marked green. Clicking any of those shows activity&apos;s name and link back to Strava</li>
-            <li>Streaks are calculated based on the daily 25 minutes minimum duration. 
+            <li>Streak is calculated based on the daily 25 minutes minimum duration. 
                 Ensure the sum of daily moving time meet the goal to maintain your streak</li>
             <li>If you encounter any issues, log out from the menu and log in again</li>
           </ul>
@@ -32,7 +42,7 @@ const SupportPage = () => {
           <ul className="list-disc list-inside mt-2 text-gray-700">
             <li>normi.run currently supports only running activities</li>
             <li>Data synchronization with Strava may take a few minutes. Reload the page if needed</li>
-            <li>Maximum streak is limited to {getInitialLoadMonths()*30.5} days</li>
+            <li>Maximum streak is limited to {INITIAL_LOAD_MONTHS*30.5} days</li>
             <li>If you encounter any persistent issues, please contact the developer for assistance</li>
           </ul>
         </div>
@@ -47,11 +57,9 @@ const SupportPage = () => {
               You can delete them anytime by using Log out from the Menu</li>
             <li>normi.run caches up to one week of activity data</li>
             <li>normi.run does not share your data with third parties</li>
-            <li>normi.run uses <a href="https://vercel.com/products/observability" target="_blank">Vercel Analytics</a> to monitor app performance. 
+            <li>normi.run uses <a href="https://vercel.com/products/observability" target="_blank" className="text-black-600 hover:underline">Vercel Analytics</a> to monitor app performance. 
             Analytics is fully anonymous</li>
-            <li>normi.run can rename activity back to Strava if the following permission is given upon Strava login:</li>
-            <span className='italic'>Upload your activities from normi.run to Strava</span>
-            <li>You can revoke access at: <a href="https://www.strava.com/settings/apps" target="_blank">https://www.strava.com/settings/apps</a></li>
+            <li>You can revoke app access at: <a href="https://www.strava.com/settings/apps" target="_blank" className="text-black-600 hover:underline">https://www.strava.com/settings/apps</a></li>
         </div>
         <div className="text-center mt-4">
           <Link href="/" className="text-black-600 hover:underline">
