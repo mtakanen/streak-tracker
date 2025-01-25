@@ -7,10 +7,9 @@ import { Clock, Milestone } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { ActivityModal, LoadingModal, MilestoneModal } from '@/components/ui/modal';
 import Image from 'next/image';
-import { StravaTokenData, StravaActivity, RecentDays, StreakData, LocalActivities } from '@/types/strava';
-import { getStravaActivities, refreshStravaToken } from '@/lib/strava/api';
-import { getStravaAuthUrl } from '@/lib/strava/auth';
-import { MINIMUM_DURATION, getInitialLoadMonths, MILESTONES } from '@/lib/strava/config';
+import { StravaActivity, RecentDays, StreakData, LocalActivities } from '@/types/strava';
+import { getStravaActivities } from '@/lib/strava/api';
+import { STRAVA_CONFIG, MINIMUM_DURATION, INITIAL_LOAD_MONTHS, MILESTONES } from '@/lib/strava/config';
 import { getDayStatus, calculateStreakLength, dateToIsoDate, invalidateLocalStorage, updateCurrentStreak, getNextMilestone } from '@/lib/utils';
 
 
@@ -26,37 +25,11 @@ const StreakTracker = () => {
   const [showMilestoneModal, setShowMilestoneModal] = useState(false);
 
   const router = useRouter();
-  const STRAVA_AUTH_URL = getStravaAuthUrl();
 
   const fetchActivities = React.useCallback(async (fromTimestamp: number): Promise<StravaActivity[]> => {
       let activities: StravaActivity[] = [];
-      try {
-        let token = localStorage.getItem('stravaAccessToken');
-        const tokenExpiry = localStorage.getItem('stravaTokenExpiry');
-        const refreshToken = localStorage.getItem('stravaRefreshToken');
-  
-        if (!token || !tokenExpiry || !refreshToken) {
-          throw new Error('No valid access token found. Redirecting to authorization.');
-        }
-  
-        const now = new Date().getTime();
-        if (now >= parseInt(tokenExpiry, 10)) {
-          // Token has expired, try to refresh it
-          const newTokenData: StravaTokenData | null = await refreshStravaToken(refreshToken);
-          if (newTokenData) {
-            token = newTokenData.access_token;
-            localStorage.setItem('stravaAccessToken', newTokenData.access_token);
-            localStorage.setItem('stravaRefreshToken', newTokenData.refresh_token);
-            localStorage.setItem('stravaTokenExpiry', (now + newTokenData.expires_in * 1000).toString());
-          } else {
-            // Refresh token is invalid, redirect to Strava authorization URL
-            localStorage.removeItem('stravaAccessToken');
-            localStorage.removeItem('stravaRefreshToken');
-            localStorage.removeItem('stravaTokenExpiry');
-            throw new Error('Refresh token invalid. Redirecting to authorization.');
-          }
-        }
-  
+      const now = new Date().getTime();
+      try {  
         const storedData = localStorage.getItem('stravaActivities');
         let pageSize = 30;
   
@@ -82,7 +55,7 @@ const StreakTracker = () => {
           localStorage.removeItem('stravaAccessToken');
           localStorage.removeItem('stravaRefreshToken');
           localStorage.removeItem('stravaTokenExpiry');
-          window.location.href = STRAVA_AUTH_URL; // Redirect to Strava authorization URL if token error
+          window.location.href = STRAVA_CONFIG.authUrl; // Redirect to Strava authorization URL if token error
         } else {
           setError(err instanceof Error ? err.message : 'Failed to fetch activities');
           throw err;
@@ -176,7 +149,7 @@ const StreakTracker = () => {
 
       const week = 7 * 24 * 60 * 60 * 1000;
       const month = 30.5 * 24 * 60 * 60 * 1000;
-      const fromTimestamp = initialize ? (Date.now() - getInitialLoadMonths() * month) / 1000 : (Date.now() - week) / 1000;
+      const fromTimestamp = initialize ? Math.floor((Date.now() - INITIAL_LOAD_MONTHS * month) / 1000) : Math.floor((Date.now() - week) / 1000);
 
       const activities = await fetchActivities(fromTimestamp);
       const redirectedFlag = localStorage.getItem('redirected');
@@ -188,7 +161,7 @@ const StreakTracker = () => {
         // Handle case where no activities are returned
         if (!redirectedFlag) {
           localStorage.setItem('redirected', '1');
-          window.location.href = STRAVA_AUTH_URL; // Redirect to Strava authorization URL
+          window.location.href = STRAVA_CONFIG.authUrl; // Redirect to Strava authorization URL
         } else {
           setError('No activities found from your Strava account. Go running and come back!');
         }
@@ -200,7 +173,7 @@ const StreakTracker = () => {
     } catch (err) {
       console.error('Error fetching data:', err);
       if (err instanceof Error && err.message.includes('token')) {
-        window.location.href = STRAVA_AUTH_URL; // Redirect to Strava authorization URL if token error
+        window.location.href = STRAVA_CONFIG.authUrl; // Redirect to Strava authorization URL if token error
       } else {
         setError(err instanceof Error ? err.message : 'Failed to fetch activities');
       }

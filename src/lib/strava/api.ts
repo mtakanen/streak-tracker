@@ -1,45 +1,42 @@
 import axios from 'axios';
-import { AxiosError }  from 'axios';
+import { STRAVA_CONFIG } from "./config";
 import { StravaActivity, StravaTokenData } from '@/types/strava';
 
-const ATHLETE_ACTIVITIES_URL = 'https://www.strava.com/api/v3/athlete/activities';
-const STRAVA_CLIENT_ID = process.env.NEXT_PUBLIC_STRAVA_CLIENT_ID;
-const STRAVA_CLIENT_SECRET = process.env.NEXT_PUBLIC_STRAVA_CLIENT_SECRET;
 
-export async function refreshStravaToken(refreshToken: string): Promise<StravaTokenData | null> {
-  try {
-    const response = await axios.post<StravaTokenData>('https://www.strava.com/oauth/token', null, {
-      params: {
-        client_id: STRAVA_CLIENT_ID,
-        client_secret: STRAVA_CLIENT_SECRET,
-        grant_type: 'refresh_token',
-        refresh_token: refreshToken,
-      },
+async function getAccessToken(): Promise<string | null> {
+  const accessToken: StravaTokenData['access_token'] = localStorage.getItem('stravaAccessToken') || '';
+  const refreshToken: StravaTokenData['refresh_token'] = localStorage.getItem('stravaRefreshToken') || '';
+  const tokenExpiry: StravaTokenData['expires_in'] = parseInt(localStorage.getItem('stravaTokenExpiry') || '0');
+
+  if (!accessToken || !tokenExpiry || !refreshToken) {
+    throw new Error('Missing tokens');
+  }
+
+  if (Date.now() > tokenExpiry) {
+    // Token has expired, refresh it
+    console.log('token expired, refreshing');
+    const response = await axios.post(STRAVA_CONFIG.tokenUrl, {
+      client_id: STRAVA_CONFIG.clientId,
+      client_secret: STRAVA_CONFIG.clientSecret,
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken,
     });
 
-    if (response.status === 200) {
-      return response.data;
-    } else {
-      console.error('Failed to refresh token:', response.status, response.statusText);
-      return null;
+    if (response.status !== 200) {
+      throw new Error('Failed to refresh token');
     }
-  } catch (error) {
-    if (axios.isAxiosError(error) && (error as AxiosError).response) {
-      const axiosError = error as AxiosError;
-      console.error('Error refreshing token:', axiosError.response?.status, axiosError.response?.data);
-    } else {
-      if (error instanceof Error) {
-        console.error('Error refreshing token:', error.message);
-      } else {
-        console.error('Error refreshing token:', error);
-      }
-    }
-    return null;
+
+    const data = response.data;
+    localStorage.setItem('stravaAccessToken', data.access_token);
+    localStorage.setItem('stravaTokenExpiry', (Date.now() + (data.expires_in * 1000)).toString());
+    localStorage.setItem('stravaRefreshToken', data.refresh_token);
+    return data.access_token;
   }
-}
+  return accessToken;
+};
 
 export async function getStravaActivities(after: number, perPage: number): Promise<StravaActivity[]> {
-  const token = localStorage.getItem('stravaAccessToken');
+  const token = await getAccessToken();
   if (!token) {
     throw new Error('No access token found');
   }
@@ -49,7 +46,7 @@ export async function getStravaActivities(after: number, perPage: number): Promi
   let allActivities: StravaActivity[] = [];
 
   while (hasMoreActivities) {
-    const response = await axios.get<StravaActivity[]>(ATHLETE_ACTIVITIES_URL, {
+    const response = await axios.get<StravaActivity[]>(STRAVA_CONFIG.activitiesUrl, {
       params: {
         after,
         page,

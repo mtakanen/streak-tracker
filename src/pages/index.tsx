@@ -99,9 +99,10 @@ const HomePage = () => {
         <StreakTracker />
       ) : (
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Welcome to normi.run</h1>
-          <p className="mb-2">App tracks your streak using your Strava activities.</p>
-          <p className="mb-4">Please connect with Strava to get started.</p>
+          <h1 className="text-2xl font-bold mb-4">Welcome to Normi Run</h1>
+          <p className="mb-2">App tracks your running streak using your Strava activities</p>
+          <p className="mb-2">App requires to <span className='italic'>View data about your (public) activities</span></p>
+          <p className="mb-4">Please connect with Strava to get started</p>
           <div className="flex justify-center">
             <StravaConnectButton />
           </div>
