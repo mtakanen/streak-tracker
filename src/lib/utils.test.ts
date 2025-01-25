@@ -48,8 +48,8 @@ describe('Utility Functions', () => {
     describe('getDayStatus', () => {
         it('should return correct day status', () => {
             const activities: StravaActivity[] = [
-                { id: 1, start_date_local: '2023-10-01T10:00:00Z', type: 'Run', moving_time: 3600, distance: 10000, name: 'Morning Run' },
-                { id: 2, start_date_local: '2023-10-01T12:00:00Z', type: 'Run', moving_time: 1800, distance: 5000, name: 'Afternoon Run' }
+                { id: 1, start_date_local: '2023-10-01T10:00:00Z', type: 'Run', moving_time: 3600, distance: 10000, name: 'Morning Run', outdoors: true },
+                { id: 2, start_date_local: '2023-10-01T12:00:00Z', type: 'Run', moving_time: 1800, distance: 5000, name: 'Afternoon Run', outdoors: true  }
             ];
             const date = new Date('2023-10-01T00:00:00Z');
             const status = getDayStatus(activities, date);
@@ -58,8 +58,8 @@ describe('Utility Functions', () => {
         });
         it('5k race day + warm-up, should return completed day status', () => {
             const activities: StravaActivity[] = [
-                { id: 1, start_date_local: '2023-10-01T10:00:00Z', type: 'Run', moving_time: 19*60, distance: 5000, name: '5K Race' },
-                { id: 2, start_date_local: '2023-10-01T10:30:00Z', type: 'Run', moving_time: 5*60, distance: 1000, name: 'Warm-up' }
+                { id: 1, start_date_local: '2023-10-01T10:00:00Z', type: 'Run', moving_time: 19*60, distance: 5000, name: '5K Race', outdoors: true  },
+                { id: 2, start_date_local: '2023-10-01T10:30:00Z', type: 'Run', moving_time: 5*60, distance: 1000, name: 'Warm-up', outdoors: true  }
             ];
             const date = new Date('2023-10-01T00:00:00Z');
             const status = getDayStatus(activities, date);
@@ -68,7 +68,7 @@ describe('Utility Functions', () => {
         });
         it('5k race day, absolute minimum, should return completed day status', () => {
             const activities: StravaActivity[] = [
-                { id: 1, start_date_local: '2023-10-01T10:00:00Z', type: 'Run', moving_time: 20*60, distance: 5000, name: '5K Race' },
+                { id: 1, start_date_local: '2023-10-01T10:00:00Z', type: 'Run', moving_time: 20*60, distance: 5000, name: '5K Race', outdoors: true  },
             ];
             const date = new Date('2023-10-01T00:00:00Z');
             const status = getDayStatus(activities, date);
@@ -81,9 +81,9 @@ describe('Utility Functions', () => {
     describe('calculateStreakLength', () => {
         it('should handle timezone differences correctly (user in Calgary, server in Washington)', () => {
             const activities: StravaActivity[] = [
-            { id: 1, start_date_local: '2023-09-30T10:00:00Z', type: 'Run', moving_time: 3600, distance: 10000, name: 'Morning Run' },
-            { id: 2, start_date_local: '2023-10-01T12:00:00Z', type: 'Run', moving_time: 1800, distance: 5000, name: 'Afternoon Run' },
-            { id: 3, start_date_local: '2023-10-02T23:00:00Z', type: 'Run', moving_time: 3600, distance: 10000, name: 'Evening Run' }
+            { id: 1, start_date_local: '2023-09-30T10:00:00Z', type: 'Run', moving_time: 3600, distance: 10000, name: 'Morning Run', outdoors: true  },
+            { id: 2, start_date_local: '2023-10-01T12:00:00Z', type: 'Run', moving_time: 1800, distance: 5000, name: 'Afternoon Run', outdoors: true  },
+            { id: 3, start_date_local: '2023-10-02T23:00:00Z', type: 'Run', moving_time: 3600, distance: 10000, name: 'Evening Run', outdoors: true  }
             ];
             // Calgary is UTC-6, Washington is UTC-4
             const dateInCalgary = new Date('2023-10-02T23:00:00'); // 2023-10-03T05:00:00Z
@@ -104,9 +104,9 @@ describe('Utility Functions', () => {
 
         it('should return correct streak length and start date', () => {
             const activities: StravaActivity[] = [
-                { id: 1, start_date_local: '2023-09-30T10:00:00Z', type: 'Run', moving_time: 3600, distance: 10000, name: 'Morning Run' },
-                { id: 2, start_date_local: '2023-10-01T12:00:00Z', type: 'Run', moving_time: 1800, distance: 5000, name: 'Afternoon Run' },
-                { id: 3, start_date_local: '2023-10-02T08:00:00Z', type: 'Run', moving_time: 3600, distance: 10000, name: 'Morning Run' }
+                { id: 1, start_date_local: '2023-09-30T10:00:00Z', type: 'Run', moving_time: 3600, distance: 10000, name: 'Morning Run', outdoors: true  },
+                { id: 2, start_date_local: '2023-10-01T12:00:00Z', type: 'Run', moving_time: 1800, distance: 5000, name: 'Afternoon Run', outdoors: true  },
+                { id: 3, start_date_local: '2023-10-02T08:00:00Z', type: 'Run', moving_time: 3600, distance: 10000, name: 'Morning Run', outdoors: true  }
             ];
             const date = new Date('2023-10-02T00:00:00Z');
             const streak = calculateStreakLength(activities, date);
@@ -117,8 +117,8 @@ describe('Utility Functions', () => {
 
         it('gap in dates, should retrun length of 1', () => {
             const activities: StravaActivity[] = [
-                { id: 1, start_date_local: '2023-09-30T10:00:00Z', type: 'Run', moving_time: 3600, distance: 10000, name: 'Morning Run' },
-                { id: 2, start_date_local: '2023-10-02T08:00:00Z', type: 'Run', moving_time: 3600, distance: 10000, name: 'Morning Run' }
+                { id: 1, start_date_local: '2023-09-30T10:00:00Z', type: 'Run', moving_time: 3600, distance: 10000, name: 'Morning Run', outdoors: true  },
+                { id: 2, start_date_local: '2023-10-02T08:00:00Z', type: 'Run', moving_time: 3600, distance: 10000, name: 'Morning Run', outdoors: true  }
             ];
             const date = new Date('2023-10-02T00:00:00Z');
             const streak = calculateStreakLength(activities, date);
@@ -128,7 +128,7 @@ describe('Utility Functions', () => {
         });
         it('should return streak length of 0 if no activities are completed', () => {
             const activities: StravaActivity[] = [
-                { id: 1, start_date_local: '2023-09-30T10:00:00Z', type: 'Run', moving_time: 1800, distance: 5000, name: 'Morning Run' }
+                { id: 1, start_date_local: '2023-09-30T10:00:00Z', type: 'Run', moving_time: 1800, distance: 5000, name: 'Morning Run', outdoors: true  }
             ];
             const date = new Date('2023-10-02T00:00:00Z');
             const streak = calculateStreakLength(activities, date);
@@ -137,8 +137,8 @@ describe('Utility Functions', () => {
 
         it('should keep streak even if current day is not completed yet', () => {
             const activities: StravaActivity[] = [
-                { id: 1, start_date_local: '2023-09-30T10:00:00Z', type: 'Run', moving_time: 3600, distance: 10000, name: 'Morning Run' },
-                { id: 2, start_date_local: '2023-10-01T12:00:00Z', type: 'Run', moving_time: 1800, distance: 5000, name: 'Afternoon Run' }
+                { id: 1, start_date_local: '2023-09-30T10:00:00Z', type: 'Run', moving_time: 3600, distance: 10000, name: 'Morning Run', outdoors: true  },
+                { id: 2, start_date_local: '2023-10-01T12:00:00Z', type: 'Run', moving_time: 1800, distance: 5000, name: 'Afternoon Run', outdoors: true  }
             ];
             const date = new Date('2023-10-02T12:00:00Z');
             const streak = calculateStreakLength(activities, date);
