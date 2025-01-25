@@ -149,14 +149,14 @@ const StatsModal = ({ stats, onClose }: { stats: StreakStats, onClose: () => voi
         <h2 className="text-slate-600 font-bold mb-2 mr-4">Streak Stats</h2>
         <button className="absolute top-2 right-2 text-gray-500" onClick={onClose}>&times;</button>
         <h3 className="text-slate-600">Totals</h3>
-        <p><span className="text-slate-600 text-xs">Runs:</span><span className="">{stats.runs}</span></p>
+        <p><span className="text-slate-600 text-xs">Runs:</span><span className=""> {stats.runs}</span></p>
         <p><span className="text-slate-600 text-xs">Runs &lt;30min:</span> {stats.minimums}</p>
         <p><span className="text-slate-600 text-xs">Duration:</span> {totalHours}h{totalMinutes}min</p>
         <p><span className="text-slate-600 text-xs">Distance:</span> {stats.totalDistance.toFixed(1)} km</p>
         <h3 className="text-slate-600 mt-2">Averages</h3>
         <p><span className="text-slate-600 text-xs">Duration:</span> {stats.avgDuration} min</p>
         <p><span className="text-slate-600 text-xs">Distance:</span> {stats.avgDistance.toFixed(1)} km</p>
-        <p><span className="text-slate-600 text-xs">Pace:</span> {paceMinutes}&apos;{paceSeconds}&quot;</p>
+        <p><span className="text-slate-600 text-xs">Pace:</span> {paceMinutes.toFixed(0).padStart(2, '0')}&apos;{paceSeconds.toFixed(0).padStart(2, '0')}&quot;</p>
         <h3 className="text-slate-600 mt-2">Percentages</h3>
         <p><span className="text-slate-600 text-xs">Outdoor runs:</span> {stats.outdoorRuns}%</p>
       </div>
