@@ -1,6 +1,6 @@
 import React from 'react';
 import { Loader } from 'lucide-react';
-import { StravaActivity } from '@/types/strava';
+import { StravaActivity, StreakStats } from '@/types/strava';
 import { updateActivityName}  from '@/lib/utils';
 import { useScope } from '@/context/ScopeContext';
 import { StreakData } from '@/types/strava';
@@ -127,4 +127,35 @@ const MilestoneModal = ({ milestone, onClose }: { milestone: {text: string, size
   );
 }
 
-export { ActivityModal, LoadingModal, MilestoneModal };
+const StatsModal = ({ stats, onClose }: { stats: StreakStats, onClose: () => void }) => {
+  const [isVisible, setIsVisible] = React.useState(false);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 750); // 750 ms delay
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!isVisible) return null;
+  const totalHours = Math.floor(stats.totalDuration / 60);
+  const totalMinutes = stats.totalDuration % 60;
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center px-4">
+      <div className="bg-white p-4 rounded-lg max-w-md w-full sm:w-auto relative mx-4">
+        <h2 className="text-slate-600 font-bold mb-2 mr-4">Current Streak Stats</h2>
+        <button className="absolute top-2 right-2 text-gray-500" onClick={onClose}>&times;</button>
+        <p className="text-slate-600 text-xs">Runs: {stats.runs}</p>
+        <p className="text-slate-600 text-xs">Runs &lt;30min: {stats.minimums}</p>
+        <p className="text-slate-600 text-xs">Total duration: {totalHours}h{totalMinutes}min</p>
+        <p className="text-slate-600 text-xs">Avg. duration: {stats.avgDuration} min</p>
+        <p className="text-slate-600 text-xs">Total distance: {stats.totalDistance.toFixed(1)} km</p>
+        <p className="text-slate-600 text-xs">Average distance: {stats.avgDistance.toFixed(1)} km</p>
+        <p className="text-slate-600 text-xs">Outdoor runs: {stats.outdoorRuns}%</p>
+      </div>
+    </div>
+  );
+};
+
+export { ActivityModal, LoadingModal, MilestoneModal, StatsModal };

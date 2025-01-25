@@ -1,16 +1,15 @@
 "use client";
 
 import React from 'react';
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
 import { Clock, Milestone } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { ActivityModal, LoadingModal, MilestoneModal } from '@/components/ui/modal';
-import Image from 'next/image';
-import { StravaActivity, RecentDays, StreakData, LocalActivities } from '@/types/strava';
+import { ActivityModal, LoadingModal, MilestoneModal, StatsModal } from '@/components/ui/modal';
+import { StravaActivity, RecentDays, StreakData, LocalActivities,StreakStats } from '@/types/strava';
 import { getStravaActivities } from '@/lib/strava/api';
 import { STRAVA_CONFIG, MINIMUM_DURATION, INITIAL_LOAD_MONTHS, MILESTONES } from '@/lib/strava/config';
-import { getDayStatus, calculateStreakLength, dateToIsoDate, invalidateLocalStorage, updateCurrentStreak, getNextMilestone } from '@/lib/utils';
+import { getDayStatus, calculateStreakLength, dateToIsoDate, invalidateLocalStorage, updateCurrentStreak, getNextMilestone, calculateStreakStatistics } from '@/lib/utils';
 
 
 const StreakTracker = () => {
@@ -23,8 +22,8 @@ const StreakTracker = () => {
   const [selectedDayActivities, setSelectedDayActivities] = useState<StravaActivity[]>([]);
   const [streakData, setStreakData] = useState<StreakData | null>(null);
   const [showMilestoneModal, setShowMilestoneModal] = useState(false);
-
-  const router = useRouter();
+  const [stats, setStats] = useState<StreakStats | null>(null);
+  const [showStatsModal, setShowStatsModal] = useState(false);
 
   const fetchActivities = React.useCallback(async (fromTimestamp: number): Promise<StravaActivity[]> => {
       let activities: StravaActivity[] = [];
@@ -64,7 +63,7 @@ const StreakTracker = () => {
         setLoading(false);
       }
       return activities;
-    }, [router]);
+    }, []);
 
 
   const initStreaks = (activities: StravaActivity[], localDate: Date) => {
@@ -170,6 +169,7 @@ const StreakTracker = () => {
 
       const streaks = calculateStreakData(activities, initialize);
       setStreakData(streaks);
+      setStats(calculateStreakStatistics(activities));
     } catch (err) {
       console.error('Error fetching data:', err);
       if (err instanceof Error && err.message.includes('token')) {
@@ -180,17 +180,20 @@ const StreakTracker = () => {
     } finally {
       setLoading(false);
     }
-  }, [fetchActivities]);
+  }, [fetchActivities,calculateStreakData]);
 
   const handleCloseMilestoneModal = () => {
     setShowMilestoneModal(false);
   };
 
-  
+
+  const handleCloseStatsModal = () => {
+    setShowStatsModal(false);
+  };
+
   useEffect(() => {
     invalidateLocalStorage(false);
     fetchData();
-    
   }, [fetchData]);
 
   useEffect(() => {
@@ -268,7 +271,12 @@ const StreakTracker = () => {
 
           {/* Stats Grid */}
           <div className="grid grid-cols-2 gap-3">
-            <div className="p-3 bg-slate-50 rounded-lg text-center">
+            <div className="p-3 bg-slate-50 rounded-lg text-center cursor-pointer"
+             onClick={() => {
+              setShowStatsModal(true);
+             }}
+             style={{ cursor: 'pointer' }}
+            >
               <Clock className="w-5 h-5 mx-auto mb-1" />
               <div className="text-xl font-bold">{streakData.todayMinutes}min</div>
               <div className="text-xs text-slate-600">today</div>
@@ -342,6 +350,9 @@ const StreakTracker = () => {
           onClose={handleCloseMilestoneModal}
         />
       } 
+      {showStatsModal && stats && (
+        <StatsModal stats={stats} onClose={handleCloseStatsModal} />
+      )}
     </>
   );
 };

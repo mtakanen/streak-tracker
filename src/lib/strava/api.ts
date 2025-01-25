@@ -15,12 +15,30 @@ async function getAccessToken(): Promise<string | null> {
   if (Date.now() > tokenExpiry) {
     // Token has expired, refresh it
     console.log('token expired, refreshing');
-    const response = await axios.post(STRAVA_CONFIG.tokenUrl, {
-      client_id: STRAVA_CONFIG.clientId,
-      client_secret: STRAVA_CONFIG.clientSecret,
-      grant_type: 'refresh_token',
-      refresh_token: refreshToken,
-    });
+    let response;
+    try {
+      response = await axios.post(STRAVA_CONFIG.tokenUrl, {
+        client_id: STRAVA_CONFIG.clientId,
+        client_secret: STRAVA_CONFIG.clientSecret,
+        grant_type: 'refresh_token',
+        refresh_token: refreshToken,
+      });
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          console.error('Error response data:', error.response.data);
+          throw new Error(`Failed to refresh token: ${error.response.status} ${error.response.statusText}`);
+        } else if (error.request) {
+          console.error('Network error:', error.message);
+          throw new Error('Network error: Failed to refresh token');
+        } else {
+          console.error('Error message:', error.message);
+          throw new Error('Failed to refresh token');
+        }
+      } else {
+        throw new Error('Failed to refresh token');
+      }
+    }
 
     if (response.status !== 200) {
       throw new Error('Failed to refresh token');
@@ -46,7 +64,7 @@ export async function getStravaActivities(after: number, perPage: number): Promi
   let allActivities: StravaActivity[] = [];
 
   while (hasMoreActivities) {
-    const response = await axios.get<StravaActivity[]>(STRAVA_CONFIG.activitiesUrl, {
+    const response = await axios.get<StravaCustomActivity[]>(STRAVA_CONFIG.activitiesUrl, {
       params: {
         after,
         page,
@@ -55,6 +73,7 @@ export async function getStravaActivities(after: number, perPage: number): Promi
       headers: {
         'Authorization': `Bearer ${token}`,
       },
+        timeout: 10000 // Set timeout to 10 seconds
     });
 
     if (response.status !== 200) {
@@ -75,7 +94,7 @@ export async function getStravaActivities(after: number, perPage: number): Promi
         throw new Error('Failed to fetch activities');
       }
     }
-    const data: StravaActivity[] = response.data;
+    const data: StravaActivity[] = extendStravaData(response.data);
     allActivities = allActivities.concat(data);
 
     if (data.length == 0) {
@@ -86,4 +105,28 @@ export async function getStravaActivities(after: number, perPage: number): Promi
   }
 
   return allActivities;
+
+
+  interface StravaCustomActivity extends StravaActivity {
+    map: object;
+    trainer: boolean;
+    outdoors: boolean;
+  }
+
+  function extendStravaData(stravaData: StravaCustomActivity[]): StravaActivity[] {
+    const tempData: StravaCustomActivity[] = stravaData.map(activity => ({
+      ...activity,
+      outdoors: activity.map && !activity.trainer
+    }));
+    const data: StravaActivity[] = tempData.map(activity => ({
+      id: activity.id,
+      type: activity.type,
+      start_date_local: activity.start_date_local,
+      moving_time: activity.moving_time,
+      distance: activity.distance,
+      name: activity.name,
+      outdoors: activity.outdoors
+    }));
+    return data;
+  }
 }

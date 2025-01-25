@@ -6,6 +6,7 @@ export interface StravaActivity {
     moving_time: number;
     distance: number;
     name: string;
+    outdoors: boolean;
 }
   
 export interface TokenResponse {
@@ -57,4 +58,14 @@ export interface StreakData {
 export interface LocalActivities {
     activities: StravaActivity[];
     timestamp: number;
+}
+
+export interface StreakStats {
+    runs: number;
+    minimums: number;
+    totalDuration: number;
+    avgDuration: number;
+    totalDistance: number;
+    avgDistance: number;
+    outdoorRuns: number;
 }

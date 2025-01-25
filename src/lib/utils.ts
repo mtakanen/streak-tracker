@@ -1,7 +1,7 @@
 // src/lib/utils.ts
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { DayStatus, RecentDays, StravaActivity } from '@/types/strava';
+import { DayStatus, RecentDays, StravaActivity, StreakStats } from '@/types/strava';
 import { MINIMUM_DURATION, GRACE_DURATION, GRACE_DISTANCE, MILESTONES } from '@/lib/strava/config';
 
 const STORAGE_VERSION = '1.0';
@@ -152,3 +152,21 @@ export const getNextMilestone = (currentStreak: number): string | undefined => {
   }
   return undefined;
 }
+
+
+export const calculateStreakStatistics = (activities: StravaActivity[]): StreakStats => {
+  const runs = activities.filter(activity => activity.type === 'Run');
+  const totalDuration = Math.floor(runs.reduce((acc, day) => acc + day.moving_time / 60, 0));
+  const totalDistance = (runs.reduce((acc, day) => acc + day.distance / 1000, 0));
+  const outdoorRuns = Math.floor(runs.filter(day => day.outdoors).length/runs.length * 100);
+  const minimums = runs.filter(day => day.moving_time < 30*60).length;
+  return {
+    runs: runs.length,
+    totalDuration,
+    avgDuration: Math.floor(totalDuration / runs.length),
+    totalDistance,
+    avgDistance: Math.floor(totalDistance / runs.length),
+    outdoorRuns,
+    minimums,
+  };
+};
