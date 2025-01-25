@@ -67,5 +67,6 @@ export interface StreakStats {
     avgDuration: number;
     totalDistance: number;
     avgDistance: number;
+    avgPace: number;
     outdoorRuns: number;
 }

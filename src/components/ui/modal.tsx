@@ -141,6 +141,8 @@ const StatsModal = ({ stats, onClose }: { stats: StreakStats, onClose: () => voi
   if (!isVisible) return null;
   const totalHours = Math.floor(stats.totalDuration / 60);
   const totalMinutes = stats.totalDuration % 60;
+  const paceMinutes = Math.floor(stats.avgPace);
+  const paceSeconds = Math.round((stats.avgPace - paceMinutes) * 60);
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center px-4">
       <div className="bg-white p-4 rounded-lg max-w-md w-full sm:w-auto relative mx-4">
@@ -151,7 +153,8 @@ const StatsModal = ({ stats, onClose }: { stats: StreakStats, onClose: () => voi
         <p className="text-slate-600 text-xs">Total duration: {totalHours}h{totalMinutes}min</p>
         <p className="text-slate-600 text-xs">Avg. duration: {stats.avgDuration} min</p>
         <p className="text-slate-600 text-xs">Total distance: {stats.totalDistance.toFixed(1)} km</p>
-        <p className="text-slate-600 text-xs">Average distance: {stats.avgDistance.toFixed(1)} km</p>
+        <p className="text-slate-600 text-xs">Avg. distance: {stats.avgDistance.toFixed(1)} km</p>
+        <p className="text-slate-600 text-xs">Avg. pace: {paceMinutes}'{paceSeconds}"</p>
         <p className="text-slate-600 text-xs">Outdoor runs: {stats.outdoorRuns}%</p>
       </div>
     </div>
