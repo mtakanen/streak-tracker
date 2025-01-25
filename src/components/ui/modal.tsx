@@ -146,16 +146,19 @@ const StatsModal = ({ stats, onClose }: { stats: StreakStats, onClose: () => voi
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center px-4">
       <div className="bg-white p-4 rounded-lg max-w-md w-full sm:w-auto relative mx-4">
-        <h2 className="text-slate-600 font-bold mb-2 mr-4">Current Streak Stats</h2>
+        <h2 className="text-slate-600 font-bold mb-2 mr-4">Streak Stats</h2>
         <button className="absolute top-2 right-2 text-gray-500" onClick={onClose}>&times;</button>
-        <p className="text-slate-600 text-xs">Runs: {stats.runs}</p>
-        <p className="text-slate-600 text-xs">Runs &lt;30min: {stats.minimums}</p>
-        <p className="text-slate-600 text-xs">Total duration: {totalHours}h{totalMinutes}min</p>
-        <p className="text-slate-600 text-xs">Avg. duration: {stats.avgDuration} min</p>
-        <p className="text-slate-600 text-xs">Total distance: {stats.totalDistance.toFixed(1)} km</p>
-        <p className="text-slate-600 text-xs">Avg. distance: {stats.avgDistance.toFixed(1)} km</p>
-        <p className="text-slate-600 text-xs">Avg. pace: {paceMinutes}'{paceSeconds}"</p>
-        <p className="text-slate-600 text-xs">Outdoor runs: {stats.outdoorRuns}%</p>
+        <h3 className="text-slate-600">Totals</h3>
+        <p><span className="text-slate-600 text-xs">Runs:</span><span className="">{stats.runs}</span></p>
+        <p><span className="text-slate-600 text-xs">Runs &lt;30min:</span> {stats.minimums}</p>
+        <p><span className="text-slate-600 text-xs">Duration:</span> {totalHours}h{totalMinutes}min</p>
+        <p><span className="text-slate-600 text-xs">Distance:</span> {stats.totalDistance.toFixed(1)} km</p>
+        <h3 className="text-slate-600 mt-2">Averages</h3>
+        <p><span className="text-slate-600 text-xs">Duration:</span> {stats.avgDuration} min</p>
+        <p><span className="text-slate-600 text-xs">Distance:</span> {stats.avgDistance.toFixed(1)} km</p>
+        <p><span className="text-slate-600 text-xs">Pace:</span> {paceMinutes}&apos;{paceSeconds}&quot;</p>
+        <h3 className="text-slate-600 mt-2">Percentages</h3>
+        <p><span className="text-slate-600 text-xs">Outdoor runs:</span> {stats.outdoorRuns}%</p>
       </div>
     </div>
   );
