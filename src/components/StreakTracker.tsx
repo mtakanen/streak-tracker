@@ -103,6 +103,7 @@ const StreakTracker = () => {
     return {
       currentStreak: streaks.currentStreak,
       currentStreakStartDate: streaks.currentStreakStartDate,
+      currentStreakUpdatedAt: streaks.currentStreakUpdatedAt,
       todayMinutes: lastSevenDays[0].duration,
       completed: lastSevenDays[0].completed,
       longestStreak: streaks.longestStreak,
@@ -114,9 +115,9 @@ const StreakTracker = () => {
 
   const fetchData = React.useCallback(async () => {
     try {
-      const longestStreak = localStorage.getItem('longestStreak');
-      const initialize = longestStreak === null || longestStreak === '0';
-
+      const cachedStreaks = JSON.parse(localStorage.getItem('streaks') || '{}');
+      const longestStreak = cachedStreaks && cachedStreaks.longestStreak;
+      const initialize = longestStreak === undefined || longestStreak === '0';
       const week = 7 * 24 * 60 * 60 * 1000;
       const month = 30.5 * 24 * 60 * 60 * 1000;
       const fromTimestamp = initialize ? Math.floor((Date.now() - INITIAL_LOAD_MONTHS * month) / 1000) : Math.floor((Date.now() - week) / 1000);
