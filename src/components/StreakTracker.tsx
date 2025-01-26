@@ -6,10 +6,10 @@ import { useState, useEffect } from 'react';
 import { Clock, Milestone } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { ActivityModal, LoadingModal, MilestoneModal, StatsModal } from '@/components/ui/modal';
-import { StravaActivity, RecentDays, StreakData, LocalActivities } from '@/types/strava';
+import { StravaActivity, DayEntry, StreakData, LocalActivities } from '@/types/strava';
 import { getStravaActivities } from '@/lib/strava/api';
 import { STRAVA_CONFIG, MINIMUM_DURATION, INITIAL_LOAD_MONTHS, MILESTONES } from '@/lib/strava/config';
-import { calculateRecentDays, dateToIsoDate, invalidateLocalStorage, initStreaks, updateCurrentStreak, getNextMilestone } from '@/lib/utils';
+import { calculateDayEntries, dateToIsoDate, invalidateLocalStorage, initStreaks, updateCurrentStreak, getNextMilestone } from '@/lib/utils';
 
 
 const StreakTracker = () => {
@@ -65,7 +65,7 @@ const StreakTracker = () => {
     }, []);
 
 
-  const updateStreaks = (lastSevenDays: RecentDays[], currentDate: Date) => {
+  const updateStreaks = (lastSevenDays: DayEntry[], currentDate: Date) => {
     // console.log('updateStreaks');
     const streaks = JSON.parse(localStorage.getItem('streaks') || '{}');
     let currentStreak = parseInt(streaks.currentStreak);
@@ -74,7 +74,7 @@ const StreakTracker = () => {
     let longestStreakStartDate = new Date(streaks.longestStreakStartDate);
     let currentStreakUpdatedAt = new Date(streaks.currentStreakUpdatedAt);
     const updatedStreak = updateCurrentStreak(
-      lastSevenDays, currentDate, currentStreakUpdatedAt, currentStreak, currentStreakStartDate);
+      lastSevenDays, currentDate, currentStreakUpdatedAt, currentStreak, currentStreakStartDate, streaks.stats);
     currentStreakUpdatedAt = updatedStreak.currentStreakUpdatedAt;
     currentStreak = updatedStreak.currentStreak;
     currentStreakStartDate = updatedStreak.currentStreakStartDate;
@@ -97,13 +97,13 @@ const StreakTracker = () => {
   const calculateStreakData = (activities: StravaActivity[], initializing: boolean) => {
     const currentDate = new Date(new Date().toLocaleString('en-US', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone }));
 
-    const lastSevenDays: RecentDays[] = calculateRecentDays(activities, currentDate);
+    const lastSevenDays: DayEntry[] = calculateDayEntries(activities, currentDate);
     const streaks = initializing ? initStreaks(activities, currentDate) : updateStreaks(lastSevenDays, currentDate);
 
     return {
       currentStreak: streaks.currentStreak,
       currentStreakStartDate: streaks.currentStreakStartDate,
-      todayMinutes: lastSevenDays[0].minutes,
+      todayMinutes: lastSevenDays[0].duration,
       completed: lastSevenDays[0].completed,
       longestStreak: streaks.longestStreak,
       longestStreakStartDate: streaks.longestStreakStartDate,
@@ -265,7 +265,7 @@ const StreakTracker = () => {
               {streakData.lastSevenDays.map((day: {
                 index: number;
                 weekday: string;
-                minutes: number;
+                duration: number;
                 completed: boolean;
                 activities: StravaActivity[];
               }, index: number) => (
@@ -283,7 +283,7 @@ const StreakTracker = () => {
                 style={{ cursor: day.completed ? 'pointer' : 'not-allowed' }}      
                 >
                 <div className="text-xs text-green-800"><span style={{ whiteSpace: 'nowrap' }}>{day.weekday}</span></div>
-                <div className="text-sm font-medium">{day.minutes}min</div>
+                <div className="text-sm font-medium">{day.duration}min</div>
                 </div>
               ))}
             </div>
