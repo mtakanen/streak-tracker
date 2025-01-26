@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { INITIAL_LOAD_MONTHS } from '@/lib/strava/config';
+import { INITIAL_LOAD_MONTHS, MINIMUM_DURATION } from '@/lib/strava/config';
 
 const SupportPage = () => {
   return (
@@ -28,9 +28,10 @@ const SupportPage = () => {
           </p>
           <ul className="list-disc list-inside mt-2 text-gray-700">
             <li>Dashboard shows your current streak, upcoming milestone and runs from the previous 7 days</li>
-            <li>Completed runs are marked green. Clicking any of those shows activity&apos;s name and link back to Strava</li>
-            <li>Streak is calculated based on the daily 25 minutes minimum duration. 
-                Ensure the sum of daily moving time meet the goal to maintain your streak</li>
+            <li>Streak calculation is based on the daily {MINIMUM_DURATION} minutes minimum duration. 
+                Ensure the sum of daily moving time meet the goal to maintain your streak!</li>
+            <li>Streak statistics are shown when today minutes is clicked</li>
+            <li>Previous 7 days shows completed runs as green. Clicking any of those days shows activity&apos;s name and link back to Strava</li>
             <li>If you encounter any issues, log out from the menu and log in again</li>
           </ul>
         </div>
@@ -55,7 +56,8 @@ const SupportPage = () => {
             <ul className="list-disc list-inside mt-2 text-gray-700"></ul>
             <li>All athlete and activity data is stored in your browser&apos;s local storage only. 
               You can delete them anytime by using Log out from the Menu</li>
-            <li>normi.run caches up to one week of activity data</li>
+            <li>normi.run caches up to one week of Strava activity data</li>
+            <li>normi.run caches derived data (such as streak and statistics) as long as user is logged in the app</li>
             <li>normi.run does not share your data with third parties</li>
             <li>normi.run uses <a href="https://vercel.com/products/observability" target="_blank" className="text-black-600 hover:underline">Vercel Analytics</a> to monitor app performance. 
             Analytics is fully anonymous</li>
