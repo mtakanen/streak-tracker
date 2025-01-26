@@ -130,3 +130,23 @@ export async function getStravaActivities(after: number, perPage: number): Promi
     return data;
   }
 }
+
+export const updateActivityName = async (activityId: number, newName: string, accessToken: string): Promise<void> => {
+  try {
+    const response = await axios.put(
+      `https://www.strava.com/api/v3/activities/${activityId}`,
+      { name: newName },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    if (response.status !== 200) {
+      throw new Error('Failed to update activity name');
+    }
+  } catch (error) {
+    console.error('Error updating activity name:', error);
+  }
+};

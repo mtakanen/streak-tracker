@@ -83,6 +83,41 @@ export const calculateStreakLength = (activities: StravaActivity[], toDate: Date
   return { length: streak, startDate: streakStartDate, lastDate: streakLastDate };
 };
 
+ export const initStreaks = (activities: StravaActivity[], localDate: Date) => {
+    // console.log('initStreaks');
+    const { length: currentStreak, startDate: currentStreakStartDate, lastDate: currentStreakUpdatedAt } = calculateStreakLength(activities, localDate);
+    let {length: longestStreak, startDate: longestStreakStartDate}  = activities.reduce((maxStreak, activity) => {
+      const streakData = calculateStreakLength(activities, new Date(activity.start_date_local));
+      return streakData.length > maxStreak.length ? streakData : maxStreak;
+    }, { length: 0, startDate: new Date() });
+    if (currentStreak > longestStreak) {
+      longestStreak = currentStreak;
+      longestStreakStartDate = currentStreakStartDate;
+    }
+    const stats = calculateStreakStats(activities, currentStreakStartDate);
+
+    return { currentStreak, longestStreak, currentStreakStartDate, currentStreakUpdatedAt, longestStreakStartDate, stats };
+  };
+
+export function calculateRecentDays(activities: StravaActivity[], localDate: Date, ) {
+  const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const lastSevenDays: RecentDays[] = Array.from({ length: 7 }, (_, i) => {
+    const currentDate = new Date(localDate);
+    currentDate.setDate(currentDate.getDate() - i);
+    const status = getDayStatus(activities, currentDate);
+    return {
+      index: i,
+      start_date_local: status.local_date,
+      weekday: weekdays[currentDate.getDay()],
+      minutes: status.duration,
+      completed: status.completed,
+      activities: status.activities
+    };
+  });
+  return lastSevenDays;
+}
+  
+  
 export function updateCurrentStreak(lastSevenDays: RecentDays[], currentDate: Date, 
   currentStreakUpdatedAt: Date, currentStreak: number, currentStreakStartDate: Date) {
   
@@ -104,8 +139,9 @@ export function updateCurrentStreak(lastSevenDays: RecentDays[], currentDate: Da
       break;
     }
   }
-
-  return { currentStreakUpdatedAt, currentStreak, currentStreakStartDate };
+  const stats = calculateStreakStats(
+    lastSevenDays.flatMap(day => day.activities), currentStreakStartDate); // FIME: update cum stats
+  return { currentStreakUpdatedAt, currentStreak, currentStreakStartDate, stats };
 }
 
 /*
@@ -120,28 +156,6 @@ const subTypeToMainType: { [key: string]: string; } = {
 };
 */
 
-import axios from 'axios';
-
-export const updateActivityName = async (activityId: number, newName: string, accessToken: string): Promise<void> => {
-  try {
-    const response = await axios.put(
-      `https://www.strava.com/api/v3/activities/${activityId}`,
-      { name: newName },
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
-
-    if (response.status !== 200) {
-      throw new Error('Failed to update activity name');
-    }
-  } catch (error) {
-    console.error('Error updating activity name:', error);
-  }
-};
-
 
 export const getNextMilestone = (currentStreak: number): string | undefined => {
   const milestoneKeys: number[] = Object.keys(MILESTONES).map(Number).sort((a, b) => a - b);
@@ -154,20 +168,24 @@ export const getNextMilestone = (currentStreak: number): string | undefined => {
 }
 
 
-export const calculateStreakStatistics = (activities: StravaActivity[]): StreakStats => {
-  const runs = activities.filter(activity => activity.type === 'Run');
+export const calculateStreakStats = (activities: StravaActivity[], fromDate: Date): StreakStats => {
+  // FIME: make totals cumulative. avg can be 7-days avg 
+  const runs = activities.filter(
+    activity => activity.type === 'Run' && 
+    activity.start_date_local >= dateToIsoDate(fromDate))
+  ; 
   const totalDuration = runs.reduce((acc, day) => acc + day.moving_time / 60, 0);
   const totalDistance = (runs.reduce((acc, day) => acc + day.distance / 1000, 0));
-  const outdoorRuns = Math.floor(runs.filter(day => day.outdoors).length/runs.length * 100);
+  const outdoorRuns = runs.filter(day => day.outdoors).length;
   const minimums = runs.filter(day => day.moving_time < 30*60).length;
   return {
     runs: runs.length,
+    minimums,
+    outdoorRuns,
     totalDuration: Math.floor(totalDuration),
-    avgDuration: Math.floor(totalDuration / runs.length),
     totalDistance,
+    avgDuration: Math.floor(totalDuration / runs.length),
     avgDistance: Math.floor(totalDistance / runs.length),
     avgPace: totalDuration / totalDistance,
-    outdoorRuns,
-    minimums,
   };
 };
