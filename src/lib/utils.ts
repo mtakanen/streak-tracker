@@ -2,9 +2,7 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { DayStatus, DayEntry, StravaActivity, StreakStats } from '@/types/strava';
-import { MINIMUM_DURATION, GRACE_DURATION, GRACE_DISTANCE, MILESTONES } from '@/lib/strava/config';
-
-const STORAGE_VERSION = '1.0';
+import { MINIMUM_DURATION, GRACE_DURATION, GRACE_DISTANCE, MILESTONES, STORAGE_VERSION } from '@/lib/strava/config';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
