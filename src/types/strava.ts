@@ -53,6 +53,7 @@ export interface StreakData {
     longestStreak: number;
     longestStreakStartDate: Date;
     lastSevenDays: RecentDays[];
+    stats: StreakStats;
 }
 
 export interface LocalActivities {
@@ -63,10 +64,10 @@ export interface LocalActivities {
 export interface StreakStats {
     runs: number;
     minimums: number;
+    outdoorRuns: number;
     totalDuration: number;
     avgDuration: number;
     totalDistance: number;
     avgDistance: number;
     avgPace: number;
-    outdoorRuns: number;
 }

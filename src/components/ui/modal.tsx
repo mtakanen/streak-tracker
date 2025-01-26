@@ -1,7 +1,7 @@
 import React from 'react';
 import { Loader } from 'lucide-react';
 import { StravaActivity, StreakStats } from '@/types/strava';
-import { updateActivityName}  from '@/lib/utils';
+import { updateActivityName}  from '@/lib/strava/api';
 import { useScope } from '@/context/ScopeContext';
 import { StreakData } from '@/types/strava';
 import Realistic from 'react-canvas-confetti/dist/presets/realistic';
@@ -158,7 +158,7 @@ const StatsModal = ({ stats, onClose }: { stats: StreakStats, onClose: () => voi
         <p><span className="text-slate-600 text-xs">Distance:</span> {stats.avgDistance.toFixed(1)} km</p>
         <p><span className="text-slate-600 text-xs">Pace:</span> {paceMinutes.toFixed(0).padStart(2, '0')}&apos;{paceSeconds.toFixed(0).padStart(2, '0')}&quot;</p>
         <h3 className="text-slate-600 mt-2">Percentages</h3>
-        <p><span className="text-slate-600 text-xs">Outdoor runs:</span> {stats.outdoorRuns}%</p>
+        <p><span className="text-slate-600 text-xs">Outdoor runs:</span> {Math.floor(stats.outdoorRuns/stats.runs * 100)}%</p>
       </div>
     </div>
   );
