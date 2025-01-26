@@ -33,17 +33,17 @@ export interface DayStatus {
     local_date: Date;
     completed: boolean;
     duration: number;
+    distance: number;
+    runs: number;
+    minimums: number;
+    outdoorRuns: number;
     activities: StravaActivity[];
 }
 
-export interface RecentDays {
+export interface DayEntry extends DayStatus {
     index: number;
-    start_date_local: Date;
     weekday: string;
-    minutes: number;
-    completed: boolean;
-    activities: StravaActivity[];
-  }
+}
 
 export interface StreakData {
     currentStreak: number;
@@ -52,7 +52,7 @@ export interface StreakData {
     completed: boolean;
     longestStreak: number;
     longestStreakStartDate: Date;
-    lastSevenDays: RecentDays[];
+    lastSevenDays: DayEntry[];
     stats: StreakStats;
 }
 
@@ -62,12 +62,10 @@ export interface LocalActivities {
 }
 
 export interface StreakStats {
+    // totals
     runs: number;
     minimums: number;
     outdoorRuns: number;
     totalDuration: number;
-    avgDuration: number;
     totalDistance: number;
-    avgDistance: number;
-    avgPace: number;
 }

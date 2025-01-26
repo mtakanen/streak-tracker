@@ -141,8 +141,11 @@ const StatsModal = ({ stats, onClose }: { stats: StreakStats, onClose: () => voi
   if (!isVisible) return null;
   const totalHours = Math.floor(stats.totalDuration / 60);
   const totalMinutes = stats.totalDuration % 60;
-  const paceMinutes = Math.floor(stats.avgPace);
-  const paceSeconds = Math.round((stats.avgPace - paceMinutes) * 60);
+  const avgDuration = Math.floor(stats.totalDuration / stats.runs);
+  const avgDistance = Math.floor(stats.totalDistance / stats.runs);
+  const avgPace = stats.totalDuration / stats.totalDistance;
+  const paceMinutes = Math.floor(avgPace);
+  const paceSeconds = Math.round((avgPace - paceMinutes) * 60);
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center px-4">
       <div className="bg-white p-4 rounded-lg max-w-md w-full sm:w-auto relative mx-4">
@@ -154,8 +157,8 @@ const StatsModal = ({ stats, onClose }: { stats: StreakStats, onClose: () => voi
         <p><span className="text-slate-600 text-xs">Duration:</span> {totalHours}h{totalMinutes}min</p>
         <p><span className="text-slate-600 text-xs">Distance:</span> {stats.totalDistance.toFixed(1)} km</p>
         <h3 className="text-slate-600 mt-2">Averages</h3>
-        <p><span className="text-slate-600 text-xs">Duration:</span> {stats.avgDuration} min</p>
-        <p><span className="text-slate-600 text-xs">Distance:</span> {stats.avgDistance.toFixed(1)} km</p>
+        <p><span className="text-slate-600 text-xs">Duration:</span> {avgDuration} min</p>
+        <p><span className="text-slate-600 text-xs">Distance:</span> {avgDistance.toFixed(1)} km</p>
         <p><span className="text-slate-600 text-xs">Pace:</span> {paceMinutes.toFixed(0).padStart(2, '0')}&apos;{paceSeconds.toFixed(0).padStart(2, '0')}&quot;</p>
         <h3 className="text-slate-600 mt-2">Percentages</h3>
         <p><span className="text-slate-600 text-xs">Outdoor runs:</span> {Math.floor(stats.outdoorRuns/stats.runs * 100)}%</p>

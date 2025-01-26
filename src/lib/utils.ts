@@ -1,7 +1,7 @@
 // src/lib/utils.ts
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { DayStatus, RecentDays, StravaActivity, StreakStats } from '@/types/strava';
+import { DayStatus, DayEntry, StravaActivity, StreakStats } from '@/types/strava';
 import { MINIMUM_DURATION, GRACE_DURATION, GRACE_DISTANCE, MILESTONES } from '@/lib/strava/config';
 
 const STORAGE_VERSION = '1.0';
@@ -42,11 +42,17 @@ export const getDayStatus = (activities: StravaActivity[], localDate: Date): Day
   const completed = (totalDuration >= MINIMUM_DURATION || 
     (totalDuration >= GRACE_DURATION && totalDistance >= GRACE_DISTANCE)
   );
+  const minimums = dayActivities.filter(day => day.moving_time < 30*60).length;
+  const outdoorRuns = dayActivities.filter(day => day.outdoors).length;
   const startDate = dayActivities.length > 0 ? dayActivities[0].start_date_local : dateString;
   return {
     local_date: new Date(startDate),
     completed: completed,
     duration: totalDuration,
+    distance: totalDistance,
+    runs: dayActivities.length,
+    minimums,
+    outdoorRuns,
     activities: dayActivities
   };
 };
@@ -94,23 +100,26 @@ export const calculateStreakLength = (activities: StravaActivity[], toDate: Date
       longestStreak = currentStreak;
       longestStreakStartDate = currentStreakStartDate;
     }
-    const stats = calculateStreakStats(activities, currentStreakStartDate);
-
+    const stats = calculateInitStats(activities, currentStreakStartDate);
     return { currentStreak, longestStreak, currentStreakStartDate, currentStreakUpdatedAt, longestStreakStartDate, stats };
   };
 
-export function calculateRecentDays(activities: StravaActivity[], localDate: Date, ) {
+export function calculateDayEntries(activities: StravaActivity[], localDate: Date, ): DayEntry[] {
   const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const lastSevenDays: RecentDays[] = Array.from({ length: 7 }, (_, i) => {
+  const lastSevenDays: DayEntry[] = Array.from({ length: 7 }, (_, i) => {
     const currentDate = new Date(localDate);
     currentDate.setDate(currentDate.getDate() - i);
     const status = getDayStatus(activities, currentDate);
     return {
       index: i,
-      start_date_local: status.local_date,
       weekday: weekdays[currentDate.getDay()],
-      minutes: status.duration,
+      local_date: status.local_date,
       completed: status.completed,
+      duration: status.duration,
+      distance: status.distance,
+      runs: status.runs,
+      minimums: status.minimums,
+      outdoorRuns: status.outdoorRuns,
       activities: status.activities
     };
   });
@@ -118,29 +127,35 @@ export function calculateRecentDays(activities: StravaActivity[], localDate: Dat
 }
   
   
-export function updateCurrentStreak(lastSevenDays: RecentDays[], currentDate: Date, 
-  currentStreakUpdatedAt: Date, currentStreak: number, currentStreakStartDate: Date) {
+export function updateCurrentStreak(lastSevenDays: DayEntry[], currentDate: Date, 
+  currentStreakUpdatedAt: Date, currentStreak: number, currentStreakStartDate: Date, stats: StreakStats): {
+  currentStreakUpdatedAt: Date, currentStreak: number, currentStreakStartDate: Date, stats: StreakStats } {
   
   const reversedDays = [...lastSevenDays].reverse();
   for (let i = 0; i < reversedDays.length; i++) {
-    const dayStatus = reversedDays[i];
-    const dayString = dateToIsoDate(dayStatus.start_date_local);
+    const dayEntry = reversedDays[i];
+    const dayString = dateToIsoDate(dayEntry.local_date);
 
-    if (dayStatus.completed && dayString > dateToIsoDate(currentStreakUpdatedAt)) {
+    if (dayEntry.completed && dayString > dateToIsoDate(currentStreakUpdatedAt)) {
       currentStreak++;
-      currentStreakUpdatedAt = new Date(dayStatus.start_date_local);
-    } else if (!dayStatus.completed && dayString === dateToIsoDate(currentDate)) {
+      // increment stats
+      stats.runs += dayEntry.runs;
+      stats.minimums += dayEntry.minimums;
+      stats.outdoorRuns += dayEntry.outdoorRuns;
+      stats.totalDuration += dayEntry.duration;
+      stats.totalDistance += dayEntry.distance;
+      currentStreakUpdatedAt = new Date(dayEntry.local_date);
+    } else if (!dayEntry.completed && dayString === dateToIsoDate(currentDate)) {
       // If today's activity is not completed, do not increment the streak
       continue;
-    } else if (!dayStatus.completed) {
+    } else if (!dayEntry.completed) {
       currentStreak = 0;
       currentStreakStartDate = new Date(0); // epoch
       currentStreakUpdatedAt = new Date(0); // epoch
       break;
     }
   }
-  const stats = calculateStreakStats(
-    lastSevenDays.flatMap(day => day.activities), currentStreakStartDate); // FIME: update cum stats
+  
   return { currentStreakUpdatedAt, currentStreak, currentStreakStartDate, stats };
 }
 
@@ -168,7 +183,7 @@ export const getNextMilestone = (currentStreak: number): string | undefined => {
 }
 
 
-export const calculateStreakStats = (activities: StravaActivity[], fromDate: Date): StreakStats => {
+export const calculateInitStats = (activities: StravaActivity[], fromDate: Date): StreakStats => {
   // FIME: make totals cumulative. avg can be 7-days avg 
   const runs = activities.filter(
     activity => activity.type === 'Run' && 
@@ -184,8 +199,5 @@ export const calculateStreakStats = (activities: StravaActivity[], fromDate: Dat
     outdoorRuns,
     totalDuration: Math.floor(totalDuration),
     totalDistance,
-    avgDuration: Math.floor(totalDuration / runs.length),
-    avgDistance: Math.floor(totalDistance / runs.length),
-    avgPace: totalDuration / totalDistance,
   };
 };
