@@ -323,7 +323,11 @@ const StreakTracker = () => {
         />
       } 
       {showStatsModal && (
-        <StatsModal stats={streakData.stats} onClose={handleCloseStatsModal} />
+        <StatsModal 
+          stats={streakData.stats} 
+          streak={streakData.currentStreak}
+          onClose={handleCloseStatsModal} 
+        />
       )}
     </>
   );
