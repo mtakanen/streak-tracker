@@ -153,7 +153,7 @@ const StatsModal = ({ stats, onClose }: { stats: StreakStats, onClose: () => voi
         <button className="absolute top-2 right-2 text-gray-500" onClick={onClose}>&times;</button>
         <h3 className="text-slate-600">Totals</h3>
         <p><span className="text-slate-600 text-xs">Runs:</span><span className=""> {stats.runs}</span></p>
-        <p><span className="text-slate-600 text-xs">Runs &lt;30min:</span> {stats.minimums}</p>
+        <p><span className="text-slate-600 text-xs">Minimum days:</span> {stats.minimumDays}</p>
         <p><span className="text-slate-600 text-xs">Duration:</span> {totalHours}h{totalMinutes}min</p>
         <p><span className="text-slate-600 text-xs">Distance:</span> {stats.totalDistance.toFixed(1)} km</p>
         <h3 className="text-slate-600 mt-2">Averages</h3>

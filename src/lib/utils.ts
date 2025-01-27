@@ -40,7 +40,7 @@ export const getDayStatus = (activities: StravaActivity[], localDate: Date): Day
   const completed = (totalDuration >= MINIMUM_DURATION || 
     (totalDuration >= GRACE_DURATION && totalDistance >= GRACE_DISTANCE)
   );
-  const minimums = dayActivities.filter(day => day.moving_time < 30*60).length;
+  const isMinimumDay = totalDuration < (MINIMUM_DURATION + 5) * 60;
   const outdoorRuns = dayActivities.filter(day => day.outdoors).length;
   const startDate = dayActivities.length > 0 ? dayActivities[0].start_date_local : dateString;
   return {
@@ -49,7 +49,7 @@ export const getDayStatus = (activities: StravaActivity[], localDate: Date): Day
     duration: totalDuration,
     distance: totalDistance,
     runs: dayActivities.length,
-    minimums,
+    isMinimumDay,
     outdoorRuns,
     activities: dayActivities
   };
@@ -116,7 +116,7 @@ export function calculateDayEntries(activities: StravaActivity[], localDate: Dat
       duration: status.duration,
       distance: status.distance,
       runs: status.runs,
-      minimums: status.minimums,
+      isMinimumDay: status.isMinimumDay,
       outdoorRuns: status.outdoorRuns,
       activities: status.activities
     };
@@ -138,7 +138,7 @@ export function updateCurrentStreak(lastSevenDays: DayEntry[], currentDate: Date
       currentStreak++;
       // increment stats
       stats.runs += dayEntry.runs;
-      stats.minimums += dayEntry.minimums;
+      stats.minimumDays += dayEntry.isMinimumDay ? 1 : 0;
       stats.outdoorRuns += dayEntry.outdoorRuns;
       stats.totalDuration += dayEntry.duration;
       stats.totalDistance += dayEntry.distance;
@@ -193,7 +193,7 @@ export const calculateInitStats = (activities: StravaActivity[], fromDate: Date)
   const minimums = runs.filter(day => day.moving_time < 30*60).length;
   return {
     runs: runs.length,
-    minimums,
+    minimumDays: minimums,
     outdoorRuns,
     totalDuration: Math.floor(totalDuration),
     totalDistance,
