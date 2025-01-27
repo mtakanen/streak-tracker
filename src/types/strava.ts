@@ -35,7 +35,7 @@ export interface DayStatus {
     duration: number;
     distance: number;
     runs: number;
-    minimums: number;
+    isMinimumDay: boolean;
     outdoorRuns: number;
     activities: StravaActivity[];
 }
@@ -64,7 +64,7 @@ export interface LocalActivities {
 export interface StreakStats {
     // totals
     runs: number;
-    minimums: number;
+    minimumDays: number;
     outdoorRuns: number;
     totalDuration: number;
     totalDistance: number;
