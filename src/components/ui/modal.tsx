@@ -127,7 +127,7 @@ const MilestoneModal = ({ milestone, onClose }: { milestone: {text: string, size
   );
 }
 
-const StatsModal = ({ stats, onClose }: { stats: StreakStats, onClose: () => void }) => {
+const StatsModal = ({ stats, streak, onClose }: { stats: StreakStats, streak: number, onClose: () => void }) => {
   const [isVisible, setIsVisible] = React.useState(false);
 
   React.useEffect(() => {
@@ -146,22 +146,31 @@ const StatsModal = ({ stats, onClose }: { stats: StreakStats, onClose: () => voi
   const avgPace = stats.totalDuration / stats.totalDistance;
   const paceMinutes = Math.floor(avgPace);
   const paceSeconds = Math.round((avgPace - paceMinutes) * 60);
+  const extraFreq = Math.round(streak / (streak - stats.minimumDays));
+  const minimumFreq = Math.round(streak / stats.minimumDays);
+  const outdoorRunRatio = Math.floor(stats.outdoorRuns / stats.runs * 100);
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center px-4">
       <div className="bg-white p-4 rounded-lg max-w-md w-full sm:w-auto relative mx-4">
-        <h2 className="text-slate-600 font-bold mb-2 mr-4">Streak Stats</h2>
+        <h1 className="text-slate-600 font-bold mb-2 mr-4">Statistics</h1>
         <button className="absolute top-2 right-2 text-gray-500" onClick={onClose}>&times;</button>
-        <h3 className="text-slate-600">Totals</h3>
+        <h2 className="text-slate-600 mt-2">Totals</h2>
+        <p><span className="text-slate-600 text-xs">Streak: </span>{streak} days</p>
         <p><span className="text-slate-600 text-xs">Runs:</span><span className=""> {stats.runs}</span></p>
         <p><span className="text-slate-600 text-xs">Minimum days:</span> {stats.minimumDays}</p>
         <p><span className="text-slate-600 text-xs">Duration:</span> {totalHours}h{totalMinutes}min</p>
         <p><span className="text-slate-600 text-xs">Distance:</span> {stats.totalDistance.toFixed(1)} km</p>
-        <h3 className="text-slate-600 mt-2">Averages</h3>
+        <h2 className="text-slate-600 mt-2">Averages</h2>
         <p><span className="text-slate-600 text-xs">Duration:</span> {avgDuration} min</p>
         <p><span className="text-slate-600 text-xs">Distance:</span> {avgDistance.toFixed(1)} km</p>
         <p><span className="text-slate-600 text-xs">Pace:</span> {paceMinutes.toFixed(0).padStart(2, '0')}&apos;{paceSeconds.toFixed(0).padStart(2, '0')}&quot;</p>
-        <h3 className="text-slate-600 mt-2">Percentages</h3>
-        <p><span className="text-slate-600 text-xs">Outdoor runs:</span> {Math.floor(stats.outdoorRuns/stats.runs * 100)}%</p>
+        <h2 className="text-slate-600 mt-2">Misc</h2>
+        {extraFreq > 1 ? (
+          <p><span className="text-slate-600 text-xs">Extras every:</span> {extraFreq} days</p>
+        ) : (
+          <p><span className="text-slate-600 text-xs">Minimum day every:</span> {minimumFreq} days</p>
+        )}
+        <p><span className="text-slate-600 text-xs">Outdoor runs:</span> {outdoorRunRatio}%</p>
       </div>
     </div>
   );
