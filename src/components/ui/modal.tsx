@@ -155,22 +155,22 @@ const StatsModal = ({ stats, streak, onClose }: { stats: StreakStats, streak: nu
         <h1 className="text-slate-600 font-bold mb-2 mr-4">Statistics</h1>
         <button className="absolute top-2 right-2 text-gray-500" onClick={onClose}>&times;</button>
         <h2 className="text-slate-600 mt-2">Totals</h2>
-        <p><span className="text-slate-600 text-xs">Streak: </span>{streak} days</p>
-        <p><span className="text-slate-600 text-xs">Runs:</span><span className=""> {stats.runs}</span></p>
-        <p><span className="text-slate-600 text-xs">Minimum days:</span> {stats.minimumDays}</p>
-        <p><span className="text-slate-600 text-xs">Duration:</span> {totalHours}h{totalMinutes}min</p>
-        <p><span className="text-slate-600 text-xs">Distance:</span> {stats.totalDistance.toFixed(1)} km</p>
+        <p><span className="text-slate-600 text-xs">Streak: </span><span className="float-right">{streak} days</span></p>
+        <p><span className="text-slate-600 text-xs">Runs:</span><span className="float-right">{stats.runs}</span></p>
+        <p><span className="text-slate-600 text-xs">Minimum days:</span><span className="float-right">{stats.minimumDays}</span></p>
+        <p><span className="text-slate-600 text-xs">Duration:</span><span className="float-right">{totalHours}h{totalMinutes}min</span></p>
+        <p><span className="text-slate-600 text-xs">Distance:</span><span className="float-right">{stats.totalDistance.toFixed(1)} km</span></p>
         <h2 className="text-slate-600 mt-2">Averages</h2>
-        <p><span className="text-slate-600 text-xs">Duration:</span> {avgDuration} min</p>
-        <p><span className="text-slate-600 text-xs">Distance:</span> {avgDistance.toFixed(1)} km</p>
-        <p><span className="text-slate-600 text-xs">Pace:</span> {paceMinutes.toFixed(0).padStart(2, '0')}&apos;{paceSeconds.toFixed(0).padStart(2, '0')}&quot;</p>
+        <p><span className="text-slate-600 text-xs">Duration:</span><span className="float-right">{avgDuration}min</span></p>
+        <p><span className="text-slate-600 text-xs">Distance:</span><span className="float-right">{avgDistance.toFixed(1)} km</span></p>
+        <p><span className="text-slate-600 text-xs">Pace:</span><span className="float-right">{paceMinutes.toFixed(0).padStart(2, '0')}&apos;{paceSeconds.toFixed(0).padStart(2, '0')}&quot;</span></p>
         <h2 className="text-slate-600 mt-2">Misc</h2>
+        <p><span className="text-slate-600 text-xs">Outdoor runs:</span><span className="float-right">{outdoorRunRatio}%</span></p>
         {extraFreq > 1 ? (
-          <p><span className="text-slate-600 text-xs">Extras every:</span> {extraFreq} days</p>
+          <p><span className="text-slate-600 text-xs">Extras every:</span><span className="float-right">{extraFreq} days</span></p>
         ) : (
-          <p><span className="text-slate-600 text-xs">Minimum day every:</span> {minimumFreq} days</p>
+          <p><span className="text-slate-600 text-xs">Minimum day every:</span><span className="float-right">{minimumFreq} days</span></p>
         )}
-        <p><span className="text-slate-600 text-xs">Outdoor runs:</span> {outdoorRunRatio}%</p>
       </div>
     </div>
   );
