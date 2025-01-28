@@ -254,7 +254,10 @@ const StreakTracker = () => {
               <div className="text-xl font-bold">{streakData.todayMinutes}min</div>
               <div className="text-xs text-slate-600">today</div>
             </div>
-            <MilestoneCard streak={streakData.currentStreak} />
+            <MilestoneCard 
+              streak={streakData.currentStreak}
+              todayCompleted={streakData.completed} 
+            />
           </div>
           {/* Last 7 Days Timeline with Strava Links */}
           <div className="space-y-2 max-h-48 overflow-y-auto">

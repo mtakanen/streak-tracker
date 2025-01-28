@@ -175,6 +175,8 @@ export const getNextMilestone = (currentStreak: number): string | undefined => {
   for (const milestone of milestoneKeys) {
     if (currentStreak < milestone) {
       return `${milestone - currentStreak} days`;
+    } else if (currentStreak === milestone) {
+      return '0 days';
     }
   }
   return undefined;
