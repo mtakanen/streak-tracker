@@ -17,12 +17,16 @@ async function getAccessToken(): Promise<string | null> {
     console.log('token expired, refreshing');
     let response;
     try {
-      response = await axios.post(STRAVA_CONFIG.tokenUrl, {
-        client_id: STRAVA_CONFIG.clientId,
-        client_secret: STRAVA_CONFIG.clientSecret,
-        grant_type: 'refresh_token',
-        refresh_token: refreshToken,
+      response = await axios.post<StravaTokenData>(STRAVA_CONFIG.tokenUrl, {
+        params: {
+          client_id: STRAVA_CONFIG.clientId,
+          client_secret: STRAVA_CONFIG.clientSecret,
+          grant_type: 'refresh_token',
+          refresh_token: refreshToken,
+        },
+        timeout: STRAVA_CONFIG.timeout
       });
+
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response) {
@@ -64,7 +68,7 @@ export async function getStravaActivities(after: number, perPage: number): Promi
   let allActivities: StravaActivity[] = [];
 
   while (hasMoreActivities) {
-    const response = await axios.get<StravaCustomActivity[]>(STRAVA_CONFIG.activitiesUrl, {
+    const response = await axios.get<StravaCustomActivity[]>(STRAVA_CONFIG.athelteActivitiesUrl, {
       params: {
         after,
         page,
@@ -73,7 +77,7 @@ export async function getStravaActivities(after: number, perPage: number): Promi
       headers: {
         'Authorization': `Bearer ${token}`,
       },
-        timeout: 10000 // Set timeout to 10 seconds
+        timeout: STRAVA_CONFIG.timeout
     });
 
     if (response.status !== 200) {
@@ -133,13 +137,14 @@ export async function getStravaActivities(after: number, perPage: number): Promi
 
 export const updateActivityName = async (activityId: number, newName: string, accessToken: string): Promise<void> => {
   try {
-    const response = await axios.put(
-      `https://www.strava.com/api/v3/activities/${activityId}`,
+    const response = await axios.put<StravaActivity>(
+      `${STRAVA_CONFIG.activityUrl}/${activityId}`,
       { name: newName },
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
+        timeout: STRAVA_CONFIG.timeout,
       }
     );
 
