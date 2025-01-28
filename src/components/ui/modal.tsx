@@ -148,7 +148,7 @@ const StatsModal = ({ stats, streak, onClose }: { stats: StreakStats, streak: nu
   const paceSeconds = Math.round((avgPace - paceMinutes) * 60);
   const extraFreq = Math.round(streak / (streak - stats.minimumDays));
   const minimumFreq = Math.round(streak / stats.minimumDays);
-  const outdoorRunRatio = Math.floor(stats.outdoorRuns / stats.runs * 100);
+  const outdoorRunRatio = Math.round(stats.outdoorRuns / stats.runs * 100);
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center px-4">
       <div className="bg-white p-4 rounded-lg max-w-md w-full sm:w-auto relative mx-4">
