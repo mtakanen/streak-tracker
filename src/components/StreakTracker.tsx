@@ -3,13 +3,14 @@
 import React from 'react';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { Clock, Milestone } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { ActivityModal, LoadingModal, MilestoneModal, StatsModal } from '@/components/ui/modal';
+import { ActivityModal, LoadingModal, StatsModal, MilestoneModal } from '@/components/ui/modal';
+import MilestoneCard from '@/components/MilestoneCard'
 import { StravaActivity, DayEntry, StreakData, LocalActivities } from '@/types/strava';
 import { getStravaActivities } from '@/lib/strava/api';
 import { STRAVA_CONFIG, MINIMUM_DURATION, INITIAL_LOAD_MONTHS, MILESTONES } from '@/lib/strava/config';
-import { calculateDayEntries, dateToIsoDate, invalidateLocalStorage, initStreaks, updateCurrentStreak, getNextMilestone } from '@/lib/utils';
+import { calculateDayEntries, dateToIsoDate, invalidateLocalStorage, initStreaks, updateCurrentStreak } from '@/lib/utils';
 
 
 const StreakTracker = () => {
@@ -21,8 +22,8 @@ const StreakTracker = () => {
   const [selectedWeekday, setSelectedWeekday] = useState<string>();
   const [selectedDayActivities, setSelectedDayActivities] = useState<StravaActivity[]>([]);
   const [streakData, setStreakData] = useState<StreakData | null>(null);
-  const [showMilestoneModal, setShowMilestoneModal] = useState(false);
   const [showStatsModal, setShowStatsModal] = useState(false);
+  const [showMilestoneModal, setShowMilestoneModal] = useState(false);
 
   const fetchActivities = React.useCallback(async (fromTimestamp: number): Promise<StravaActivity[]> => {
       let activities: StravaActivity[] = [];
@@ -253,11 +254,7 @@ const StreakTracker = () => {
               <div className="text-xl font-bold">{streakData.todayMinutes}min</div>
               <div className="text-xs text-slate-600">today</div>
             </div>
-            <div className="p-3 bg-slate-50 rounded-lg text-center">
-              <Milestone className="w-5 h-5 mx-auto mb-1" />
-              <div className="text-xl font-bold">{getNextMilestone(streakData.currentStreak)}</div>
-              <div className="text-xs text-slate-600">until next milestone</div>
-            </div>
+            <MilestoneCard streak={streakData.currentStreak} />
           </div>
           {/* Last 7 Days Timeline with Strava Links */}
           <div className="space-y-2 max-h-48 overflow-y-auto">
