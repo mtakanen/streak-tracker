@@ -137,17 +137,14 @@ export function updateCurrentStreak(lastSevenDays: DayEntry[], currentDate: Date
     if (dayEntry.completed && dayString > dateToIsoDate(currentStreakUpdatedAt)) {
       currentStreak++;
       // increment stats
-      stats.runs += dayEntry.runs;
-      stats.minimumDays += dayEntry.isMinimumDay ? 1 : 0;
-      stats.outdoorRuns += dayEntry.outdoorRuns;
-      stats.totalDuration += dayEntry.duration;
-      stats.totalDistance += dayEntry.distance;
+      accumulateDailyStats(stats, dayEntry);
       currentStreakUpdatedAt = new Date(dayEntry.local_date);
     } else if (!dayEntry.completed && dayString === dateToIsoDate(currentDate)) {
       // If today's activity is not completed, do not increment the streak
       continue;
     } else if (!dayEntry.completed) {
       currentStreak = 0;
+      resetStreakStats(stats);
       currentStreakStartDate = new Date(0); // epoch
       currentStreakUpdatedAt = new Date(0); // epoch
       break;
@@ -156,19 +153,6 @@ export function updateCurrentStreak(lastSevenDays: DayEntry[], currentDate: Date
   
   return { currentStreakUpdatedAt, currentStreak, currentStreakStartDate, stats };
 }
-
-/*
-const subTypeToMainType: { [key: string]: string; } = {
-  TrailRun: 'Run',
-  VirtualRun: 'Run',
-  VirtualRide: 'Ride',
-  NordicSki: 'Ski',
-  AlpineSki: 'Ski',
-  BackcountrySki: 'Ski',
-  // Add more sub-types and their main categories as needed
-};
-*/
-
 
 export const getNextMilestone = (currentStreak: number): string | undefined => {
   const milestoneKeys: number[] = Object.keys(MILESTONES).map(Number).sort((a, b) => a - b);
@@ -201,3 +185,32 @@ export const calculateInitStats = (activities: StravaActivity[], fromDate: Date)
     totalDistance,
   };
 };
+
+function accumulateDailyStats(stats: StreakStats, dayEntry: DayEntry) {
+  stats.runs += dayEntry.runs;
+  stats.minimumDays += dayEntry.isMinimumDay ? 1 : 0;
+  stats.outdoorRuns += dayEntry.outdoorRuns;
+  stats.totalDuration += dayEntry.duration;
+  stats.totalDistance += dayEntry.distance;
+}
+
+function resetStreakStats(stats: StreakStats) {
+  stats.runs = 0;
+  stats.minimumDays = 0;
+  stats.outdoorRuns = 0;
+  stats.totalDuration = 0;
+  stats.totalDistance = 0;
+}
+
+
+/*
+const subTypeToMainType: { [key: string]: string; } = {
+  TrailRun: 'Run',
+  VirtualRun: 'Run',
+  VirtualRide: 'Ride',
+  NordicSki: 'Ski',
+  AlpineSki: 'Ski',
+  BackcountrySki: 'Ski',
+  // Add more sub-types and their main categories as needed
+};
+*/
