@@ -10,7 +10,7 @@ import MilestoneCard from '@/components/MilestoneCard'
 import { StravaActivity, DayEntry, StreakData, LocalActivities } from '@/types/strava';
 import { getStravaActivities } from '@/lib/strava/api';
 import { STRAVA_CONFIG, MINIMUM_DURATION, INITIAL_LOAD_MONTHS, MILESTONES } from '@/lib/strava/config';
-import { calculateDayEntries, dateToIsoDate, invalidateLocalStorage, initStreaks, updateCurrentStreak } from '@/lib/utils';
+import { calculateDayEntries, dateToIsoDate, dateReviver, invalidateLocalStorage, initStreaks, updateCurrentStreak } from '@/lib/utils';
 
 
 const StreakTracker = () => {
@@ -68,12 +68,12 @@ const StreakTracker = () => {
 
   const updateStreaks = (lastSevenDays: DayEntry[], currentDate: Date) => {
     // console.log('updateStreaks');
-    const streaks = JSON.parse(localStorage.getItem('streaks') || '{}');
+    const streaks = JSON.parse(localStorage.getItem('streaks') || '{}', dateReviver);
     let currentStreak = parseInt(streaks.currentStreak);
     let longestStreak = parseInt(streaks.longestStreak);
-    let currentStreakStartDate = new Date(streaks.currentStreakStartDate);
-    let longestStreakStartDate = new Date(streaks.longestStreakStartDate);
-    let currentStreakUpdatedAt = new Date(streaks.currentStreakUpdatedAt);
+    let currentStreakStartDate = streaks.currentStreakStartDate;
+    let longestStreakStartDate = streaks.longestStreakStartDate;
+    let currentStreakUpdatedAt = streaks.currentStreakUpdatedAt;
     const updatedStreak = updateCurrentStreak(
       lastSevenDays, currentDate, currentStreakUpdatedAt, currentStreak, currentStreakStartDate, streaks.stats);
     currentStreakUpdatedAt = updatedStreak.currentStreakUpdatedAt;
@@ -166,6 +166,10 @@ const StreakTracker = () => {
 
   useEffect(() => {
     invalidateLocalStorage(false);
+    const cachedStreaks = localStorage.getItem('streaks');
+    if (cachedStreaks) {
+      setStreakData(JSON.parse(cachedStreaks, dateReviver));
+    }
     fetchData();
   }, [fetchData]);
 
@@ -176,9 +180,6 @@ const StreakTracker = () => {
     }
   }, [streakData]);
 
-  if (loading) {
-    return <LoadingModal isOpen={loading} text="Loading activities"/>;
-  }
 
   if (error) {
     return (
