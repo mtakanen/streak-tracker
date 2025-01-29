@@ -43,6 +43,7 @@ const StreakTracker = () => {
           // We don't have any stored data, so fetch all activities in bigger chunks
           pageSize = 150;
         }  
+        setLoading(true);
         const fetchedActivities: StravaActivity[] = await getStravaActivities(fromTimestamp, pageSize);
         activities = [...activities, ...fetchedActivities];
         localStorage.setItem('stravaActivities', JSON.stringify({ activities: activities, timestamp: now }));
@@ -192,10 +193,9 @@ const StreakTracker = () => {
   }
 
   if (!streakData) {
-    return null; // Render nothing if streakData is not yet available
+    return <LoadingModal isOpen={loading} text="Loading activities" />;
   }
-
-
+  
   return (
     <>
       <LoadingModal isOpen={loading} text="Loading activities" />
