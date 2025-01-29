@@ -13,8 +13,21 @@ export const isoDateToUnixTimestamp = (isoDate: string): number => {
 };
 
 export const dateToIsoDate = (date: Date): string => {
+  if (!(date instanceof Date)) {
+    console.log('date: '+ date);
+    throw new TypeError('Invalid date object');
+  }
   return date.toISOString().split('T')[0];
 };
+
+export function dateReviver(this: any, key: string, value: any) {
+  const dateFormat = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/;
+  if (typeof value === 'string' && dateFormat.test(value)) {
+    return new Date(value);
+  }
+  return value;
+}
+
 
 export const invalidateLocalStorage = (force: boolean) => {
     const storedVersion = localStorage.getItem('storageVersion');
