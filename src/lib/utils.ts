@@ -20,7 +20,7 @@ export const dateToIsoDate = (date: Date): string => {
   return date.toISOString().split('T')[0];
 };
 
-export function dateReviver(this: any, key: string, value: any) {
+export function dateReviver(this: unknown, key: string, value: string | null | object): unknown {
   const dateFormat = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/;
   if (typeof value === 'string' && dateFormat.test(value)) {
     return new Date(value);
