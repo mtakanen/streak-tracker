@@ -3,7 +3,7 @@ import { ScopeProvider } from '@/context/ScopeContext';
 import { Analytics } from "@vercel/analytics/react"
 
 import '@/styles/globals.css';
-import '@/styles/Skeleton.css'; // Add necessary CSS for skeleton loading
+import '@/styles/skeleton.css';
 
 import { Geist, Geist_Mono } from "next/font/google";
 
