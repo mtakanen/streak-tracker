@@ -9,10 +9,11 @@ const MilestoneCard = ({
   todayCompleted: boolean;
 }) => {
   const nextMilestone = getNextMilestone(streak);
-  const milestoneUnlocked = nextMilestone === '0 days';
-  const isMilestoneDay =
-    (nextMilestone === '1 days' && todayCompleted === false) ||
-    nextMilestone === '0 days';
+  const milestoneUnlocked = (nextMilestone === '0 days' && todayCompleted);
+  const isMilestoneDay = (
+    nextMilestone === '1 days' && !todayCompleted || milestoneUnlocked
+  );
+
   return (
     <div
       className={`p-3 bg-slate-50 rounded-lg text-center ${milestoneUnlocked ? 'cursor-pointer' : ''}`}
