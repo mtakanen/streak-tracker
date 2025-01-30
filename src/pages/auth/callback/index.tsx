@@ -3,13 +3,13 @@ import { useEffect, useState, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { StravaTokenData } from '@/types/strava';
-import { LoadingModal } from '@/components/ui/modal';
+// import { LoadingModal } from '@/components/ui/modal';
 import { useScope } from '@/context/ScopeContext';
 
 const STRAVA_CALLBACK_PAGE = '/api/strava/callback';
 
 export default function AuthCallback() {
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -51,7 +51,7 @@ export default function AuthCallback() {
         console.error('Error during authentication:', err); // Debugging log
         setError(err instanceof Error ? err.message : 'Authentication failed');
       } finally {
-        setLoading(false);
+        // setLoading(false);
       }
     };
 
@@ -61,7 +61,7 @@ export default function AuthCallback() {
 
   return (
     <>
-      <LoadingModal isOpen={loading} text="Authenticating..." />
+      {/**<LoadingModal isOpen={loading} text="Authenticating..." />**/}
       {error && (
         <Card>
           <CardContent>
