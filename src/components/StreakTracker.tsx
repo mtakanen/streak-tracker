@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { Clock } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import Skeleton from '@/components/Skeleton';
 import { ActivityModal, LoadingModal, StatsModal, MilestoneModal } from '@/components/ui/modal';
 import MilestoneCard from '@/components/MilestoneCard'
 import { StravaActivity, DayEntry, StreakData, LocalActivities } from '@/types/strava';
@@ -34,7 +35,7 @@ const StreakTracker = () => {
   
         if (storedData) {
           const { activities, timestamp }: LocalActivities = JSON.parse(storedData);
-          const expirary = 1 * 60 * 1000; // 5min
+          const expirary = 1 * 30 * 1000; // 5min
           if (now - timestamp < expirary) {
             // these should be fresh enough
             return activities;
@@ -193,7 +194,53 @@ const StreakTracker = () => {
   }
 
   if (!streakData) {
-    return <LoadingModal isOpen={loading} text="Loading activities" />;
+    // skeleton loading
+    return (
+      <>
+        <Card className="w-full max-w-sm mx-auto">
+          <CardHeader className="space-y-1">
+            <div className="flex items-center justify-between mb-2">
+              <CardTitle className="text-slate-600 text-xl">Normi Run</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Current Streak Display */}
+            <Skeleton width="100%" height="150px" />
+            {/* Stats Grid */}
+            <div className="grid grid-cols-2 gap-3">
+              <Skeleton  width="100%" height="90px" />
+              <Skeleton  width="100%" height="90px" />
+            </div>
+            {/* Last 7 Days Timeline */}
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              <div className="text-sm font-medium">Previous 7 days</div>
+                <div className="flex gap-[0.3rem]">
+                {[...Array(6)].map((_, index) => (
+                  <div key={index} className="flex-1 rounded-md">
+                    <Skeleton width="100" height="50px" />
+                  </div>
+                ))}
+                </div>
+            </div>
+            {/* Goal Display */}
+            <div className="text-sm text-center text-slate-600 pt-2">
+              Normi: Stay active and healthy by running at least <span style={{ whiteSpace: 'nowrap' }}>{MINIMUM_DURATION} minutes</span> every day!
+            </div>
+            {/* Strava Attribution */}
+            <div className="flex justify-center mt-4">
+              <Image 
+                src="/api_logo_pwrdBy_strava_stack_light.svg" 
+                alt="Powered by Strava" 
+                width={100} 
+                height={50} 
+                className="logo"           
+              />
+            </div>
+          </CardContent>
+        </Card>
+        <LoadingModal isOpen={loading} text="Loading activities" />
+      </>
+    );
   }
   
   return (
