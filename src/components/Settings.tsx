@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+const MINIMUM_DURATION = 5;
+
 const Settings = ({
   initialDuration,
   onSave,
@@ -14,7 +16,11 @@ const Settings = ({
   const [duration, setDuration] = useState(initialDuration);
 
   const handleSave = () => {
-    onSave(duration);
+    if (duration >= MINIMUM_DURATION) {
+      onSave(duration);
+    } else {
+      alert(`Minimum duration must be at least ${MINIMUM_DURATION} minutes.`);
+    }
   };
 
   return (
@@ -29,6 +35,7 @@ const Settings = ({
           value={duration}
           onChange={(e) => setDuration(Number(e.target.value))}
           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          min={MINIMUM_DURATION}
           disabled={settingsDisabled}
         />
       </div>
