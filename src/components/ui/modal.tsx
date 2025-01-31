@@ -54,7 +54,7 @@ const ActivityModal = ({
   }
   const newName = 'Normi Run #' + dayStreak;
   let allowedToRename = false;
-  if (scope && scope.includes('activity:write')) {
+  if (scope && scope.includes('activity:write') && dayStreak > 1) {
     allowedToRename = true;
   }
   return (
