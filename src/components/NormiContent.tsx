@@ -162,7 +162,7 @@ const NormiContent = ({ streakData, showMilestoneModal, setShowMilestoneModal ,s
       {showStatsModal && (
         <StatsModal 
           stats={streakData.stats} 
-          streak={streakData.currentStreak}
+          streakData={streakData}
           onClose={handleCloseStatsModal} 
         />
       )}
