@@ -10,8 +10,7 @@ const MilestoneCard = ({
 }) => {
   const nextMilestone = getNextMilestone(streak);
   const milestoneUnlocked = (nextMilestone === '0 days' && todayCompleted);
-  const isMilestoneDay = (
-    nextMilestone === '1 days' && !todayCompleted || milestoneUnlocked
+  const isMilestoneDay = ( milestoneUnlocked || nextMilestone === '1 days' && !todayCompleted 
   );
 
   return (
