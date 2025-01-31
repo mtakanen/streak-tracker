@@ -28,12 +28,16 @@ const UserMenu: React.FC<UserMenuProps> = ({
   settingsDisabled,
 }) => {
 
-const [settingsOpen, setSettingsOpen] = useState(false);
+    const [settingsOpen, setSettingsOpen] = useState(false);
 
-const handleSaveSettings = (duration: number) => {
-    localStorage.setItem('minimumDuration', duration.toString());
-    setSettingsOpen(false);
-  };
+    const handleSaveSettings = (duration: number) => {
+        if (duration > 0) {
+            localStorage.setItem('minimumDuration', duration.toString());
+            setSettingsOpen(false);
+        } else {    
+            setSettingsOpen(true);
+        }
+    };
 
   return (
     <div className="relative">
