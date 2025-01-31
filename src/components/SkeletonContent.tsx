@@ -18,8 +18,8 @@ return (
       <Card className="w-full max-w-sm mx-auto">
         <NormiHeader />
         <CardContent className="space-y-4">
-          {/* Current Streak Display */}
-          <Skeleton width="100%" height="150px" />
+          {/* Streak Display */}
+          <Skeleton width="100%" height="130px" />
           {/* Stats Grid */}
           <div className="grid grid-cols-2 gap-3">
             <Skeleton  width="100%" height="90px" />
