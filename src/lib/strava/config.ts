@@ -22,10 +22,10 @@ export const STRAVA_CONFIG = {
 };
 
 export const INITIAL_LOAD_MONTHS = parseInt(process.env.NEXT_PUBLIC_INITIAL_LOAD_MONTHS || '12');
-export const MINIMUM_DURATION = 25;
+export const DEFAULT_MINIMUM = 25;
 export const GRACE_DURATION = 20;
 export const GRACE_DISTANCE = 5;
-export const STORAGE_VERSION = '1.0';
+export const STORAGE_VERSION = '1.1';
 
 export const MILESTONES: { [key: number]: { text: string; size: 'minor' | 'major' } } = {
   2: { text: "Back-to-back run, 👌 it's a streak!", size: 'minor' },

@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { INITIAL_LOAD_MONTHS, MINIMUM_DURATION } from '@/lib/strava/config';
+import { DEFAULT_MINIMUM, INITIAL_LOAD_MONTHS } from '@/lib/strava/config';
 
 const SupportPage = () => {
   return (
@@ -28,7 +28,7 @@ const SupportPage = () => {
           </p>
           <ul className="list-disc list-inside mt-2 text-gray-700">
             <li>Dashboard shows your current streak, upcoming milestone and runs from the previous 7 days</li>
-            <li>Streak calculation is based on the daily {MINIMUM_DURATION} minutes minimum duration. 
+            <li>Streak calculation is based on the daily minimum goal duration in the settings (by default {DEFAULT_MINIMUM}min). 
                 Ensure the sum of daily moving time meet the goal to maintain your streak!</li>
             <li>Streak statistics are shown when today minutes is clicked</li>
             <li>Previous 7 days shows completed runs as green. Clicking any of those days shows activity&apos;s name and link back to Strava</li>
@@ -44,6 +44,7 @@ const SupportPage = () => {
             <li>normi.run currently supports only running activities</li>
             <li>Data synchronization with Strava may take a few minutes. Reload the page if needed</li>
             <li>Maximum streak is limited to {INITIAL_LOAD_MONTHS*30.5} days</li>
+            <li>Minimum duration can only be changed before Strava login</li>
             <li>If you encounter any persistent issues, please contact the developer for assistance</li>
           </ul>
         </div>

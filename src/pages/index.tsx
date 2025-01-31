@@ -9,6 +9,7 @@ import { invalidateLocalStorage } from '@/lib/utils';
 const HomePage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [settingsDisabled, setSettingsDisabled] = useState(false);
   const [profilePicture, setProfilePicture] = useState<string | undefined>(undefined);
   const [firstName, setFirstName] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -17,6 +18,7 @@ const HomePage = () => {
     const accessToken = localStorage.getItem('stravaAccessToken');
     if (accessToken) {
       setIsAuthenticated(true);
+      setSettingsDisabled(true);
     }
     const athleteData = localStorage.getItem('stravaAthlete');
     if (athleteData) {
@@ -49,6 +51,8 @@ const HomePage = () => {
     setProfilePicture(undefined);
     setFirstName(null);
     setDropdownOpen(false);
+    setSettingsDisabled(false);
+
   };
 
   return (
@@ -62,6 +66,7 @@ const HomePage = () => {
           setDropdownOpen={setDropdownOpen}
           handleLogout={handleLogout}
           dropdownRef={dropdownRef}
+          settingsDisabled={settingsDisabled}
         />
       </div>
       <div className="flex justify-center mb-4">
