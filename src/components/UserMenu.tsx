@@ -1,7 +1,10 @@
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { RefObject } from 'react';
 import Link from 'next/link';
 import { MenuIcon } from 'lucide-react';
+import Settings from './Settings';
+import { DEFAULT_MINIMUM } from '@/lib/strava/config';
 
 interface UserMenuProps {
   profilePicture?: string;
@@ -11,6 +14,7 @@ interface UserMenuProps {
   setDropdownOpen: (open: boolean) => void;
   handleLogout: () => void;
   dropdownRef: RefObject<HTMLDivElement | null>;
+  settingsDisabled: boolean;
 }
 
 const UserMenu: React.FC<UserMenuProps> = ({
@@ -21,7 +25,16 @@ const UserMenu: React.FC<UserMenuProps> = ({
   setDropdownOpen,
   handleLogout,
   dropdownRef,
+  settingsDisabled,
 }) => {
+
+const [settingsOpen, setSettingsOpen] = useState(false);
+
+const handleSaveSettings = (duration: number) => {
+    localStorage.setItem('minimumDuration', duration.toString());
+    setSettingsOpen(false);
+  };
+
   return (
     <div className="relative">
       <button
@@ -53,6 +66,14 @@ const UserMenu: React.FC<UserMenuProps> = ({
               </Link>
             </li>
             <li>
+              <button
+                onClick={() => setSettingsOpen(true)}
+                className="w-full text-left py-2 flex items-center"
+              >
+                <span className="mr-2">⚙️</span> Settings
+              </button>
+            </li>
+            <li>
               <Link href="/">
                 {isAuthenticated && (
                   <button
@@ -65,6 +86,16 @@ const UserMenu: React.FC<UserMenuProps> = ({
               </Link>
             </li>
           </ul>
+        </div>
+      )}
+      {settingsOpen && (
+        <div className="absolute top-12 right-4">
+          <Settings
+            initialDuration={Number(localStorage.getItem('minimumDuration')) || DEFAULT_MINIMUM}
+            onSave={handleSaveSettings}
+            onCancel={() => setSettingsOpen(false)}
+            settingsDisabled={settingsDisabled}
+          />
         </div>
       )}
     </div>

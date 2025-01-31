@@ -2,7 +2,7 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { DayStatus, DayEntry, StravaActivity, StreakStats } from '@/types/strava';
-import { MINIMUM_DURATION, GRACE_DURATION, GRACE_DISTANCE, MILESTONES, STORAGE_VERSION } from '@/lib/strava/config';
+import { DEFAULT_MINIMUM, GRACE_DURATION, GRACE_DISTANCE, MILESTONES, STORAGE_VERSION } from '@/lib/strava/config';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -28,6 +28,10 @@ export function dateReviver(this: unknown, key: string, value: string | null | o
   return value;
 }
 
+export const getMinimumDuration = () => {
+  const storedDuration = localStorage.getItem('minimumDuration');
+  return storedDuration ? parseInt(storedDuration) : DEFAULT_MINIMUM;
+}
 
 export const invalidateLocalStorage = (force: boolean) => {
     const storedVersion = localStorage.getItem('storageVersion');
@@ -50,10 +54,10 @@ export const getDayStatus = (activities: StravaActivity[], localDate: Date): Day
   const totalDistance = dayActivities.reduce((sum, activity) =>
     sum + Math.floor(activity.distance / 1000), 0
   );
-  const completed = (totalDuration >= MINIMUM_DURATION || 
+  const completed = (totalDuration >= getMinimumDuration() || 
     (totalDuration >= GRACE_DURATION && totalDistance >= GRACE_DISTANCE)
   );
-  const isMinimumDay = totalDuration < (MINIMUM_DURATION + 5) * 60;
+  const isMinimumDay = totalDuration < (getMinimumDuration() + 5) * 60;
   const outdoorRuns = dayActivities.filter(day => day.outdoors).length;
   const startDate = dayActivities.length > 0 ? dayActivities[0].start_date_local : dateString;
   return {

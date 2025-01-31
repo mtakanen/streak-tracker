@@ -4,10 +4,10 @@ import { Clock } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import {CardHeader, CardTitle} from '@/components/ui/card';
 import { DayEntry, StravaActivity, StreakStats } from '@/types/strava';
-import { MINIMUM_DURATION, MILESTONES } from '@/lib/strava/config';
+import { MILESTONES } from '@/lib/strava/config';
 import { ActivityModal, StatsModal, MilestoneModal } from '@/components/ui/modal';
 import MilestoneCard from '@/components/MilestoneCard'
-import { dateToIsoDate } from '@/lib/utils';
+import { dateToIsoDate, getMinimumDuration } from '@/lib/utils';
 
 const NormiHeader = () => {
   return (
@@ -23,7 +23,7 @@ const NormiFooter = () => {
       <>
         {/* Goal Display */}
         <div className="text-sm text-center text-slate-600 pt-2">
-          Normi: Stay active and healthy by running at least <span style={{ whiteSpace: 'nowrap' }}>{MINIMUM_DURATION} minutes</span> every day!
+          Normi: Stay active and healthy by running at least <span style={{ whiteSpace: 'nowrap' }}>{getMinimumDuration()} minutes</span> every day!
         </div>
         {/* Strava Attribution */}
         <div className="flex justify-center mt-4">
