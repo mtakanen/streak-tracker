@@ -7,8 +7,9 @@ import { DayEntry, StravaActivity, StreakStats } from '@/types/strava';
 import { MILESTONES } from '@/lib/strava/config';
 import { ActivityModal, StatsModal, MilestoneModal } from '@/components/ui/modal';
 import MilestoneCard from '@/components/MilestoneCard'
+import StreakCard from '@/components/StreakCard';
 import RecentDays from '@/components/RecentDays';
-import { dateToIsoDate, getMinimumDuration } from '@/lib/utils';
+import { getMinimumDuration } from '@/lib/utils';
 
 const NormiHeader = () => {
   return (
@@ -79,21 +80,9 @@ const NormiContent = ({ streakData, showMilestoneModal, setShowMilestoneModal ,s
         <NormiHeader />
         <CardContent className="space-y-4">
           {/* Current Streak Display */}
-          <div className={`text-center p-4 rounded-lg ${streakData.completed ? 'bg-green-50' : 'bg-orange-50'}`}>
-            <div className={`text-4xl font-bold ${streakData.completed ? 'text-green-600' : 'text-orange-600'}`}>
-              {streakData.currentStreak} days
-            </div>
-            <div className={`text-sm ${streakData.completed ? 'text-green-600' : 'text-orange-600'}`}>
-              current streak
-            </div>
-            <div className="text-sm text-orange-600">
-              {streakData.currentStreak > 0 && !streakData.completed ? 'Keep going! Run today to continue your streak!' : ''}
-            </div>
-            <div className="text-xs text-slate-600">
-              {streakData.currentStreak > 0 ? `started on ${dateToIsoDate(streakData.currentStreakStartDate)}` : 'Go running!'}
-            </div>
-          </div>
-
+          <StreakCard  
+            streakData={streakData}
+          />
           {/* Stats Grid */}
           <div className="grid grid-cols-2 gap-3">
             <div className="p-3 bg-slate-50 rounded-lg text-center cursor-pointer"
