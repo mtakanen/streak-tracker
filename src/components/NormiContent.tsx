@@ -7,6 +7,7 @@ import { DayEntry, StravaActivity, StreakStats } from '@/types/strava';
 import { MILESTONES } from '@/lib/strava/config';
 import { ActivityModal, StatsModal, MilestoneModal } from '@/components/ui/modal';
 import MilestoneCard from '@/components/MilestoneCard'
+import RecentDays from '@/components/RecentDays';
 import { dateToIsoDate, getMinimumDuration } from '@/lib/utils';
 
 const NormiHeader = () => {
@@ -85,7 +86,6 @@ const NormiContent = ({ streakData, showMilestoneModal, setShowMilestoneModal ,s
             <div className={`text-sm ${streakData.completed ? 'text-green-600' : 'text-orange-600'}`}>
               current streak
             </div>
-            {/* TODO: do not show this message if the streak is broken */}
             <div className="text-sm text-orange-600">
               {streakData.currentStreak > 0 && !streakData.completed ? 'Keep going! Run today to continue your streak!' : ''}
             </div>
@@ -112,35 +112,13 @@ const NormiContent = ({ streakData, showMilestoneModal, setShowMilestoneModal ,s
             />
           </div>
           {/* Last 7 Days Timeline with Strava Links */}
-          <div className="space-y-2 max-h-48 overflow-y-auto">
-            <div className="text-sm font-medium">Previous 7 days</div>
-            <div className="flex gap-1">
-              {streakData.lastSevenDays.map((day: {
-                index: number;
-                weekday: string;
-                duration: number;
-                completed: boolean;
-                activities: StravaActivity[];
-              }, index: number) => (
-                <div
-                key={index}
-                className={`flex-1 rounded-md p-2 text-center cursor-pointer ${day.completed ? 'bg-green-100' : 'bg-orange-100'}`}
-                onClick={() => {
-                  if (day.completed) {
-                    setSelectedIndex(index);
-                    setSelectedDay(day.index);
-                    setSelectedWeekday(day.weekday);
-                    setSelectedDayActivities(day.activities);
-                  }
-                }}
-                style={{ cursor: day.completed ? 'pointer' : 'not-allowed' }}      
-                >
-                <div className="text-xs text-green-800"><span style={{ whiteSpace: 'nowrap' }}>{day.weekday}</span></div>
-                <div className="text-sm font-medium">{day.duration}min</div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <RecentDays 
+            streakData={streakData}
+            setSelectedIndex={setSelectedIndex}
+            setSelectedDay={setSelectedDay}
+            setSelectedWeekday={setSelectedWeekday}
+            setSelectedDayActivities={setSelectedDayActivities}
+          />
           <NormiFooter />
         </CardContent>
         {selectedDay !== null && (
