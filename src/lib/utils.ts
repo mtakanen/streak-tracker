@@ -181,7 +181,6 @@ export const getNextMilestone = (currentStreak: number): string | undefined => {
 
 
 export const calculateInitStats = (activities: StravaActivity[], fromDate: Date): StreakStats => {
-  // FIME: make totals cumulative. avg can be 7-days avg 
   const runs = activities.filter(
     activity => activity.type === 'Run' && 
     activity.start_date_local >= dateToIsoDate(fromDate))

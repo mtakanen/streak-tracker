@@ -28,7 +28,6 @@ export const GRACE_DISTANCE = 5;
 export const STORAGE_VERSION = '1.0';
 
 export const MILESTONES: { [key: number]: { text: string; size: 'minor' | 'major' } } = {
-  1: { text: "Ta-daa! 🎉 First run!", size: 'minor' },
   2: { text: "Back-to-back run, 👌 it's a streak!", size: 'minor' },
   7: { text: "One week streak! ♨️ Can you feel it?", size: 'major' },
   10: { text: "Ten days streak! 🎯 Keep going!", size: 'minor' },
