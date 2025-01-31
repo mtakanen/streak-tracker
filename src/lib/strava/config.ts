@@ -23,7 +23,7 @@ export const STRAVA_CONFIG = {
 
 export const INITIAL_LOAD_MONTHS = parseInt(process.env.NEXT_PUBLIC_INITIAL_LOAD_MONTHS || '12');
 export const DEFAULT_MINIMUM = 25;
-export const GRACE_DURATION = 20;
+export const GRACE_DURATION = 4;
 export const GRACE_DISTANCE = 5;
 export const STORAGE_VERSION = '1.1';
 

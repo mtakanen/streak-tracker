@@ -48,16 +48,18 @@ export const getDayStatus = (activities: StravaActivity[], localDate: Date): Day
     // const mainType = subTypeToMainType[activity.type] || activity.type;
     return activity.start_date_local.startsWith(dateString) && activity.type === 'Run';
   });
+  const minimumDuration = getMinimumDuration();
   const totalDuration = dayActivities.reduce((sum, activity) =>
     sum + Math.floor(activity.moving_time / 60), 0
   );
   const totalDistance = dayActivities.reduce((sum, activity) =>
     sum + Math.floor(activity.distance / 1000), 0
   );
-  const completed = (totalDuration >= getMinimumDuration() || 
-    (totalDuration >= GRACE_DURATION && totalDistance >= GRACE_DISTANCE)
+  const completed = (totalDuration >= minimumDuration || 
+    // FIXME: Grace period for any minimum duration
+    (totalDuration >= minimumDuration - GRACE_DURATION && totalDistance >= GRACE_DISTANCE)
   );
-  const isMinimumDay = totalDuration < (getMinimumDuration() + 5) * 60;
+  const isMinimumDay = totalDuration < (minimumDuration + 5) * 60;
   const outdoorRuns = dayActivities.filter(day => day.outdoors).length;
   const startDate = dayActivities.length > 0 ? dayActivities[0].start_date_local : dateString;
   return {
