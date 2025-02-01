@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { SettingsIcon, HelpCircleIcon, LogOutIcon } from 'lucide-react';
 import { RefObject } from 'react';
 import Link from 'next/link';
 import { MenuIcon } from 'lucide-react';
@@ -47,7 +48,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
     <div className="relative">
       <button
         onClick={() => setDropdownOpen(!dropdownOpen)}
-        className="absolute top right-4 p-2 rounded-md focus:outline-none"
+        className="absolute top right-4 p-4 rounded-md focus:outline-none"
       >
         {profilePicture ? (
           <Image
@@ -66,29 +67,27 @@ const UserMenu: React.FC<UserMenuProps> = ({
           ref={dropdownRef}
           className="absolute top-12 right-4 bg-white border border-gray-300 rounded-md shadow-lg"
         >
-          <ul className="py-2 ml-2 mr-2">
+          <ul className="py-2 ml-3 mr-3">
             <li className="mb-2">{firstName}</li>
-            <li>
-              <Link href="/support">
-                <span className="mr-2 font-bold">?</span> Support
-              </Link>
-            </li>
             <li>
               <button
                 onClick={() => setSettingsOpen(true)}
-                className="w-full text-left py-2 flex items-center"
-              >
-                <span className="mr-2">⚙️</span> Settings
+                className="py-2 flex"
+              ><SettingsIcon/>Settings
               </button>
+            </li>
+            <li>
+              <Link className="py-2 flex"
+                href="/support"><HelpCircleIcon />Support</Link>
             </li>
             <li>
               <Link href="/">
                 {isAuthenticated && (
                   <button
                     onClick={() => handleLogout()}
-                    className="w-full text-left py-2 flex items-center"
+                    className="py-2 flex"
                   >
-                    <span className="mr-2">🔐</span> Log out
+                    <LogOutIcon/>Log out
                   </button>
                 )}
               </Link>
