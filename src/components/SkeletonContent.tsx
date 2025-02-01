@@ -36,6 +36,7 @@ const SkeletonContent = () => {
             ))}
           </div>
         </div>
+        {/* TODO: Goal Progress */}
       </CardContent>
       <NormiFooter />
     </Card>

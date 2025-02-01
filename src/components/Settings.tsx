@@ -4,7 +4,7 @@ const MINIMUM_DURATION = 5;
 
 interface SettingsProps {
     initialDuration: number;
-    endGoal: number;
+    goalDays: number;
     onSave: ({ duration, goal }: { duration: number; goal: number }) => void;
     onCancel: () => void;
     settingsDisabled: boolean;
@@ -12,13 +12,13 @@ interface SettingsProps {
   
 const Settings = ({
   initialDuration,
-  endGoal,
+  goalDays,
   onSave,
   onCancel,
   settingsDisabled
 }: SettingsProps) => {
   const [duration, setDuration] = useState(initialDuration);
-  const [goal, setGoal] = useState(endGoal);
+  const [goal, setGoal] = useState(goalDays);
 
   const handleSave = () => {
     if (duration >= MINIMUM_DURATION) {
@@ -64,7 +64,6 @@ const Settings = ({
       <button
         onClick={handleSave}
         className="px-4 py-2 bg-blue-500 text-white rounded-md"
-        disabled={settingsDisabled}
       >
         Save
       </button>

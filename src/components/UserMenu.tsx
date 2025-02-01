@@ -31,6 +31,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
     const [settingsOpen, setSettingsOpen] = useState(false);
 
     const handleSaveSettings = ({ duration, goal }: { duration: number; goal: number }) => {
+        // TODO: reload page after saving goal
         localStorage.setItem('goalDays', goal.toString());
         if (duration > 0) {
             localStorage.setItem('minimumDuration', duration.toString());
@@ -97,7 +98,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
         <div className="absolute top-12 right-4">
           <Settings
             initialDuration={Number(localStorage.getItem('minimumDuration')) || DEFAULT_MINIMUM}
-            endGoal={Number(localStorage.getItem('endGoal')) || 0 }
+            goalDays={Number(localStorage.getItem('goalDays')) || 0 }
             onSave={handleSaveSettings}
             onCancel={() => setSettingsOpen(false)}
             settingsDisabled={settingsDisabled}
