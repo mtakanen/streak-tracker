@@ -33,6 +33,11 @@ export const getMinimumDuration = () => {
   return storedDuration ? parseInt(storedDuration) : DEFAULT_MINIMUM;
 }
 
+export const getGoal = () => {
+  const storedGoal = localStorage.getItem('goalDays');
+  return storedGoal ? parseInt(storedGoal) : 0;
+}
+
 export const invalidateLocalStorage = (force: boolean) => {
     const storedVersion = localStorage.getItem('storageVersion');
     if (storedVersion !== STORAGE_VERSION || force) {
