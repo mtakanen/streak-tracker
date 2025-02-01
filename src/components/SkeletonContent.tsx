@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { NormiHeader, NormiFooter } from './NormiContent';
-
+import { ProgressBar } from './MilestoneCard';
 type SkeletonProps = {
   width: string;
   height: string;
@@ -13,7 +13,11 @@ const Skeleton = ({ width, height }: SkeletonProps) => {
   );
 };
 
-const SkeletonContent = () => {
+type SkeletonContentProps = {
+  goal: number;
+};
+
+const SkeletonContent = ({ goal }: SkeletonContentProps) => {
   return (
     <Card className="w-full max-w-sm mx-auto">
       <NormiHeader />
@@ -36,7 +40,9 @@ const SkeletonContent = () => {
             ))}
           </div>
         </div>
-        {/* TODO: Goal Progress */}
+        {goal > 0 && (
+          <ProgressBar streak={0} goal={goal} />
+        )}
       </CardContent>
       <NormiFooter />
     </Card>
