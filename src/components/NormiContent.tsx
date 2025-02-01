@@ -15,16 +15,16 @@ import StreakCard from '@/components/StreakCard';
 import RecentDays from '@/components/RecentDays';
 import { getMinimumDuration, getGoal } from '@/lib/utils';
 
-const GOAL = getGoal();
 const SPECIAL_GOAL = 2525;
 
 const NormiHeader = () => {
+  const goal = getGoal();
   const noGoal = 'Normi Run';
   const title =
-    GOAL === SPECIAL_GOAL
+    goal === SPECIAL_GOAL
       ? '25 for 25'
-      : GOAL > 0
-        ? `${GOAL} Days of Running`
+      : goal > 0
+        ? `${goal} Days of Running`
         : noGoal;
   return (
     <CardHeader className="space-y-1">
@@ -106,6 +106,8 @@ const NormiContent = ({
   const handleCloseStatsModal = () => {
     setShowStatsModal(false);
   };
+  const goal = getGoal();
+
   return (
     <>
       <Card className="w-full max-w-sm mx-auto">
@@ -141,10 +143,10 @@ const NormiContent = ({
             setSelectedWeekday={setSelectedWeekday}
             setSelectedDayActivities={setSelectedDayActivities}
           />
-          {GOAL > 0 && (
+          {goal > 0 && (
             <ProgressBar 
               streak={streakData.currentStreak} 
-              goal={GOAL === SPECIAL_GOAL ? 365 : GOAL} />
+              goal={goal === SPECIAL_GOAL ? 365 : goal} />
           )}
           <NormiFooter />
         </CardContent>
