@@ -71,7 +71,7 @@ const HomePage = () => {
       </div>
       <div className="flex justify-center mb-4">
         <Link href="/">
-          <Image priority src="/25.png" alt="25 for 25" width={90} height={90} />
+          <Image priority src="/normi.svg" alt="flame" width={80} height={80} />
         </Link>
       </div>
 
