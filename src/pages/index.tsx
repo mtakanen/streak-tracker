@@ -4,7 +4,7 @@ import Link from 'next/link';
 import StreakTracker from '@/components/StreakTracker';
 import StravaConnectButton from '@/components/StravaConnectButton';
 import UserMenu from '@/components/UserMenu';
-import { invalidateLocalStorage } from '@/lib/utils';
+import { invalidateLocalStorage, getGoal } from '@/lib/utils';
 
 const HomePage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -54,6 +54,11 @@ const HomePage = () => {
     setSettingsDisabled(false);
 
   };
+  const [icon, setIcon] = useState('/normi.svg');
+  useEffect(() => {
+    const icon = getGoal() === 2525 ? '/2525.png' : '/normi.svg';
+    setIcon(icon);
+  }, []);
 
   return (
     <div className="p-4">
@@ -71,7 +76,7 @@ const HomePage = () => {
       </div>
       <div className="flex justify-center mb-4">
         <Link href="/">
-          <Image priority src="/normi.svg" alt="flame" width={80} height={80} />
+          <Image src={icon} priority alt="flame" width={80} height={80} />        
         </Link>
       </div>
 
