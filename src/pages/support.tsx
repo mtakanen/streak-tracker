@@ -13,16 +13,22 @@ const SupportPage = () => {
         <div>
           <h2 className="text-xl font-semibold">Instructions</h2>
           <p className="mt-2 text-gray-700">
+            Normi Run is a simple app that helps you maintain a running streak.
             Here are some instructions to help you get started:
           </p>
-          <ul className="list-disc list-inside mt-2 text-gray-700">
+          <ol className="list-disc list-inside mt-2 text-gray-700">
+            <li>Start by setting your daily minimum duration and streak goal from the settings menu
+            </li>
             <li>Log in to your Strava account to start tracking your run streak.
-            For that app requires to get access to your activities. On Strava Authorization page you must check at least: <span className='italic'>View data about your activities</span></li>
-            <li>If you want to track from your private activities, also check <span className='italic'>
-              View data about your private activities</span></li>
+            For that app requires to get access to your activities. 
+            On Strava Authorization page you must check at least:
+            <span className='italic'>View data about your activities</span></li>
+            <li>If you want to track from your private activities, also check 
+              <span className='italic'>View data about your private activities</span>
+            </li>
             <li>App can rename activity back to Strava. If you wish to do that also check: <span className='italic'>
               Upload your activities from Normi Run to Strava</span></li>
-          </ul>
+          </ol>
           <p className="mt-2 text-gray-700">
             After you connect with Strava, you can start tracking your run streak:
           </p>
