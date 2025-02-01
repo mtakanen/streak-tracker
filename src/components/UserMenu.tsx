@@ -31,8 +31,10 @@ const UserMenu: React.FC<UserMenuProps> = ({
     const [settingsOpen, setSettingsOpen] = useState(false);
 
     const handleSaveSettings = ({ duration, goal }: { duration: number; goal: number }) => {
-        // TODO: reload page after saving goal
+        const reload = localStorage.getItem('goalDays') !== goal.toString();
         localStorage.setItem('goalDays', goal.toString());
+        if (reload) window.location.reload();
+        
         if (duration > 0) {
             localStorage.setItem('minimumDuration', duration.toString());
             setSettingsOpen(false);
