@@ -37,6 +37,27 @@ const MilestoneCard = ({
   );
 };
 
+const ProgressBar = ({ streak, goal }: { streak: number, goal: number }) => {
+  const progress = streak / goal;
+  return (
+    <>
+      <div className="flex justify-between font-medium">
+      <span className="text-sm ">Progress</span>
+      <span className="text-xs text-slate-700 ml-auto">{goal} days</span>
+      </div>
+      <div className="w-full bg-slate-200 rounded-full h-2.5">
+        <div
+          className="bg-green-600 h-2.5 rounded-full"
+          style={{ width: `${progress * 100}%` }}
+        ></div>
+      </div>
+    </>
+  );
+};
+
+export { MilestoneCard, ProgressBar };
+
+/**
 const ProgressCircle = ({ progress }: { progress: number }) => {
   const radius = 15.9155;
   const circumference = 2 * Math.PI * radius;
@@ -78,24 +99,4 @@ const ProgressCircle = ({ progress }: { progress: number }) => {
     </div>
   );
 };
-
-
-const ProgressBar = ({ streak, goal }: { streak: number, goal: number }) => {
-  const progress = streak / goal;
-  return (
-    <>
-      <div className="flex justify-between font-medium">
-      <span className="text-sm ">Progress</span>
-      <span className="text-xs text-slate-700 ml-auto">{goal} days</span>
-      </div>
-      <div className="w-full bg-slate-200 rounded-full h-2.5">
-        <div
-          className="bg-green-600 h-2.5 rounded-full"
-          style={{ width: `${progress * 100}%` }}
-        ></div>
-      </div>
-    </>
-  );
-};
-
-export { MilestoneCard, ProgressBar };
+ */

@@ -37,7 +37,7 @@ export const MILESTONES: { [key: number]: { text: string; size: 'minor' | 'major
   31: { text: "One month streak! 🥁 You're on a roll!", size: 'major' },
   35: { text: "Five weeks streak! 🙅‍♂️ You're unstoppable!", size: 'minor' },
   42: { text: "Six weeks streak! 🤖 You're a machine!", size: 'minor' },
-  50: { text: "Half of 100 days streak! 🦹 You're half-blood!", size: 'major' },
+  50: { text: "Half of 100 days streak! 🚫 No parking here!", size: 'major' },
   56: { text: "Eight weeks streak! 🏄‍♂️ Floating!", size: 'minor' },
   59: { text: "Two months streak! 🎸 Play a solo!", size: 'major' },
   70: { text: "Ten weeks streak! 🎯 You're a sniper!", size: 'major' },

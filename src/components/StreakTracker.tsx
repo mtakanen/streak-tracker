@@ -175,7 +175,6 @@ const StreakTracker = () => {
     );
   }
 
-  const goal = 100;
   if (!streakData) {
     return (
       <>
