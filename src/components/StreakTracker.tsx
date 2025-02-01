@@ -8,7 +8,7 @@ import { LoadingModal } from '@/components/ui/modal';
 import { StravaActivity, DayEntry, StreakData, LocalActivities } from '@/types/strava';
 import { getStravaActivities } from '@/lib/strava/api';
 import { STRAVA_CONFIG, INITIAL_LOAD_MONTHS, MILESTONES } from '@/lib/strava/config';
-import { calculateDayEntries, dateReviver, invalidateLocalStorage, initStreaks, updateCurrentStreak } from '@/lib/utils';
+import { getGoal, calculateDayEntries, dateReviver, invalidateLocalStorage, initStreaks, updateCurrentStreak } from '@/lib/utils';
 
 const StreakTracker = () => {
   const [loading, setLoading] = useState(true);
@@ -174,11 +174,11 @@ const StreakTracker = () => {
       <ErrorContent error={error} />
     );
   }
-
   if (!streakData) {
     return (
       <>
-        <SkeletonContent />
+        <SkeletonContent 
+          goal={getGoal()}/>
         <LoadingModal isOpen={loading} text={`Loading up to ${INITIAL_LOAD_MONTHS} months of run history..`} />
       </>
     );

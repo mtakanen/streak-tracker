@@ -4,7 +4,7 @@ import Link from 'next/link';
 import StreakTracker from '@/components/StreakTracker';
 import StravaConnectButton from '@/components/StravaConnectButton';
 import UserMenu from '@/components/UserMenu';
-import { invalidateLocalStorage } from '@/lib/utils';
+import { invalidateLocalStorage, getGoal } from '@/lib/utils';
 
 const HomePage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -54,6 +54,11 @@ const HomePage = () => {
     setSettingsDisabled(false);
 
   };
+  const [icon, setIcon] = useState('/normi.svg');
+  useEffect(() => {
+    const icon = getGoal() === 2525 ? '/2525.png' : '/normi.svg';
+    setIcon(icon);
+  }, []);
 
   return (
     <div className="p-4">
@@ -71,7 +76,7 @@ const HomePage = () => {
       </div>
       <div className="flex justify-center mb-4">
         <Link href="/">
-          <Image priority src="/25.png" alt="25 for 25" width={90} height={90} />
+          <Image src={icon} priority alt="flame" width={80} height={80} />        
         </Link>
       </div>
 
@@ -80,7 +85,7 @@ const HomePage = () => {
       ) : (
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Welcome to Normi Run</h1>
-          <p className="mb-2">App tracks your running streak using your Strava activities</p>
+          <p className="mb-2">Track running streak using your Strava</p>
           <p className="mb-2">App requires to <span className='italic'>View data about your (public) activities</span></p>
           <p className="mb-4">Please connect with Strava to get started</p>
           <div className="flex justify-center">

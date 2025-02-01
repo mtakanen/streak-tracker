@@ -43,12 +43,12 @@ const CurrentStreak = ({ streakData }: { streakData: StreakData }) => {
 
 const LongestStreak = ({ streakData }: { streakData: StreakData }) => {
   return (
-    <div className="p-4 rounded-lg text-center bg-slate-50">
-      <div className="text-4xl font-bold text-green-600">
+    <div className="p-4 rounded-lg text-center bg-slate-50 text-slate-600">
+      <div className="text-4xl font-bold ">
         {streakData.longestStreak} days
       </div>
-      <div className="text-sm text-green-600">longest streak</div>
-      <div className="text-xs text-slate-600">
+      <div className="text-sm">longest streak</div>
+      <div className="text-xs">
         {`started on ${dateToIsoDate(streakData.longestStreakStartDate)}`}
       </div>
     </div>
