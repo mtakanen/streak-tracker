@@ -19,12 +19,11 @@ const RecentDays = ({
   const lastCompleted = streakData.lastSevenDays.findLastIndex((day) => day.completed);
   const bgColor = (dayCompleted: boolean, dayIndex: number) =>
     dayCompleted ? 'bg-green-100' : dayIndex > lastCompleted ? 'bg-slate-50': 'bg-orange-100';
-  const recentDays = [...streakData.lastSevenDays].reverse();
   return (
     <div className="space-y-2 max-h-48 overflow-y-auto">
       <div className="text-sm">Last 7 days</div>
       <div className="flex">
-        {recentDays.map(
+        {streakData.lastSevenDays.map(
           (
             day: {
               index: number;

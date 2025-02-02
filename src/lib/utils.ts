@@ -145,7 +145,7 @@ export function calculateDayEntries(activities: StravaActivity[], localDate: Dat
       activities: status.activities
     };
   });
-  return lastSevenDays;
+  return lastSevenDays.reverse();
 }
   
   
@@ -153,16 +153,20 @@ export function updateCurrentStreak(lastSevenDays: DayEntry[], currentDate: Date
   currentStreakUpdatedAt: Date, currentStreak: number, currentStreakStartDate: Date, stats: StreakStats): {
   currentStreakUpdatedAt: Date, currentStreak: number, currentStreakStartDate: Date, stats: StreakStats } {
   
-  const reversedDays = [...lastSevenDays].reverse();
-  for (let i = 0; i < reversedDays.length; i++) {
-    const dayEntry = reversedDays[i];
+  //const reversedDays = [...lastSevenDays].reverse();
+  for (let i = 0; i < lastSevenDays.length; i++) {
+    const dayEntry = lastSevenDays[i];
     const dayString = dateToIsoDate(dayEntry.local_date);
 
     if (dayEntry.completed && dayString > dateToIsoDate(currentStreakUpdatedAt)) {
       currentStreak++;
+      currentStreakUpdatedAt = new Date(dayEntry.local_date);
+      if (currentStreak === 1) {
+        currentStreakStartDate = new Date(dayEntry.local_date);
+      }
       // increment stats
       accumulateDailyStats(stats, dayEntry);
-      currentStreakUpdatedAt = new Date(dayEntry.local_date);
+
     } else if (!dayEntry.completed && dayString === dateToIsoDate(currentDate)) {
       // If today's activity is not completed, do not increment the streak
       continue;
@@ -170,8 +174,7 @@ export function updateCurrentStreak(lastSevenDays: DayEntry[], currentDate: Date
       currentStreak = 0;
       resetStreakStats(stats);
       currentStreakStartDate = new Date(0); // epoch
-      currentStreakUpdatedAt = new Date(0); // epoch
-      break;
+      currentStreakUpdatedAt = new Date(dayString); // epoch
     }
   }
   
