@@ -41,13 +41,13 @@ const ProgressBar = ({ streak, goal }: { streak: number, goal: number }) => {
   const progress = streak / goal;
   return (
     <>
-      <div className="flex justify-between font-medium">
-      <span className="text-sm ">Progress</span>
-      <span className="text-xs text-slate-700 ml-auto">{goal} days</span>
+      <div className="flex justify-between">
+      <span className="text-sm">Goal progress</span>
+      <span className="text-xs text-slate-700">{goal} days</span>
       </div>
       <div className="w-full bg-slate-200 rounded-full h-2.5">
         <div
-          className="bg-green-600 h-2.5 rounded-full"
+          className="bg-orange-500 h-2.5 rounded-full"
           style={{ width: `${progress * 100}%` }}
         ></div>
       </div>

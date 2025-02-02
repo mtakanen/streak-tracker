@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Loader } from 'lucide-react';
+import { Loader, XIcon } from 'lucide-react';
 import { StravaActivity, StreakData, StreakStats } from '@/types/strava';
 import { updateActivityName } from '@/lib/strava/api';
 import { useScope } from '@/context/ScopeContext';
@@ -48,6 +48,8 @@ const ActivityModal = ({
   onClose: () => void;
 }) => {
   const { scope } = useScope();
+
+  const dateTitle = `${weekday} ${new Date(activities[0].start_date_local).toLocaleDateString()}`;
   let dayStreak = streakData.currentStreak - index;
   if (!streakData.completed) {
     dayStreak = dayStreak + 1;
@@ -60,16 +62,14 @@ const ActivityModal = ({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center px-4">
       <div className="bg-white p-4 rounded-lg max-w-md w-full sm:w-auto relative mx-4">
-        <h2 className="text-l font-bold mb-4">
-          {weekday}{' '}
-          {new Date(activities[0].start_date_local).toLocaleDateString()}
-        </h2>
+        <h2 className="text-l font-bold mb-4">{dateTitle}</h2>
         <button
           className="absolute top-2 right-2 text-gray-500"
           onClick={onClose}
         >
-          &times;
+          <XIcon />
         </button>
+
         {activities.map((activity) => (
           <div key={activity.id} className="mb-2">
             <span className="text-xs whitespace-nowrap flex items-center">
@@ -104,13 +104,19 @@ const ActivityModal = ({
   );
 };
 
-const LoadingModal = ({ isOpen, text }: { isOpen: boolean; text: string }) => {
+const LoadingModal = ({ isOpen, text, progress }: { isOpen: boolean; text: string; progress: number }) => {
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-white p-6 rounded-lg shadow-lg text-center">
         <Loader className="animate-spin mx-auto mb-4" />
         <p>{text}</p>
+        <div className="w-full bg-slate-200 rounded-full h-2.5 mt-4">
+          <div
+            className="bg-blue-500 h-2.5 rounded-full"
+            style={{ width: `${progress}%` }}
+          ></div>
+        </div>
       </div>
     </div>
   );

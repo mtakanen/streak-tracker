@@ -29,20 +29,21 @@ const SkeletonContent = ({ goal }: SkeletonContentProps) => {
           <Skeleton width="100%" height="90px" />
           <Skeleton width="100%" height="90px" />
         </div>
+        {goal > 0 && (
+          <ProgressBar streak={0} goal={goal} />
+        )}
+
         {/* Last 7 Days Timeline */}
         <div className="space-y-2 max-h-48 overflow-y-auto">
           <div className="text-sm font-medium">Previous 7 days</div>
           <div className="flex gap-[0.3rem]">
-            {[...Array(6)].map((_, index) => (
-              <div key={index} className="flex-1 rounded-md">
-                <Skeleton width="100" height="50px" />
+            {[...Array(7)].map((_, index) => (
+              <div key={index} className="flex-1 rounded-full">
+                <Skeleton width="100" height="20px" />
               </div>
             ))}
           </div>
         </div>
-        {goal > 0 && (
-          <ProgressBar streak={0} goal={goal} />
-        )}
       </CardContent>
       <NormiFooter />
     </Card>

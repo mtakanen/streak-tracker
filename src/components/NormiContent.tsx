@@ -38,7 +38,7 @@ const NormiFooter = () => {
   return (
     <>
       {/* Normi Display */}
-      <div className="text-sm text-center text-slate-600 pt-2">
+      <div className="text-sm text-center text-slate-600 pt-2 mt-4">
         Stay active and healthy by running at least{' '}
         <span style={{ whiteSpace: 'nowrap' }}>
           {getMinimumDuration()} minutes
@@ -135,6 +135,11 @@ const NormiContent = ({
               todayCompleted={streakData.completed}
             />
           </div>
+          {goal > 0 && (
+            <ProgressBar 
+              streak={streakData.currentStreak} 
+              goal={goal === SPECIAL_GOAL ? 365 : goal} />
+          )}
           {/* Last 7 Days Timeline with Strava Links */}
           <RecentDays
             streakData={streakData}
@@ -143,11 +148,6 @@ const NormiContent = ({
             setSelectedWeekday={setSelectedWeekday}
             setSelectedDayActivities={setSelectedDayActivities}
           />
-          {goal > 0 && (
-            <ProgressBar 
-              streak={streakData.currentStreak} 
-              goal={goal === SPECIAL_GOAL ? 365 : goal} />
-          )}
           <NormiFooter />
         </CardContent>
         {selectedDay !== null && (

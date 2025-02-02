@@ -18,7 +18,7 @@ export const STRAVA_CONFIG = {
   tokenUrl: TOKEN_URL,
   athelteActivitiesUrl: ATHLETE_ACTIVITIES_URL,
   activityUrl: ACTIVITY_URL,
-  timeout: 10000,
+  timeout: 15000,
 };
 
 export const INITIAL_LOAD_MONTHS = parseInt(process.env.NEXT_PUBLIC_INITIAL_LOAD_MONTHS || '12');

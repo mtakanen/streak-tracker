@@ -68,43 +68,60 @@ export async function getStravaActivities(after: number, perPage: number): Promi
   let allActivities: StravaActivity[] = [];
 
   while (hasMoreActivities) {
-    const response = await axios.get<StravaCustomActivity[]>(STRAVA_CONFIG.athelteActivitiesUrl, {
-      params: {
-        after,
-        page,
-        per_page: perPage,
-      },
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-        timeout: STRAVA_CONFIG.timeout
-    });
+    try {
+      const response = await axios.get<StravaCustomActivity[]>(STRAVA_CONFIG.athelteActivitiesUrl, {
+        params: {
+          after,
+          page,
+          per_page: perPage,
+        },
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+          timeout: STRAVA_CONFIG.timeout
+      });
 
-    if (response.status !== 200) {
-      //console.log(response);
-      if (response.status === 400) {
-        throw new Error('Strava API: 400 Bad request');
-      } else if (response.status === 401) {
-        throw new Error('Strava API: 401 Unauthorized');
-      } else if (response.status === 403) {
-        throw new Error('Strava API: 403 Forbidden');
-      } else if (response.status === 404) {
-        throw new Error('Strava API: 404 Not found');
-      } else if (response.status === 429) {
-        throw new Error('Strava API: 429 Too many requests');
-      } else if (response.status === 500) {
-        throw new Error('Strava API: 500 Internal server error');
-      } else {
-        throw new Error('Failed to fetch activities');
+      if (response.status !== 200) {
+        //console.log(response);
+        if (response.status === 400) {
+          throw new Error('Strava API: 400 Bad request');
+        } else if (response.status === 401) {
+          throw new Error('Strava API: 401 Unauthorized');
+        } else if (response.status === 403) {
+          throw new Error('Strava API: 403 Forbidden');
+        } else if (response.status === 404) {
+          throw new Error('Strava API: 404 Not found');
+        } else if (response.status === 429) {
+          throw new Error('Strava API: 429 Too many requests');
+        } else if (response.status === 500) {
+          throw new Error('Strava API: 500 Internal server error');
+        } else {
+          throw new Error('Failed to fetch activities');
+        }
       }
-    }
-    const data: StravaActivity[] = extendStravaData(response.data);
-    allActivities = allActivities.concat(data);
+      const data: StravaActivity[] = extendStravaData(response.data);
+      allActivities = allActivities.concat(data);
 
-    if (data.length == 0) {
-      hasMoreActivities = false;
-    } else {
-      page++;
+      if (data.length == 0) {
+        hasMoreActivities = false;
+      } else {
+        page++;
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          console.error('Error response data:', error.response.data);
+          throw new Error(`Failed to fetch activities: ${error.response.status} ${error.response.statusText}`);
+        } else if (error.request) {
+          console.error('Network error:', error.message);
+          throw new Error('Network error: Failed to fetch activities');
+        } else {
+          console.error('Error message:', error.message);
+          throw new Error('Failed to fetch activities');
+        }
+      } else {
+      throw new Error('Failed to fetch activities');
+      }
     }
   }
 
