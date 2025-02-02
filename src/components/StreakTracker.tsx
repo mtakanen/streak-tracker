@@ -12,6 +12,7 @@ import { getGoal, calculateDayEntries, dateReviver, invalidateLocalStorage, init
 
 const StreakTracker = () => {
   const [loading, setLoading] = useState(true);
+  const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
@@ -37,7 +38,7 @@ const StreakTracker = () => {
           }  
         } else {
           // We don't have any stored data, so fetch all activities in bigger chunks
-          pageSize = 150;
+          pageSize = 100;
         }  
         setLoading(true);
         const fetchedActivities: StravaActivity[] = await getStravaActivities(fromTimestamp, pageSize);
@@ -165,9 +166,27 @@ const StreakTracker = () => {
     // setShowMilestoneModal(true); // dev only
     if (streakData && streakData.completed && streakData.currentStreak in MILESTONES) {
       setShowMilestoneModal(true);
-    }
+    }    
   }, [streakData]);
 
+  useEffect(() => {
+    const progressInterval = 50;
+    if(loading) {
+      // timout prorges
+      const interval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 100) {
+            clearInterval(interval);
+            setLoading(false);
+            return 100;
+          }
+          return prev + (100 / (STRAVA_CONFIG.timeout / progressInterval));
+        });
+      }, progressInterval); 
+
+      return () => clearInterval(interval);
+    }
+  }, [loading]);    
 
   if (error) {
     return (
@@ -179,7 +198,10 @@ const StreakTracker = () => {
       <>
         <SkeletonContent 
           goal={getGoal()}/>
-        <LoadingModal isOpen={loading} text={`Loading up to ${INITIAL_LOAD_MONTHS} months of run history..`} />
+        <LoadingModal 
+          isOpen={loading} 
+          text={`Loading up to ${INITIAL_LOAD_MONTHS} months of run history..`} 
+          progress={progress}/>
       </>
     );
   }
@@ -201,7 +223,7 @@ const StreakTracker = () => {
         selectedDayActivities={selectedDayActivities}
         setSelectedDayActivities={setSelectedDayActivities}
       />
-      <LoadingModal isOpen={loading} text="Checking for new runs.." />
+      <LoadingModal isOpen={loading} text="Checking for new runs.." progress={progress} />
     </>
   );
 };
