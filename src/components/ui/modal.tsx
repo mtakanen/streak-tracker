@@ -54,6 +54,10 @@ const ActivityModal = ({
   if (!streakData.completed) {
     dayStreak = dayStreak + 1;
   }
+  const dayDuration = Math.floor(activities.reduce(
+    (total, activity) => total + activity.moving_time, 0)
+    /60
+  )
   const newName = 'Normi Run #' + dayStreak;
   let allowedToRename = false;
   if (scope && scope.includes('activity:write') && dayStreak > 1) {
@@ -62,14 +66,16 @@ const ActivityModal = ({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center px-4">
       <div className="bg-white p-4 rounded-lg max-w-md w-full sm:w-auto relative mx-4">
-        <h2 className="text-l font-bold mb-4">{dateTitle}</h2>
+        <h2 className="text-l font-bold">{dateTitle}</h2>
         <button
           className="absolute top-2 right-2 text-gray-500"
           onClick={onClose}
         >
           <XIcon />
         </button>
-
+        <p className="text-xs mb-4">
+          {dayDuration}min
+        </p>
         {activities.map((activity) => (
           <div key={activity.id} className="mb-2">
             <span className="text-xs whitespace-nowrap flex items-center">

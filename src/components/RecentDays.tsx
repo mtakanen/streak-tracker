@@ -23,7 +23,7 @@ const RecentDays = ({
   return (
     <div className="space-y-2 max-h-48 overflow-y-auto">
       <div className="text-sm">Last 7 days</div>
-      <div className="flex gap-1">
+      <div className="flex">
         {recentDays.map(
           (
             day: {
