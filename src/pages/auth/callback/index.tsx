@@ -1,8 +1,6 @@
 import axios from 'axios';
-import Link from 'next/link';
 import { useEffect, useState, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Card, CardContent } from '@/components/ui/card';
 import { StravaTokenData } from '@/types/strava';
 import { LoadingModal } from '@/components/ui/modal';
 import { useScope } from '@/context/ScopeContext';
