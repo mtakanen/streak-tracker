@@ -1,15 +1,16 @@
 import axios from 'axios';
+import Link from 'next/link';
 import { useEffect, useState, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { StravaTokenData } from '@/types/strava';
-// import { LoadingModal } from '@/components/ui/modal';
+import { LoadingModal } from '@/components/ui/modal';
 import { useScope } from '@/context/ScopeContext';
 
 const STRAVA_CALLBACK_PAGE = '/api/strava/callback';
 
 export default function AuthCallback() {
-  // const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -32,10 +33,8 @@ export default function AuthCallback() {
       }
 
       try {
+        setLoading(true);
         const response = await axios.post<StravaTokenData>(STRAVA_CALLBACK_PAGE, { code, scope })
-        if (response.status !== 200) {
-          throw new Error('Failed to exchange code');
-        }
         const data = response.data;
         // Store tokens
         localStorage.setItem('stravaAccessToken', data.access_token);
@@ -47,11 +46,22 @@ export default function AuthCallback() {
         localStorage.setItem('scope', scope || '');
         // Redirect to home
         router.push('/');
-      } catch (err) {
-        console.error('Error during authentication:', err); // Debugging log
-        setError(err instanceof Error ? err.message : 'Authentication failed');
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          if (error.response && error.response.data) {
+            console.error('Error during token exchange:', error.response.data);
+            setError(error.response.data.message);        
+          } else if (error.request) {
+            console.error('Network error:', error.message);
+            setError('Network error: Failed to refresh token');
+          } else {
+            console.error('Error message:', error.message);
+          }
+        } else {
+          console.error('Unknown Error:', error);
+      }
       } finally {
-        // setLoading(false);
+        setLoading(false);
       }
     };
 
@@ -61,12 +71,17 @@ export default function AuthCallback() {
 
   return (
     <>
-      {/**<LoadingModal isOpen={loading} text="Authenticating..." />**/}
-      {error && (
+      <LoadingModal isOpen={loading} text="Authenticating..." progress={0} />
+    {error && (
         <Card>
           <CardContent>
-            <h1>OH NOES</h1>
-            <p>Error: {error}</p>
+            <h1>OH NOES!</h1>
+            <p>{error}</p>
+            <div className="text-center mt-4">
+              <Link href="/" className="text-black-600 hover:underline">
+                Back to Main Page
+              </Link>
+            </div>
           </CardContent>
         </Card>
       )}

@@ -62,7 +62,6 @@ export async function getStravaActivities(after: number, perPage: number): Promi
   if (!token) {
     throw new Error('No access token found');
   }
-
   let page = 1;
   let hasMoreActivities = true;
   let allActivities: StravaActivity[] = [];
