@@ -11,7 +11,6 @@ const STRAVA_CALLBACK_PAGE = '/api/strava/callback';
 
 export default function AuthCallback() {
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const router = useRouter();
   const hasHandledCallback = useRef(false);
@@ -20,7 +19,7 @@ export default function AuthCallback() {
   useEffect(() => {
     const code = searchParams.get('code');
     const scope = searchParams.get('scope');
-
+    let route = '/';
     if (!code || hasHandledCallback.current) {
       return;
     }
@@ -28,7 +27,6 @@ export default function AuthCallback() {
     const handleCallback = async () => {
       const code = searchParams.get('code');
       if (!code) {
-        setError('No authorization code received');
         return;
       }
 
@@ -44,24 +42,26 @@ export default function AuthCallback() {
         // Set the scope in the global state
         setScope(scope);
         localStorage.setItem('scope', scope || '');
-        // Redirect to home
-        router.push('/');
       } catch (error) {
         if (axios.isAxiosError(error)) {
           if (error.response && error.response.data) {
             console.error('Error during token exchange:', error.response.data);
-            setError(error.response.data.message);        
+            route = `/?error=${encodeURIComponent(error.response.data.message)}`;      
           } else if (error.request) {
             console.error('Network error:', error.message);
-            setError('Network error: Failed to refresh token');
+            route = `/?error=${encodeURIComponent('Network error: Failed to exchange code')}`;
           } else {
             console.error('Error message:', error.message);
+            route = `/?error=${encodeURIComponent(error.message)}`;  
           }
         } else {
           console.error('Unknown Error:', error);
-      }
+          route = `/?error=${encodeURIComponent('Unknown error: Failed to exchange code')}`;
+        }
       } finally {
         setLoading(false);
+        // Redirect to home
+        router.push(route);      
       }
     };
 
@@ -70,22 +70,7 @@ export default function AuthCallback() {
   }, [searchParams, router, setScope]);
 
   return (
-    <>
-      <LoadingModal isOpen={loading} text="Authenticating..." progress={0} />
-    {error && (
-        <Card>
-          <CardContent>
-            <h1>OH NOES!</h1>
-            <p>{error}</p>
-            <div className="text-center mt-4">
-              <Link href="/" className="text-black-600 hover:underline">
-                Back to Main Page
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-    </>
+    <LoadingModal isOpen={loading} text="Authenticating..." progress={0} />
   );
 };
 

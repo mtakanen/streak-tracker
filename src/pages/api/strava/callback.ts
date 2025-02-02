@@ -14,7 +14,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ message: 'Authorization code is required' });
   }
 
-  // console.log('POST /api/strava/callback code,scope:', code,scope);
   try {
     const response = await fetch(STRAVA_CONFIG.tokenUrl, {
       method: 'POST',

@@ -1,6 +1,8 @@
 import Image from 'next/image';
 import React, { useEffect, useState, useRef } from 'react';
+import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { Card, CardContent } from '@/components/ui/card';
 import StreakTracker from '@/components/StreakTracker';
 import StravaConnectButton from '@/components/StravaConnectButton';
 import UserMenu from '@/components/UserMenu';
@@ -8,11 +10,13 @@ import { invalidateLocalStorage, getGoal } from '@/lib/utils';
 
 const HomePage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [settingsDisabled, setSettingsDisabled] = useState(false);
   const [profilePicture, setProfilePicture] = useState<string | undefined>(undefined);
   const [firstName, setFirstName] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const accessToken = localStorage.getItem('stravaAccessToken');
@@ -30,7 +34,11 @@ const HomePage = () => {
       }
       setFirstName(athlete.firstname);
     }
-  }, []);
+    // Check for error in query parameters
+    if (router.query.error) {
+      setError(router.query.error as string);
+    }
+  }, [router.query.error]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -60,8 +68,30 @@ const HomePage = () => {
     setIcon(icon);
   }, []);
 
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => setError(null), 5000);
+      return () => {
+        clearTimeout(timer);
+        router.replace('/');
+      }
+    }
+  }, [error]);
+
   return (
     <div className="p-4">
+      {error && (
+        <Card>
+            <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-50">
+            <Card>
+              <CardContent>
+              <h1>OH NOES!</h1>
+              <p className='text-red-500'>{error}</p>
+              </CardContent>
+            </Card>
+            </div>
+        </Card>
+      )}
       <div className="relative">
         <UserMenu
           profilePicture={profilePicture}
@@ -79,7 +109,6 @@ const HomePage = () => {
           <Image src={icon} priority alt="flame" width={80} height={80} />        
         </Link>
       </div>
-
       {isAuthenticated ? (
         <StreakTracker />
       ) : (
