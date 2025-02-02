@@ -189,9 +189,9 @@ describe('Utility Functions', () => {
         });
         it('should increment streak if past activities are completed and updatedAt is before', () => {
             const lastSevenDays: DayEntry[] = [
-                {  local_date: new Date('2023-10-02T00:00:00Z'), completed: true, index: 0, weekday: 'Monday',  duration: 60, activities: [], distance: 0, runs: 0, isMinimumDay: false, outdoorRuns: 0 },
+                {  local_date: new Date('2023-09-30T00:00:00Z'), completed: true, index: 0, weekday: 'Saturday',  duration: 60, activities: [], distance: 0, runs: 0, isMinimumDay: false, outdoorRuns: 0 },
                 {  local_date: new Date('2023-10-01T00:00:00Z'), completed: true, index: 1, weekday: 'Sunday',  duration: 60, activities: [], distance: 0, runs: 0, isMinimumDay: false, outdoorRuns: 0 },
-                {  local_date: new Date('2023-09-30T00:00:00Z'), completed: true, index: 2, weekday: 'Saturday',  duration: 60, activities: [], distance: 0, runs: 0, isMinimumDay: false, outdoorRuns: 0 }
+                {  local_date: new Date('2023-10-02T00:00:00Z'), completed: true, index: 2, weekday: 'Monday',  duration: 60, activities: [], distance: 0, runs: 0, isMinimumDay: false, outdoorRuns: 0 }
 
             ];
             const currentStreak = 3;
@@ -205,9 +205,9 @@ describe('Utility Functions', () => {
         });
         it('should increment streak if past activities are completed, today not and updatedAt is before', () => {
             const lastSevenDays: DayEntry[] = [
-                {  local_date: new Date('2023-10-02T00:00:00Z'), completed: false, index: 0, weekday: 'Monday',  duration: 6, activities: [], distance: 0, runs: 0, isMinimumDay: false, outdoorRuns: 0 },
+                {  local_date: new Date('2023-09-30T00:00:00Z'), completed: true, index: 0, weekday: 'Saturday',  duration: 60, activities: [], distance: 0, runs: 0, isMinimumDay: false, outdoorRuns: 0 },
                 {  local_date: new Date('2023-10-01T00:00:00Z'), completed: true, index: 1, weekday: 'Sunday',  duration: 60, activities: [], distance: 0, runs: 0, isMinimumDay: false, outdoorRuns: 0 },
-                {  local_date: new Date('2023-09-30T00:00:00Z'), completed: true, index: 2, weekday: 'Saturday',  duration: 60, activities: [], distance: 0, runs: 0, isMinimumDay: false, outdoorRuns: 0 }
+                {  local_date: new Date('2023-10-02T00:00:00Z'), completed: false, index: 2, weekday: 'Monday',  duration: 6, activities: [], distance: 0, runs: 0, isMinimumDay: false, outdoorRuns: 0 }
 
             ];
             const currentStreak = 3;
@@ -239,17 +239,18 @@ describe('Utility Functions', () => {
             const lastSevenDays: DayEntry[] = [
                 {  local_date: new Date('2023-09-30T00:00:00Z'), completed: true, index: 0, weekday: 'Saturday',  duration: 60, activities: [], distance: 0, runs: 0, isMinimumDay: false, outdoorRuns: 0  },
                 {  local_date: new Date('2023-10-01T00:00:00Z'), completed: false, index: 1, weekday: 'Sunday',  duration: 0, activities: [], distance: 0, runs: 0, isMinimumDay: false, outdoorRuns: 0  },
-                {  local_date: new Date('2023-10-02T00:00:00Z'), completed: true, index: 2, weekday: 'Monday',  duration: 60, activities: [], distance: 0, runs: 0, isMinimumDay: false, outdoorRuns: 0  }
+                {  local_date: new Date('2023-10-02T00:00:00Z'), completed: false, index: 1, weekday: 'Sunday',  duration: 0, activities: [], distance: 0, runs: 0, isMinimumDay: false, outdoorRuns: 0  },
+                {  local_date: new Date('2023-10-03T00:00:00Z'), completed: true, index: 2, weekday: 'Monday',  duration: 60, activities: [], distance: 0, runs: 0, isMinimumDay: false, outdoorRuns: 0  }
 
             ];
             const currentStreak = 2;
             const currentStreakUpdatedAt = new Date('2023-09-30T00:00:00Z');
             const currentStreakStartDate = new Date('2023-09-30T00:00:00Z');
-            const currentDate = new Date('2023-10-02T00:00:00Z');
+            const currentDate = new Date('2023-10-03T00:00:00Z');
             const stats: StreakStats = { runs: 0, minimumDays: 0, outdoorRuns: 0, totalDuration: 0, totalDistance: 0 };
             const result = updateCurrentStreak(lastSevenDays, currentDate, currentStreakUpdatedAt, currentStreak, currentStreakStartDate, stats);
-            expect(result.currentStreak).toBe(0);
-            expect(result.currentStreakStartDate.getTime()).toBe(0); // epoch
+            expect(result.currentStreak).toBe(1);
+            expect(result.currentStreakStartDate.getTime()).toBe(currentDate.getTime()); // epoch
         });
     });
   });
