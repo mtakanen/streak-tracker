@@ -10,7 +10,9 @@ class MyDocument extends Document {
   render() {
     return (
       <Html lang="en">
-        <Head />
+        <Head>
+          <link rel="icon" href="/normi.svg" />
+        </Head>
         <body className="antialiased">
           <Main />
           <NextScript />
