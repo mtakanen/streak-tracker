@@ -39,6 +39,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ error: "Invalid code" });
     }
     if (!(await accountCanMakeRequest(data.athlete.id))) {
+      console.log('Request Limiter: ' + data.athlete.id);
       return res.status(429).json({ message: "Request Limiter: 15min request limit exceeded" });
     }
     // Check if the scope field is present in the response
