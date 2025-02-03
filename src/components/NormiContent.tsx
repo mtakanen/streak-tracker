@@ -179,12 +179,18 @@ const NormiContent = ({
 
 const ErrorContent = ({ error }: { error: string }) => {
   return (
-    <Card className="w-full max-w-sm mx-auto">
-      <NormiHeader />
-      <CardContent>
-        <p>Error: {error}</p>
-      </CardContent>
-    </Card>
+    <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-85">
+      <Card className="w-full max-w-sm mx-auto">
+        <CardHeader className="space-y-1">
+          <div className="flex items-center justify-between mb-2">
+            <CardTitle className="text-red-500 text-xl">ERROR</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <p className='text-red-500'>Error: {error}</p>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

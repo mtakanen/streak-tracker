@@ -2,10 +2,10 @@ import Image from 'next/image';
 import React, { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { Card, CardContent } from '@/components/ui/card';
 import StreakTracker from '@/components/StreakTracker';
 import StravaConnectButton from '@/components/StravaConnectButton';
 import UserMenu from '@/components/UserMenu';
+import { ErrorContent } from '@/components/NormiContent';
 import { invalidateLocalStorage, getGoal } from '@/lib/utils';
 
 const HomePage = () => {
@@ -76,21 +76,12 @@ const HomePage = () => {
         router.replace('/');
       }
     }
-  }, [error]);
+  }, [error, router]);
 
   return (
     <div className="p-4">
       {error && (
-        <Card>
-            <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-50">
-            <Card>
-              <CardContent>
-              <h1>OH NOES!</h1>
-              <p className='text-red-500'>{error}</p>
-              </CardContent>
-            </Card>
-            </div>
-        </Card>
+        <ErrorContent error={error} />
       )}
       <div className="relative">
         <UserMenu
