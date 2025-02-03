@@ -38,7 +38,7 @@ const StreakTracker = () => {
           }  
         } else {
           // We don't have any stored data, so fetch all activities in bigger chunks
-          pageSize = 100;
+          pageSize = 200;
         }  
         setLoading(true);
         const fetchedActivities: StravaActivity[] = await getStravaActivities(fromTimestamp, pageSize);
