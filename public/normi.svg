@@ -10,12 +10,12 @@
     <filter id="turbulence">
       <feTurbulence 
         type="fractalNoise" 
-        baseFrequency="3" 
+        baseFrequency="0.005" 
         numOctaves="3" 
         seed="3">
         <animate 
-          attributeName="baseFrequency" 
-          dur="3s" 
+          attributeName="baseFrequency"
+          dur="26s" 
           values="0.02;0.02;0.01" 
           repeatCount="indefinite" />
       </feTurbulence>
