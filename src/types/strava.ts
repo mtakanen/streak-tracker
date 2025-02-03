@@ -9,6 +9,14 @@ export interface StravaActivity {
     outdoors: boolean;
 }
   
+export interface StravaAthlete {
+    id: number;
+    username: string;
+    firstname: string;
+    lastname: string;
+    profile_medium: string;
+}
+
 export interface TokenResponse {
     access_token: string;
     refresh_token: string;
@@ -19,13 +27,7 @@ export interface StravaTokenData {
     access_token: string;
     refresh_token: string;
     expires_in: number;
-    athlete: {
-        id: number;
-        username: string;
-        firstname: string;
-        lastname: string;
-        profile_medium: string;
-    };
+    athlete: StravaAthlete;
     granted_scope: string;       
 }
 

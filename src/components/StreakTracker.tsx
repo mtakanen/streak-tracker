@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { NormiContent, ErrorContent } from './NormiContent';
+import { NormiContent } from './NormiContent';
 import SkeletonContent from '@/components/SkeletonContent';
 import { LoadingModal } from '@/components/ui/modal';
 import { StravaActivity, DayEntry, StreakData, LocalActivities } from '@/types/strava';
@@ -45,7 +45,6 @@ const StreakTracker = () => {
         activities = [...activities, ...fetchedActivities];
         localStorage.setItem('stravaActivities', JSON.stringify({ activities: activities, timestamp: now }));
       } catch (err) {
-        console.log(err);
         if (err instanceof Error && (err.message.includes('401') || err.message.includes('token'))) {
           // Clear tokens if they're invalid and redirect to login page
           console.log(err.message);
@@ -54,7 +53,7 @@ const StreakTracker = () => {
           localStorage.removeItem('stravaTokenExpiry');
           window.location.href = STRAVA_CONFIG.authUrl; // Redirect to Strava authorization URL if token error
         } else {
-          setError(err instanceof Error ? err.message : 'Failed to fetch activities');
+          //setError(err instanceof Error ? err.message : 'Failed to fetch activities');
           throw err;
         }
       } finally {
@@ -142,7 +141,6 @@ const StreakTracker = () => {
       localStorage.setItem('streaks', JSON.stringify(streaks));
       setStreakData(streaks);
     } catch (err) {
-      console.error('Error fetching data:', err);
       if (err instanceof Error && err.message.includes('token')) {
         window.location.href = STRAVA_CONFIG.authUrl; // Redirect to Strava authorization URL if token error
       } else {
@@ -188,11 +186,16 @@ const StreakTracker = () => {
     }
   }, [loading]);    
 
-  if (error) {
-    return (
-      <ErrorContent error={error} />
-    );
-  }
+
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => setError(null), 5000);
+      return () => {
+        clearTimeout(timer);
+      }
+    }
+  }, [error]);
+
   if (!streakData) {
     return (
       <>
@@ -210,7 +213,7 @@ const StreakTracker = () => {
     <>
       <NormiContent
         streakData={streakData}
-        showMilestoneModal={showMilestoneModal}
+        showMilestoneModal={!error && showMilestoneModal}
         setShowMilestoneModal={setShowMilestoneModal}
         showStatsModal={showStatsModal}
         setShowStatsModal={setShowStatsModal}
@@ -222,6 +225,7 @@ const StreakTracker = () => {
         setSelectedWeekday={setSelectedWeekday}
         selectedDayActivities={selectedDayActivities}
         setSelectedDayActivities={setSelectedDayActivities}
+        error={error}
       />
       <LoadingModal isOpen={loading} text="Checking for new runs.." progress={progress} />
     </>

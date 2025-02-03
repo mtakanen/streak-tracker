@@ -82,6 +82,7 @@ interface NormiContentProps {
   setSelectedWeekday: (value: string | null) => void;
   selectedDayActivities: StravaActivity[];
   setSelectedDayActivities: (activities: StravaActivity[]) => void;
+  error: string | null;
 }
 
 const NormiContent = ({
@@ -98,6 +99,7 @@ const NormiContent = ({
   setSelectedWeekday,
   selectedDayActivities,
   setSelectedDayActivities,
+  error,
 }: NormiContentProps) => {
   const handleCloseMilestoneModal = () => {
     setShowMilestoneModal(false);
@@ -173,18 +175,19 @@ const NormiContent = ({
           onClose={handleCloseStatsModal}
         />
       )}
+      {error && <ErrorContent error={error} />}
     </>
   );
 };
 
 const ErrorContent = ({ error }: { error: string }) => {
   return (
-    <Card className="w-full max-w-sm mx-auto">
-      <NormiHeader />
-      <CardContent>
-        <p>Error: {error}</p>
-      </CardContent>
-    </Card>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+      <div className="bg-white p-4 rounded-lg max-w-md w-full sm:w-auto relative mx-4">
+        <h1 className="text-red-500 font-bold">ERROR</h1>
+        <p className="text-slate-600">Error: {error}</p>
+      </div>
+    </div>
   );
 };
 

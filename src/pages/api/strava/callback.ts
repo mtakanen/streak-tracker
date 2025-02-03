@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import {STRAVA_CONFIG} from '@/lib/strava/config';
+import accountCanMakeRequest from '@/lib/strava/ratelimit';
 
 // server-side code
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -13,7 +14,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ message: 'Authorization code is required' });
   }
 
-  // console.log('POST /api/strava/callback code,scope:', code,scope);
   try {
     const response = await fetch(STRAVA_CONFIG.tokenUrl, {
       method: 'POST',
@@ -31,12 +31,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Failed to exchange code:', errorText);
-      throw new Error('Failed to exchange code');
+      throw new Error('Failed to exchange Strava API code');
     }
 
     const data = await response.json();
-    //console.log('Received data from Strava:', data);
-
+    if (!data) {
+        return res.status(400).json({ error: "Invalid code" });
+    }
+    if (!(await accountCanMakeRequest(data.athlete.id))) {
+      console.log('Request Limiter: ' + data.athlete.id);
+      return res.status(429).json({ message: "Request Limiter: 15min request limit exceeded" });
+    }
     // Check if the scope field is present in the response
     const grantedScope = data.scope || scope || 'No scope granted';
     // console.log('Granted scopes:', grantedScope);

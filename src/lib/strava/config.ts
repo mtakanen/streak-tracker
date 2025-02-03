@@ -20,7 +20,9 @@ export const STRAVA_CONFIG = {
   activityUrl: ACTIVITY_URL,
   timeout: 15000,
 };
-
+export const UPSTASH_REDIS_REST_URL = process.env.KV_REST_API_URL;
+export const UPSTASH_REDIS_REST_TOKEN = process.env.KV_REST_API_TOKEN;
+export const STRAVA_API_LIMIT = parseInt(process.env.ACCOUNT_STRAVA_API_LIMIT || '10');
 export const INITIAL_LOAD_MONTHS = parseInt(process.env.NEXT_PUBLIC_INITIAL_LOAD_MONTHS || '12');
 export const DEFAULT_MINIMUM = 25;
 export const GRACE_DURATION = 4;
