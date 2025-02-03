@@ -67,7 +67,7 @@ export async function getStravaActivities(after: number, perPage: number): Promi
   let allActivities: StravaActivity[] = [];
   const stravaAthlete = localStorage.getItem('stravaAthlete');
   if (!stravaAthlete) {
-    throw new Error('Cannot request without athlete!');
+    throw new Error('Unable to request activities without athlete!');
   }
   const accountID = JSON.parse(stravaAthlete).id;
 
@@ -98,7 +98,7 @@ export async function getStravaActivities(after: number, perPage: number): Promi
       if (axios.isAxiosError(error)) {
         if (error.response) {
           //console.error('Error response data:', error.response.data);
-          throw new Error(`${error.response.status} ${error.response.data.message}`);
+          throw new Error(error.response.data.message);
         } else if (error.request) {
           //console.error('Network error:', error.message);
           throw new Error('Network error: Failed to fetch activities');

@@ -13,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!data || !data.account_id) {
     return res.status(400).json({ message: 'Request Limiter: invalid data' });
   } else if (!(await accountCanMakeRequest(data.account_id))) {
-    return res.status(429).json({ message: "Request Limiter: account exceeded 15min request limit" });
+    return res.status(429).json({ message: "Request Limiter: 15min request limit exceeded" });
   } else {
     res.status(200).json({ message: "OK" });
   }

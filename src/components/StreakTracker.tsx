@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { NormiContent, ErrorContent } from './NormiContent';
+import { NormiContent } from './NormiContent';
 import SkeletonContent from '@/components/SkeletonContent';
 import { LoadingModal } from '@/components/ui/modal';
 import { StravaActivity, DayEntry, StreakData, LocalActivities } from '@/types/strava';
@@ -192,7 +192,6 @@ const StreakTracker = () => {
       const timer = setTimeout(() => setError(null), 5000);
       return () => {
         clearTimeout(timer);
-        //router.replace('/');
       }
     }
   }, [error]);
@@ -212,12 +211,9 @@ const StreakTracker = () => {
 
   return (
     <>
-      {error && (
-        <ErrorContent error={error} />
-      )}
       <NormiContent
         streakData={streakData}
-        showMilestoneModal={showMilestoneModal}
+        showMilestoneModal={!error && showMilestoneModal}
         setShowMilestoneModal={setShowMilestoneModal}
         showStatsModal={showStatsModal}
         setShowStatsModal={setShowStatsModal}
@@ -229,6 +225,7 @@ const StreakTracker = () => {
         setSelectedWeekday={setSelectedWeekday}
         selectedDayActivities={selectedDayActivities}
         setSelectedDayActivities={setSelectedDayActivities}
+        error={error}
       />
       <LoadingModal isOpen={loading} text="Checking for new runs.." progress={progress} />
     </>
