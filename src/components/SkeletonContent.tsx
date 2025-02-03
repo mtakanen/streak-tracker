@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { NormiHeader, NormiFooter } from './NormiContent';
+import { NormiHeader, NormiFooter, ErrorContent } from './NormiContent';
 import { ProgressBar } from './MilestoneCard';
 type SkeletonProps = {
   width: string;
@@ -15,9 +15,10 @@ const Skeleton = ({ width, height }: SkeletonProps) => {
 
 type SkeletonContentProps = {
   goal: number;
+  error: string | null;
 };
 
-const SkeletonContent = ({ goal }: SkeletonContentProps) => {
+const SkeletonContent = ({ goal, error }: SkeletonContentProps) => {
   return (
     <Card className="w-full max-w-sm mx-auto">
       <NormiHeader />
@@ -46,6 +47,7 @@ const SkeletonContent = ({ goal }: SkeletonContentProps) => {
         </div>
       </CardContent>
       <NormiFooter />
+      {error && <ErrorContent error={error} />}
     </Card>
   );
 };

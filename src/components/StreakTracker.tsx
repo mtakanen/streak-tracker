@@ -200,7 +200,9 @@ const StreakTracker = () => {
     return (
       <>
         <SkeletonContent 
-          goal={getGoal()}/>
+          goal={getGoal()}
+          error={error}
+        />
         <LoadingModal 
           isOpen={loading} 
           text={`Loading up to ${INITIAL_LOAD_MONTHS} months of run history..`} 
