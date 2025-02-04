@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { Clock } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { CardHeader, CardTitle } from '@/components/ui/card';
-import { DayEntry, StravaActivity, StreakStats } from '@/types/strava';
+import { StravaActivity, StreakData } from '@/types/strava';
 import { MILESTONES } from '@/lib/strava/config';
 import {
   ActivityModal,
@@ -60,16 +60,7 @@ const NormiFooter = () => {
 };
 
 interface NormiContentProps {
-  streakData: {
-    completed: boolean;
-    currentStreak: number;
-    currentStreakStartDate: Date;
-    longestStreak: number;
-    longestStreakStartDate: Date;
-    todayMinutes: number;
-    lastSevenDays: DayEntry[];
-    stats: StreakStats;
-  };
+  streakData: StreakData;
   showMilestoneModal: boolean;
   setShowMilestoneModal: (value: boolean) => void;
   showStatsModal: boolean;
@@ -133,8 +124,7 @@ const NormiContent = ({
               <div className="text-xs text-slate-600">today</div>
             </div>
             <MilestoneCard
-              streak={streakData.currentStreak}
-              todayCompleted={streakData.completed}
+              streakData={streakData}
             />
           </div>
           {goal > 0 && (
