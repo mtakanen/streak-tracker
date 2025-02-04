@@ -1,13 +1,6 @@
 import { useState } from 'react';
 import { dateToIsoDate } from '@/lib/utils';
-
-interface StreakData {
-  completed: boolean;
-  currentStreak: number;
-  currentStreakStartDate: Date;
-  longestStreak: number;
-  longestStreakStartDate: Date;
-}
+import { StreakData } from '@/types/strava';
 
 const CurrentStreak = ({ streakData }: { streakData: StreakData }) => {
   const bgColor = (dayCompleted: boolean) =>
@@ -29,7 +22,7 @@ const CurrentStreak = ({ streakData }: { streakData: StreakData }) => {
       </div>
       <div className="text-sm text-orange-600">
         {streakData.currentStreak > 0 && !streakData.completed
-          ? 'Keep going! Run today to continue your streak!'
+          ? 'Keep going!'
           : ''}
       </div>
       <div className="text-xs text-slate-600">
@@ -48,6 +41,7 @@ const LongestStreak = ({ streakData }: { streakData: StreakData }) => {
         {streakData.longestStreak} days
       </div>
       <div className="text-sm">longest streak</div>
+      <div className=""></div>
       <div className="text-xs">
         {`started on ${dateToIsoDate(streakData.longestStreakStartDate)}`}
       </div>

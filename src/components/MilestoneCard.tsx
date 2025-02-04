@@ -1,17 +1,12 @@
 import { Milestone } from 'lucide-react';
-import { getNextMilestone } from '@/lib/utils';
+import { getDaysToNextMilestone, isMilestoneDay } from '@/lib/utils';
+import { StreakData } from '@/types/strava';
 
-const MilestoneCard = ({
-  streak,
-  todayCompleted,
-}: {
-  streak: number;
-  todayCompleted: boolean;
-}) => {
-  const nextMilestone = getNextMilestone(streak);
-  const milestoneUnlocked = (nextMilestone === '0 days' && todayCompleted);
-  const isMilestoneDay = ( milestoneUnlocked || nextMilestone === '1 days' && !todayCompleted 
-  );
+
+const MilestoneCard =  ({ streakData }: { streakData: StreakData })  => {
+  const daysToNextMilestone = getDaysToNextMilestone(streakData.currentStreak);
+  const milestoneDay = isMilestoneDay(streakData.currentStreak, streakData.currentStreakUpdatedAt, daysToNextMilestone);
+  const milestoneUnlocked = (daysToNextMilestone === 0 && streakData.completed);
 
   return (
     <div
@@ -21,12 +16,12 @@ const MilestoneCard = ({
       <Milestone className="w-5 h-5 mx-auto mb-1" />
       <div>
         <div className="text-xl font-bold">
-          {isMilestoneDay ? <span>Milestone</span> : nextMilestone}
+          {milestoneDay ? <span>Milestone</span> : `${daysToNextMilestone} days`}
         </div>
         <div className="text-xs text-slate-600">
           {milestoneUnlocked ? (
             <span>unlocked!</span>
-          ) : isMilestoneDay ? (
+          ) : milestoneDay ? (
             <span>today</span>
           ) : (
             <span>until next milestone</span>

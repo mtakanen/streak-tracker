@@ -1,6 +1,6 @@
 import 'jest-localstorage-mock';
 
-import { getDayStatus, calculateStreakLength, isoDateToUnixTimestamp, dateToIsoDate, invalidateLocalStorage, updateCurrentStreak } from './utils';
+import { getDayStatus, calculateStreakLength, isoDateToUnixTimestamp, dateToIsoDate, invalidateLocalStorage, updateCurrentStreak, getDaysToNextMilestone, isMilestoneDay } from './utils';
 import { DayEntry, StravaActivity, StreakStats } from '../types/strava';
 
 describe('Utility Functions', () => {
@@ -251,6 +251,46 @@ describe('Utility Functions', () => {
             const result = updateCurrentStreak(lastSevenDays, currentDate, currentStreakUpdatedAt, currentStreak, currentStreakStartDate, stats);
             expect(result.currentStreak).toBe(1);
             expect(result.currentStreakStartDate.getTime()).toBe(currentDate.getTime()); // epoch
+        });
+
+        describe('isMilestoneDay', () => {
+            it('should return true if streak matches next milestone and lastUpdated is before today', () => {
+                const streak = 10;
+                const lastUpdated = new Date('2023-10-01T00:00:00Z');
+                const nextMilestone = 10;
+                const result = isMilestoneDay(streak, lastUpdated, nextMilestone);
+                expect(result).toBe(true);
+            });
+
+            it('should return false if streak does not match next milestone', () => {
+                const streak = 9;
+                const lastUpdated = new Date('2023-10-01T00:00:00Z');
+                const nextMilestone = 10;
+                const result = isMilestoneDay(streak, lastUpdated, nextMilestone);
+                expect(result).toBe(false);
+            });
+
+            it('should return false if lastUpdated is today', () => {
+                const streak = 10;
+                const lastUpdated = new Date();
+                const nextMilestone = 20;
+                const result = isMilestoneDay(streak, lastUpdated, nextMilestone);
+                expect(result).toBe(false);
+            });
+        });
+
+        describe('getDaysToNextMilestone', () => {
+            it('should return correct days to next milestone', () => {
+                const currentStreak = 5;
+                const result = getDaysToNextMilestone(currentStreak);
+                expect(result).toBe(2); // Assuming the next milestone is 7
+            });
+
+            it('should return Infinity if no milestones are left', () => {
+                const currentStreak = 1000;
+                const result = getDaysToNextMilestone(currentStreak);
+                expect(result).toBe(Infinity);
+            });
         });
     });
   });

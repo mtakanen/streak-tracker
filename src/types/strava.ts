@@ -50,6 +50,7 @@ export interface DayEntry extends DayStatus {
 export interface StreakData {
     currentStreak: number;
     currentStreakStartDate: Date;
+    currentStreakUpdatedAt: Date;
     todayMinutes: number;
     completed: boolean;
     longestStreak: number;
