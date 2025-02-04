@@ -11,7 +11,8 @@ class MyDocument extends Document {
     return (
       <Html lang="en">
         <Head>
-          <link rel="icon" href="/normi.svg" />
+          <link rel="icon" href="/normi.svg" type="image/svg+xml"/>
+          <link rel="apple-touch-icon" href="/normi.png" />
         </Head>
         <body className="antialiased">
           <Main />

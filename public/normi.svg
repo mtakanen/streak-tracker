@@ -18,9 +18,10 @@
         seed="3">
         <animate 
           attributeName="baseFrequency"
-          dur="26s" 
+          dur="21s" 
           values="0.02;0.02;0.01" 
-          repeatCount="indefinite" />
+          repeatCount="1" 
+        />
       </feTurbulence>
       <feDisplacementMap in="SourceGraphic" scale="10" />
     </filter>
@@ -28,8 +29,6 @@
   
   <!-- Background circle   -->
   <circle cx="50" cy="50" r="50" fill="url(#navyGrad)"/>
-
-
   <!-- Animated outer orange flame -->
   <path d="M50 20 
            C58 35, 70 40, 70 55
