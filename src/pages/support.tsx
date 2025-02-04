@@ -51,6 +51,8 @@ const SupportPage = () => {
             <li>Data synchronization with Strava may take a few minutes. Reload the page if needed</li>
             <li>Maximum streak is limited to {INITIAL_LOAD_MONTHS*30.5} days</li>
             <li>Minimum duration can only be changed before Strava login</li>
+            <li>The number of requests to the Strava API is limited on a 15-minute and 24-hour basis. 
+              When the user-specific request quota is reached, further requests are blocked for the next 15-minute or 24-hour intervals, respectively.</li>
             <li>If you encounter any persistent issues, please contact the developer for assistance</li>
           </ul>
         </div>
@@ -66,6 +68,8 @@ const SupportPage = () => {
             <li>normi.run caches up to one week of Strava activity data</li>
             <li>normi.run caches derived data (such as streak and statistics) as long as user is logged in the app</li>
             <li>normi.run does not share your data with third parties</li>
+            <li>normi.run stores an anonymized user identifier in Upstash/Redis to limit the number of requests to the Strava API.
+               This helps ensure fair usage and prevents exceeding Strava&apos;s rate limits.</li>
             <li>normi.run uses <a href="https://vercel.com/products/observability" target="_blank" className="text-black-600 hover:underline">Vercel Analytics</a> to monitor app performance. 
             Analytics is fully anonymous</li>
             <li>You can revoke app access at: <a href="https://www.strava.com/settings/apps" target="_blank" className="text-black-600 hover:underline">https://www.strava.com/settings/apps</a></li>
