@@ -175,7 +175,6 @@ const StreakTracker = () => {
         setProgress((prev) => {
           if (prev >= 100) {
             clearInterval(interval);
-            setLoading(false);
             return 100;
           }
           return prev + (100 / (STRAVA_CONFIG.timeout / progressInterval));
