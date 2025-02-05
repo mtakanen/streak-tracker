@@ -50,7 +50,7 @@ const ActivityModal = ({
   const { scope } = useScope();
 
   const dateTitle = `${weekday} ${new Date(activities[0].start_date_local).toLocaleDateString()}`;
-  let dayStreak = streakData.currentStreak - index;
+  let dayStreak = streakData.currentStreak + index - 6 ;
   if (!streakData.completed) {
     dayStreak = dayStreak + 1;
   }
@@ -60,7 +60,7 @@ const ActivityModal = ({
   )
   const newName = 'Normi Run #' + dayStreak;
   let allowedToRename = false;
-  if (scope && scope.includes('activity:write') && dayStreak > 1) {
+  if (scope && scope.includes('activity:write') && dayStreak >= 1) {
     allowedToRename = true;
   }
   return (

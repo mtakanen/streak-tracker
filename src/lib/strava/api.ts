@@ -142,6 +142,10 @@ export async function getStravaActivities(after: number, perPage: number): Promi
 }
 
 export const updateActivityName = async (activityId: number, newName: string, accessToken: string): Promise<void> => {
+  const token = await getAccessToken();
+  if (!token) {
+    throw new Error('No access token found');
+  }
   try {
     const response = await axios.put<StravaActivity>(
       `${STRAVA_CONFIG.activityUrl}/${activityId}`,
