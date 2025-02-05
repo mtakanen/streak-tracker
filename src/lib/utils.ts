@@ -58,7 +58,7 @@ export const getDayStatus = (activities: StravaActivity[], localDate: Date): Day
     sum + Math.floor(activity.moving_time / 60), 0
   );
   const totalDistance = dayActivities.reduce((sum, activity) =>
-    sum + Math.floor(activity.distance / 1000), 0
+    sum + activity.distance / 1000, 0
   );
   const completed = (totalDuration >= minimumDuration || 
     // FIXME: Grace period for any minimum duration
