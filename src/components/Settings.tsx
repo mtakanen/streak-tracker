@@ -44,7 +44,7 @@ const Settings = ({
           disabled={settingsDisabled}
         />
         <label className="block text-sm font-medium text-gray-700">
-          Goal days (No goal = 0)
+          Goal streak (No goal = 0)
         </label>
         <input
           type="number"
