@@ -103,15 +103,23 @@ const HomePage = () => {
       {isAuthenticated ? (
         <StreakTracker />
       ) : (
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Welcome to Normi Run</h1>
-          <p className="mb-2">Track running streak using your Strava</p>
-          <p className="mb-2">App requires to <span className='italic'>View data about your (public) activities</span></p>
-          <p className="mb-4">Please connect with Strava to get started</p>
-          <div className="flex justify-center">
-            <StravaConnectButton />
+        <>
+        <h1 className="text-center text-2xl font-bold mb-4">Welcome to Normi Run</h1>
+        <div className="flex justify-center">
+          <div className="text-left">
+            <p className="mb-2">Track running streak using your Strava data</p>
+            <ul>To get started:</ul>
+            <ol className="list-decimal list-inside mb-4">
+              <li>Set the daily minimum minutes in Menu Settings</li>
+              <li>Connect with Strava</li>
+            </ol>
+            <p>App requires: <span className='italic'>View data about your (public) activities</span></p>
+            <div className="mt-4 flex justify-center">
+              <StravaConnectButton />
+            </div>
           </div>
         </div>
+      </>
       )}
     </div>
   );

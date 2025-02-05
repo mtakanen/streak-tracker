@@ -63,7 +63,7 @@ export async function getStravaActivities(after: number, perPage: number): Promi
     throw new Error('No access token found');
   }
   let page = 1;
-  let hasMoreActivities = true;
+  let getMoreActitivities = true;
   let allActivities: StravaActivity[] = [];
   const stravaAthlete = localStorage.getItem('stravaAthlete');
   if (!stravaAthlete) {
@@ -71,7 +71,8 @@ export async function getStravaActivities(after: number, perPage: number): Promi
   }
   const accountID = JSON.parse(stravaAthlete).id;
 
-  while (hasMoreActivities) {
+  // TOOD: move to backend
+  while (getMoreActitivities) {
     try {
       await axios.post('/api/strava/limiter', { 'account_id': accountID })
       const response = await axios.get<StravaCustomActivity[]>(STRAVA_CONFIG.athelteActivitiesUrl, {
@@ -89,8 +90,8 @@ export async function getStravaActivities(after: number, perPage: number): Promi
       const data: StravaActivity[] = extendStravaData(response.data);
       allActivities = allActivities.concat(data);
 
-      if (data.length == 0) {
-        hasMoreActivities = false;
+      if (data.length == 0 || perPage == 30) {
+        getMoreActitivities = false;
       } else {
         page++;
       }
@@ -122,7 +123,8 @@ export async function getStravaActivities(after: number, perPage: number): Promi
   }
 
   function extendStravaData(stravaData: StravaCustomActivity[]): StravaActivity[] {
-    const tempData: StravaCustomActivity[] = stravaData.map(activity => ({
+    const runs = stravaData.filter((activity: any) => activity.sport_type === "Run")
+    const tempData: StravaCustomActivity[] = runs.map(activity => ({
       ...activity,
       outdoors: activity.map && !activity.trainer
     }));

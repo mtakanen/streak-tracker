@@ -23,15 +23,16 @@ const StreakTracker = () => {
   const [showMilestoneModal, setShowMilestoneModal] = useState(false);
 
   const fetchActivities = React.useCallback(async (fromTimestamp: number): Promise<StravaActivity[]> => {
+      let pageSize = 30;
       let activities: StravaActivity[] = [];
       const now = new Date().getTime();
+      const expirary = 5 * 30 * 1000; // 5min
+
       try {  
         const storedData = localStorage.getItem('stravaActivities');
-        let pageSize = 30;
   
         if (storedData) {
           const { activities, timestamp }: LocalActivities = JSON.parse(storedData);
-          const expirary = 1 * 30 * 1000; // 5min
           if (now - timestamp < expirary) {
             // these should be fresh enough
             return activities;
