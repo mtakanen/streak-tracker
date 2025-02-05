@@ -3,6 +3,7 @@ import { Ratelimit } from "@upstash/ratelimit";
 import crypto from "crypto";
 import { UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, STRAVA_API_LIMIT } from './config';
 
+const STRAVA_API_24H_LIMIT = STRAVA_API_LIMIT * 4;
 const redis = new Redis(
     {
         url: UPSTASH_REDIS_REST_URL, 
@@ -20,7 +21,7 @@ const ratelimit = {
           redis,
           prefix: "normirun-24h",
           analytics: false,
-          limiter: Ratelimit.slidingWindow(STRAVA_API_LIMIT * 3, "24h"),
+          limiter: Ratelimit.slidingWindow(STRAVA_API_24H_LIMIT, "24h"),
         }),
 };
   
