@@ -64,7 +64,7 @@ export const getDayStatus = (activities: StravaActivity[], localDate: Date): Day
     // FIXME: Grace period for any minimum duration
     (totalDuration >= minimumDuration - GRACE_DURATION && totalDistance >= GRACE_DISTANCE)
   );
-  const isMinimumDay = totalDuration < (minimumDuration + 5) * 60;
+  const isMinimumDay = totalDuration < (minimumDuration + 5);
   const outdoorRuns = dayActivities.filter(day => day.outdoors).length;
   const startDate = dayActivities.length > 0 ? dayActivities[0].start_date_local : dateString;
   return {
