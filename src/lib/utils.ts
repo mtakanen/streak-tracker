@@ -133,7 +133,7 @@ export function calculateDayEntries(activities: StravaActivity[], localDate: Dat
     currentDate.setDate(currentDate.getDate() - i);
     const status = getDayStatus(activities, currentDate);
     return {
-      index: i,
+      index: 6 - i,
       weekday: weekdays[currentDate.getDay()],
       local_date: status.local_date,
       completed: status.completed,

@@ -169,7 +169,7 @@ const StreakTracker = () => {
   }, [streakData]);
 
   useEffect(() => {
-    const progressInterval = 50;
+    const progressInterval = 500;
     if(loading) {
       // timout prorges
       const interval = setInterval(() => {

@@ -16,9 +16,9 @@ const RecentDays = ({
   setSelectedDayActivities,
 }: RecentDaysProps) => {
 
-  const lastCompleted = streakData.lastSevenDays.findLastIndex((day) => day.completed);
-  const bgColor = (dayCompleted: boolean, dayIndex: number) =>
-    dayCompleted ? 'bg-green-100' : dayIndex > lastCompleted ? 'bg-slate-50': 'bg-orange-100';
+  const firstCompleted = streakData.lastSevenDays.findIndex((day) => day.completed);
+  const bgColor = (dayCompleted: boolean, index: number) =>
+    dayCompleted ? 'bg-green-100' : index < firstCompleted ? 'bg-slate-50' : 'bg-orange-100';
   return (
     <div className="space-y-2 max-h-48 overflow-y-auto">
       <div className="text-sm">Last 7 days</div>
