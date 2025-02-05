@@ -110,7 +110,7 @@ const HomePage = () => {
             <p className="mb-2">Track running streak using your Strava data</p>
             <ul>To get started:</ul>
             <ol className="list-decimal list-inside mb-4">
-              <li>Set the daily minimum minutes in Menu Settings</li>
+              <li>Set daily minimum and streak goal in the Menu Settings</li>
               <li>Connect with Strava</li>
             </ol>
             <p>App requires: <span className='italic'>View data about your (public) activities</span></p>
