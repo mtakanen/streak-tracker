@@ -20,15 +20,15 @@ const CurrentStreak = ({ streakData }: { streakData: StreakData }) => {
       <div className={`text-sm ${bgColor(streakData.completed)}`}>
         current streak
       </div>
-      <div className="text-sm text-orange-600">
-        {streakData.currentStreak > 0 && !streakData.completed
-          ? 'Keep going!'
-          : ''}
-      </div>
       <div className="text-xs text-slate-600">
         {streakData.currentStreak > 0
           ? `started on ${dateToIsoDate(streakData.currentStreakStartDate)}`
           : 'Go running!'}
+      </div>
+      <div className="text-sm text-orange-600">
+        {streakData.currentStreak > 0 && !streakData.completed
+          ? 'Keep going!'
+          : ''}
       </div>
     </div>
   );
@@ -41,10 +41,10 @@ const LongestStreak = ({ streakData }: { streakData: StreakData }) => {
         {streakData.longestStreak} days
       </div>
       <div className="text-sm">longest streak</div>
-      <div className=""></div>
       <div className="text-xs">
         {`started on ${dateToIsoDate(streakData.longestStreakStartDate)}`}
       </div>
+      <div className="text-sm">Beat it!</div>
     </div>
   );
 };
