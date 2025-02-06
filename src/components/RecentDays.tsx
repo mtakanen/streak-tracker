@@ -17,8 +17,9 @@ const RecentDays = ({
 }: RecentDaysProps) => {
 
   const firstCompleted = streakData.lastSevenDays.findIndex((day) => day.completed);
+  const adjustedFirstCompleted = firstCompleted === -1 ? streakData.lastSevenDays.length : firstCompleted;
   const bgColor = (dayCompleted: boolean, index: number) =>
-    dayCompleted ? 'bg-green-100' : index < firstCompleted ? 'bg-slate-50' : 'bg-orange-100';
+     index < adjustedFirstCompleted ? 'bg-slate-50' : dayCompleted ? 'bg-green-100' : 'bg-orange-100';
   return (
     <div className="space-y-2 max-h-48 overflow-y-auto">
       <div className="text-sm">Last 7 days</div>
