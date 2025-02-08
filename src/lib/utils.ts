@@ -51,7 +51,7 @@ export const getDayStatus = (activities: StravaActivity[], localDate: Date): Day
   const dateString = dateToIsoDate(localDate);
   const dayActivities = activities.filter(activity => {
     // const mainType = subTypeToMainType[activity.type] || activity.type;
-    return activity.start_date_local.startsWith(dateString) && activity.type === 'Run';
+    return activity.start_date_local.startsWith(dateString);
   });
   const minimumDuration = getMinimumDuration();
   const totalDuration = dayActivities.reduce((sum, activity) =>
