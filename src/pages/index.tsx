@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import React, { useEffect, useState, useRef } from 'react';
-import { useRouter } from 'next/router';
+//import { useRouter } from 'next/router';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import StreakTracker from '@/components/StreakTracker';
 import StravaConnectButton from '@/components/StravaConnectButton';
@@ -11,12 +12,14 @@ import { invalidateLocalStorage, getGoal } from '@/lib/utils';
 const HomePage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [multisport, setMultisport] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [settingsDisabled, setSettingsDisabled] = useState(false);
   const [profilePicture, setProfilePicture] = useState<string | undefined>(undefined);
   const [firstName, setFirstName] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     const accessToken = localStorage.getItem('stravaAccessToken');
@@ -35,10 +38,19 @@ const HomePage = () => {
       setFirstName(athlete.firstname);
     }
     // Check for error in query parameters
-    if (router.query.error) {
-      setError(router.query.error as string);
+    const isMultiSport = (
+      searchParams.has('multisport') && (searchParams.get('multisport') || 'true') === 'true' || 
+      (localStorage.getItem('multiSport') || 'false') == 'true');
+    if (searchParams.has('error')) {
+      setError(searchParams.get('error'));
+    } else if (isMultiSport) {
+      setMultisport(true);
+      localStorage.setItem('multiSport', 'true');
+    } else {
+      setMultisport(false);
+      localStorage.setItem('multiSport', 'false');
     }
-  }, [router.query.error]);
+  }, [searchParams]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -104,10 +116,10 @@ const HomePage = () => {
         <StreakTracker />
       ) : (
         <>
-        <h1 className="text-center text-2xl font-bold mb-4">Welcome to Normi Run</h1>
+        <h1 className="text-center text-2xl font-bold mb-4">Welcome to Normi {multisport? 'Sport': 'Run'}</h1>
         <div className="flex justify-center">
           <div className="text-left">
-            <p className="mb-2">Track running streak using your Strava data</p>
+            <p className="mb-2">Track your {multisport ? 'activity': 'run'} streak from Strava</p>
             <ul>To get started:</ul>
             <ol className="list-decimal list-inside mb-4">
               <li>Set daily minimum and streak goal in the Menu Settings</li>

@@ -205,7 +205,7 @@ const StreakTracker = () => {
         />
         <LoadingModal 
           isOpen={loading} 
-          text={`Loading up to ${INITIAL_LOAD_MONTHS} months of run history..`} 
+          text={`Loading up to ${INITIAL_LOAD_MONTHS} months of history..`} 
           progress={progress}/>
       </>
     );
@@ -229,7 +229,7 @@ const StreakTracker = () => {
         setSelectedDayActivities={setSelectedDayActivities}
         error={error}
       />
-      <LoadingModal isOpen={loading} text="Checking for new runs.." progress={progress} />
+      <LoadingModal isOpen={loading} text="Checking for new activities.." progress={progress} />
     </>
   );
 };

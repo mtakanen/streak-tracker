@@ -197,10 +197,7 @@ export const getDaysToNextMilestone = (currentStreak: number): number => {
 
 
 export const calculateInitStats = (activities: StravaActivity[], fromDate: Date): StreakStats => {
-  const runs = activities.filter(
-    activity => activity.type === 'Run' && 
-    activity.start_date_local >= dateToIsoDate(fromDate))
-  ; 
+  const runs = activities.filter(activity => activity.start_date_local >= dateToIsoDate(fromDate)); 
   const totalDuration = runs.reduce((acc, day) => acc + day.moving_time / 60, 0);
   const totalDistance = (runs.reduce((acc, day) => acc + day.distance / 1000, 0));
   const outdoorRuns = runs.filter(day => day.outdoors).length;
