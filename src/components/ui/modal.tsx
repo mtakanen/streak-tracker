@@ -13,7 +13,7 @@ const activityTypeSymbols: { [key: string]: string } = {
   Swim: '🏊‍♂️',
   Walk: '🚶‍♂️',
   Ski: '🎿',
-  Skate: '⛸️',
+  IceSkate: '⛸️',
   // Add more activity types and symbols as needed
 };
 
@@ -49,6 +49,10 @@ const ActivityModal = ({
 }) => {
   const { scope } = useScope();
 
+  const getNewName = (type: string, streak: number) => {
+    return `Normi ${type} #` + streak;
+  };
+
   const dateTitle = `${weekday} ${new Date(activities[0].start_date_local).toLocaleDateString()}`;
   let dayStreak = streakData.currentStreak + index - 6 ;
   if (!streakData.completed) {
@@ -58,7 +62,6 @@ const ActivityModal = ({
     (total, activity) => total + activity.moving_time, 0)
     /60
   )
-  const newName = 'Normi Run #' + dayStreak;
   let allowedToRename = false;
   if (scope && scope.includes('activity:write') && dayStreak >= 1) {
     allowedToRename = true;
@@ -88,17 +91,18 @@ const ActivityModal = ({
                 View on Strava
               </a>
             </span>
-            {allowedToRename && activity.name !== newName && (
+
+            {allowedToRename && activity.name !== getNewName(activity.type, dayStreak) && (
               <button
                 onClick={() => {
-                  handleUpdateActivityName(activity.id, newName);
-                  activity.name = newName; // Update the activity name locally to remove the button
+                  handleUpdateActivityName(activity.id, getNewName(activity.type, dayStreak));
+                  activity.name = getNewName(activity.type, dayStreak); // Update the activity name locally to remove the button
                   onClose(); // Close the modal
                 }}
               >
                 <div className="text-xs">
                   ✏️ <span>Rename:</span>{' '}
-                  <span className="italic">{newName}</span>
+                  <span className="italic">{getNewName(activity.type, dayStreak)}</span>
                 </div>
               </button>
             )}
@@ -199,7 +203,7 @@ const StatsModal = ({
   }, []);
 
   if (!isVisible) return null;
-  
+
   const streak = streakData.currentStreak;
   const totalHours = Math.floor(stats.totalDuration / 60);
   const totalMinutes = stats.totalDuration % 60;
