@@ -199,7 +199,7 @@ const StatsModal = ({
   }, []);
 
   if (!isVisible) return null;
-
+  
   const streak = streakData.currentStreak;
   const totalHours = Math.floor(stats.totalDuration / 60);
   const totalMinutes = stats.totalDuration % 60;
@@ -211,6 +211,8 @@ const StatsModal = ({
   const extraFreq = Math.round(streak / (streak - stats.minimumDays));
   const minimumFreq = Math.round(div0(streak, stats.minimumDays));
   const outdoorRunRatio = Math.round(div0(stats.outdoorRuns, stats.runs) * 100);
+  const isMultiSport = localStorage.getItem('multiSport') === 'true';
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center px-4">
       <div className="bg-white p-4 rounded-lg max-w-md w-full sm:w-auto relative mx-4">
@@ -227,7 +229,7 @@ const StatsModal = ({
           <span className="float-right">{streak} days</span>
         </p>
         <p>
-          <span className="text-slate-600 text-xs">Runs:</span>
+          <span className="text-slate-600 text-xs">{isMultiSport ? 'Activities:': 'Runs:'}</span>
           <span className="float-right">{stats.runs}</span>
         </p>
         <p>
@@ -255,6 +257,7 @@ const StatsModal = ({
           <span className="text-slate-600 text-xs">Distance:</span>
           <span className="float-right">{avgDistance.toFixed(1)} km</span>
         </p>
+        {!isMultiSport && (
         <p>
           <span className="text-slate-600 text-xs">Pace:</span>
           <span className="float-right">
@@ -262,9 +265,10 @@ const StatsModal = ({
             {paceSeconds.toFixed(0).padStart(2, '0')}&quot;
           </span>
         </p>
+        )}
         <h2 className="text-slate-600 mt-2">Misc</h2>
         <p>
-          <span className="text-slate-600 text-xs">Outdoor runs:</span>
+          <span className="text-slate-600 text-xs">Outdoors:</span>
           <span className="float-right">{outdoorRunRatio}%</span>
         </p>
         {extraFreq > 1 ? (
