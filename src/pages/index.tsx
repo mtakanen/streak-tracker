@@ -38,7 +38,9 @@ const HomePage = () => {
       setFirstName(athlete.firstname);
     }
     // Check for error in query parameters
-    const isMultiSport = searchParams.has('multisport') || localStorage.getItem('multiSport');
+    const isMultiSport = (
+      searchParams.has('multisport') && (searchParams.get('multisport') || 'true') === 'true' || 
+      (localStorage.getItem('multiSport') || 'false') == 'true');
     if (searchParams.has('error')) {
       setError(searchParams.get('error'));
     } else if (isMultiSport) {
