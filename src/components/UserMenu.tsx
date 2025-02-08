@@ -32,11 +32,15 @@ const UserMenu: React.FC<UserMenuProps> = ({
     const [settingsOpen, setSettingsOpen] = useState(false);
 
     const handleSaveSettings = ({ duration, goal, multiSport }: { duration: number; goal: number, multiSport: boolean }) => {
-        const reload = localStorage.getItem('goalDays') !== goal.toString();
         localStorage.setItem('goalDays', goal.toString());
         localStorage.setItem('multiSport', multiSport.toString());
+        const reload = localStorage.getItem('goalDays') !== goal.toString();
         if (reload) window.location.reload();
-        
+        if (multiSport) {
+            window.location.href = '/?multisport=' + multiSport
+        } else {  
+            window.location.href = '/';
+        }
         if (duration > 0) {
             localStorage.setItem('minimumDuration', duration.toString());
             setSettingsOpen(false);
