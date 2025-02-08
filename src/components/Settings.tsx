@@ -3,26 +3,30 @@ import { useState } from 'react';
 const MINIMUM_DURATION = 5;
 
 interface SettingsProps {
-    initialDuration: number;
-    goalDays: number;
-    onSave: ({ duration, goal }: { duration: number; goal: number }) => void;
+    initialSettings: InitialSettings;
+    onSave: ({ duration, goal, multiSport }: { duration: number; goal: number, multiSport: boolean }) => void;
     onCancel: () => void;
     settingsDisabled: boolean;
   }
+
+interface InitialSettings {
+    duration: number;
+    goal: number;
+    multiSport: boolean;
+  }
   
 const Settings = ({
-  initialDuration,
-  goalDays,
+  initialSettings,
   onSave,
   onCancel,
   settingsDisabled
 }: SettingsProps) => {
-  const [duration, setDuration] = useState(initialDuration);
-  const [goal, setGoal] = useState(goalDays);
+
+  const [settings, setSettings] = useState(initialSettings);
 
   const handleSave = () => {
-    if (duration >= MINIMUM_DURATION) {
-      onSave({duration, goal});
+    if (settings.duration >= MINIMUM_DURATION) {
+      onSave(settings);
     } else {
       alert(`Minimum duration must be at least ${MINIMUM_DURATION} minutes.`);
     }
@@ -37,8 +41,8 @@ const Settings = ({
         </label>
         <input
           type="number"
-          value={duration}
-          onChange={(e) => setDuration(Number(e.target.value))}
+          value={settings.duration}
+          onChange={(e) => setSettings({ ...settings, duration: Number(e.target.value) })}
           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm mb-2"
           min={MINIMUM_DURATION}
           disabled={settingsDisabled}
@@ -48,12 +52,21 @@ const Settings = ({
         </label>
         <input
           type="number"
-          value={goal}
-          onChange={(e) => setGoal(Number(e.target.value))}
+          value={settings.goal}
+          onChange={(e) => setSettings({ ...settings, goal: Number(e.target.value) })}
           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           min={0}
         />
-
+        <label className="mt-2 block text-sm font-medium text-gray-700">
+          Multi-sport
+        </label>
+        <input
+          type="checkbox"
+          checked={settings.multiSport}
+          onChange={(e) => setSettings({ ...settings, multiSport: e.target.checked })}
+          className="mt-1 mb-4"
+          disabled={settingsDisabled}
+        />
       </div>
       <button
         onClick={onCancel}

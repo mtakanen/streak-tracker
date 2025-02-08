@@ -17,9 +17,13 @@ import { getMinimumDuration, getGoal } from '@/lib/utils';
 
 const SPECIAL_GOAL = 2525;
 
+function isMultiSport() {
+  return localStorage.getItem('multiSport') === 'true';
+}
+
 const NormiHeader = () => {
   const goal = getGoal();
-  const noGoal = 'Normi Run';
+  const noGoal = isMultiSport() ? 'Normi Sport' : 'Normi Run';
   const title =
     goal === SPECIAL_GOAL
       ? '25 for 25'
@@ -35,11 +39,13 @@ const NormiHeader = () => {
   );
 };
 const NormiFooter = () => {
+
+  const how = isMultiSport() ? 'sporting' : 'running';
   return (
     <>
       {/* Normi Display */}
       <div className="text-sm text-center text-slate-600 pt-2 mt-4">
-        Stay active and healthy by running at least{' '}
+        Stay active and healthy by {how} at least{' '}
         <span style={{ whiteSpace: 'nowrap' }}>
           {getMinimumDuration()} minutes
         </span>{' '}

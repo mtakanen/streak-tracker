@@ -123,7 +123,8 @@ export async function getStravaActivities(after: number, perPage: number): Promi
   }
 
   function extendStravaData(stravaData: StravaCustomActivity[]): StravaActivity[] {
-    const runs = stravaData.filter((activity: StravaActivity) => activity.type === "Run")
+    const isMultisport = (localStorage.getItem('multiSport') || 'false') === 'true';
+    const runs = isMultisport ? stravaData : stravaData.filter((activity: StravaActivity) => activity.type === "Run")
     const tempData: StravaCustomActivity[] = runs.map(activity => ({
       ...activity,
       outdoors: activity.map && !activity.trainer
