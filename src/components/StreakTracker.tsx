@@ -142,7 +142,7 @@ const StreakTracker = () => {
       localStorage.setItem('streaks', JSON.stringify(streaks));
       setStreakData(streaks);
     } catch (err) {
-      if (err instanceof Error && err.message.includes('token')) {
+      if (err instanceof Error && (err.message.includes('token') || err.message.includes('code'))) {
         window.location.href = STRAVA_CONFIG.authUrl; // Redirect to Strava authorization URL if token error
       } else {
         setError(err instanceof Error ? err.message : 'Failed to fetch activities');
