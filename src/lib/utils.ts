@@ -181,8 +181,11 @@ export function updateCurrentStreak(lastSevenDays: DayEntry[], currentDate: Date
   return { currentStreakUpdatedAt, currentStreak, currentStreakStartDate, stats };
 }
 
-export const isMilestoneDay = (streak: number, lastUpdated: Date, nextMilestone: number): boolean => {
-  return streak === nextMilestone && dateToIsoDate(new Date()) >= dateToIsoDate(lastUpdated);
+export const isMilestoneDay = (currentStreak: number, todayCompleted: boolean, 
+  lastUpdated: Date, nextMilestone: number): boolean => {
+  return ( Object.keys(MILESTONES).includes(currentStreak.toString()))  ||
+    ( nextMilestone === 1 && !todayCompleted && 
+      dateToIsoDate(lastUpdated) < dateToIsoDate(new Date())) ;
 }
 
 export const getDaysToNextMilestone = (currentStreak: number): number => {
