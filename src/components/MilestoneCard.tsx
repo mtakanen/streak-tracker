@@ -5,7 +5,7 @@ import { StreakData } from '@/types/strava';
 
 const MilestoneCard =  ({ streakData }: { streakData: StreakData })  => {
   const daysToNextMilestone = getDaysToNextMilestone(streakData.currentStreak);
-  const milestoneDay = isMilestoneDay(streakData.currentStreak, streakData.currentStreakUpdatedAt, daysToNextMilestone);
+  const milestoneDay = isMilestoneDay(daysToNextMilestone, streakData.completed, streakData.currentStreakUpdatedAt);
   const milestoneUnlocked = (daysToNextMilestone === 0 && streakData.completed);
 
   return (
