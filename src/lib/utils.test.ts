@@ -256,26 +256,29 @@ describe('Utility Functions', () => {
         describe('isMilestoneDay', () => {
             it('should return true if streak matches next milestone and lastUpdated is before today', () => {
                 const streak = 10;
+                const todayCompleted = false;
                 const lastUpdated = new Date('2023-10-01T00:00:00Z');
                 const nextMilestone = 10;
-                const result = isMilestoneDay(streak, lastUpdated, nextMilestone);
+                const result = isMilestoneDay(streak, todayCompleted, lastUpdated, nextMilestone);
                 expect(result).toBe(true);
             });
 
             it('should return false if streak does not match next milestone', () => {
                 const streak = 9;
+                const todayCompleted = false;
                 const lastUpdated = new Date('2023-10-01T00:00:00Z');
                 const nextMilestone = 10;
-                const result = isMilestoneDay(streak, lastUpdated, nextMilestone);
+                const result = isMilestoneDay(streak, todayCompleted, lastUpdated, nextMilestone);
                 expect(result).toBe(false);
             });
 
-            it('should return false if lastUpdated is today', () => {
+            it('should return true if milestone unlocked', () => {
                 const streak = 10;
+                const todayCompleted = true;
                 const lastUpdated = new Date();
                 const nextMilestone = 20;
-                const result = isMilestoneDay(streak, lastUpdated, nextMilestone);
-                expect(result).toBe(false);
+                const result = isMilestoneDay(streak, todayCompleted, lastUpdated, nextMilestone);
+                expect(result).toBe(true);
             });
         });
 

@@ -5,9 +5,8 @@ import { StreakData } from '@/types/strava';
 
 const MilestoneCard =  ({ streakData }: { streakData: StreakData })  => {
   const daysToNextMilestone = getDaysToNextMilestone(streakData.currentStreak);
-  const milestoneDay = isMilestoneDay(daysToNextMilestone, streakData.completed, streakData.currentStreakUpdatedAt);
-  const milestoneUnlocked = (daysToNextMilestone === 0 && streakData.completed);
-
+  const milestoneDay = isMilestoneDay(streakData.currentStreak, streakData.completed, streakData.currentStreakUpdatedAt, daysToNextMilestone);
+  const milestoneUnlocked = (milestoneDay && streakData.completed);
   return (
     <div
       className={`p-3 bg-slate-50 rounded-lg text-center ${milestoneUnlocked ? 'cursor-pointer' : ''}`}
