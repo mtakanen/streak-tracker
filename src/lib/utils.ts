@@ -183,7 +183,8 @@ export function updateCurrentStreak(lastSevenDays: DayEntry[], currentDate: Date
 
 export const isMilestoneDay = (currentStreak: number, todayCompleted: boolean, 
   lastUpdated: Date, nextMilestone: number): boolean => {
-  return ( Object.keys(MILESTONES).includes(currentStreak.toString()))  ||
+  return ( Object.keys(MILESTONES).includes(currentStreak.toString()) && 
+  dateToIsoDate(lastUpdated) === dateToIsoDate(new Date()))  ||
     ( nextMilestone === 1 && !todayCompleted && 
       dateToIsoDate(lastUpdated) < dateToIsoDate(new Date())) ;
 }

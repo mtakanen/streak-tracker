@@ -254,32 +254,42 @@ describe('Utility Functions', () => {
         });
 
         describe('isMilestoneDay', () => {
-            it('should return true if streak matches next milestone and lastUpdated is before today', () => {
-                const streak = 10;
-                const todayCompleted = false;
-                const lastUpdated = new Date('2023-10-01T00:00:00Z');
-                const nextMilestone = 10;
-                const result = isMilestoneDay(streak, todayCompleted, lastUpdated, nextMilestone);
-                expect(result).toBe(true);
-            });
-
-            it('should return false if streak does not match next milestone', () => {
+            it('should return true if next is milestone and lastUpdated is before today', () => {
                 const streak = 9;
                 const todayCompleted = false;
                 const lastUpdated = new Date('2023-10-01T00:00:00Z');
-                const nextMilestone = 10;
+                const nextMilestone = 1;
                 const result = isMilestoneDay(streak, todayCompleted, lastUpdated, nextMilestone);
-                expect(result).toBe(false);
+                expect(result).toBe(true);
             });
 
             it('should return true if milestone unlocked', () => {
                 const streak = 10;
                 const todayCompleted = true;
                 const lastUpdated = new Date();
-                const nextMilestone = 20;
+                const nextMilestone = 0;
                 const result = isMilestoneDay(streak, todayCompleted, lastUpdated, nextMilestone);
                 expect(result).toBe(true);
             });
+            it('should return false next day the milestone unlocked', () => {
+                const streak = 10;
+                const todayCompleted = false;
+                const lastUpdated = new Date('2023-10-01T00:00:00Z');
+                const nextMilestone = 7;
+                const result = isMilestoneDay(streak, todayCompleted, lastUpdated, nextMilestone);
+                expect(result).toBe(false);
+            });
+
+            it('should return false if streak does not match next milestone', () => {
+                const streak = 8;
+                const todayCompleted = false;
+                const lastUpdated = new Date('2023-10-01T00:00:00Z');
+                const nextMilestone = 2;
+                const result = isMilestoneDay(streak, todayCompleted, lastUpdated, nextMilestone);
+                expect(result).toBe(false);
+            });
+
+
         });
 
         describe('getDaysToNextMilestone', () => {
