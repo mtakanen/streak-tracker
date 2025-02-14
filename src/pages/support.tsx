@@ -12,11 +12,11 @@ const SupportPage = () => {
       <CardContent className="space-y-4">
         <div>
           <h2 className="text-xl font-semibold">Instructions</h2>
-          <p className="mt-2 text-gray-700">
+          <p className="mt-2">
             Normi Run is a simple app that helps you maintain a running streak.
             Here are some instructions to help you get started:
           </p>
-          <ol className="list-disc list-inside mt-2 text-gray-700">
+          <ol className="list-disc list-inside mt-2">
             <li>Start by setting your daily minimum duration and streak goal from the settings menu
             </li>
             <li>Log in to your Strava account to start tracking your run streak.
@@ -29,10 +29,10 @@ const SupportPage = () => {
             <li>App can rename activity back to Strava. If you wish to do that also check: <span className='italic'>
               Upload your activities from Normi Run to Strava</span></li>
           </ol>
-          <p className="mt-2 text-gray-700">
+          <p className="mt-2">
             After you connect with Strava, you can start tracking your run streak:
           </p>
-          <ul className="list-disc list-inside mt-2 text-gray-700">
+          <ul className="list-disc list-inside mt-2">
             <li>Dashboard shows your current streak, upcoming milestone and runs from the previous 7 days</li>
             <li>Streak calculation is based on the daily minimum goal duration in the settings (by default {DEFAULT_MINIMUM}min). 
                 Ensure the sum of daily moving time meet the goal to maintain your streak!</li>
@@ -43,10 +43,10 @@ const SupportPage = () => {
         </div>
         <div>
           <h2 className="text-xl font-semibold">Limitations</h2>
-          <p className="mt-2 text-gray-700">
+          <p className="mt-2">
             Please be aware of the following limitations:
           </p>
-          <ul className="list-disc list-inside mt-2 text-gray-700">
+          <ul className="list-disc list-inside mt-2">
             <li>normi.run currently supports only running activities</li>
             <li>Data synchronization with Strava may take a few minutes. Reload the page if needed</li>
             <li>Maximum streak is limited to {INITIAL_LOAD_MONTHS*30.5} days</li>
@@ -58,11 +58,11 @@ const SupportPage = () => {
         </div>
         <div>
         <h2 className="text-xl font-semibold">Privacy</h2>
-            <p className="mt-2 text-gray-700">
+            <p className="mt-2">
             Your privacy is important to us.<br />
             TL;DR: <span className='font-bold'>we cannot access any of your Strava data!</span> 
             </p>
-            <ul className="list-disc list-inside mt-2 text-gray-700"></ul>
+            <ul className="list-disc list-inside mt-2"></ul>
             <li>All athlete and activity data is stored in your browser&apos;s local storage only. 
               You can delete them anytime by using Log out from the Menu</li>
             <li>normi.run caches up to one week of Strava activity data</li>
