@@ -219,7 +219,7 @@ const StatsModal = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center px-4">
-      <div className="bg-primary p-4 rounded-lg max-w-md w-full sm:w-auto relative mx-4">
+      <div className="bg-muted p-4 rounded-lg max-w-md w-full sm:w-auto relative mx-4">
         <h1 className="font-bold mb-2 mr-4">Statistics</h1>
         <button
           className="absolute top-2 right-2 text-gray-500"

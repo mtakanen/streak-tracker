@@ -39,7 +39,7 @@ const ProgressBar = ({ streak, goal }: { streak: number, goal: number }) => {
       <span className="text-sm">Goal progress</span>
       <span className="text-xs ">{goal} days</span>
       </div>
-      <div className="bg-primary w-full rounded-full h-2.5">
+      <div className="bg-muted w-full rounded-full h-2.5">
         <div
           className="bg-orange-500 h-2.5 rounded-full"
           style={{ width: `${progress * 100}%` }}

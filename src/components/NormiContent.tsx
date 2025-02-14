@@ -179,7 +179,7 @@ const NormiContent = ({
 const ErrorContent = ({ error }: { error: string }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-      <div className="bg-white p-4 rounded-lg max-w-md w-full sm:w-auto relative mx-4">
+      <div className="bg-muted p-4 rounded-lg max-w-md w-full sm:w-auto relative mx-4">
         <h1 className="text-red-500 font-bold">ERROR</h1>
         <p className="text-slate-600">Error: {error}</p>
       </div>
