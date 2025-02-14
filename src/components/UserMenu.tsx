@@ -77,7 +77,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
       {dropdownOpen && (
         <div
           ref={dropdownRef}
-          className="absolute top-12 right-4 bg-white border border-gray-300 rounded-md shadow-lg"
+          className="absolute top-12 right-4 bg-primary border border-border rounded-md shadow-lg"
         >
           <ul className="py-2 ml-3 mr-3">
             <li className="mb-2">{firstName}</li>

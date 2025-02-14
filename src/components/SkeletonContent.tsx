@@ -20,7 +20,7 @@ type SkeletonContentProps = {
 
 const SkeletonContent = ({ goal, error }: SkeletonContentProps) => {
   return (
-    <Card className="w-full max-w-sm mx-auto">
+    <Card className="border-border w-full max-w-sm mx-auto">
       <NormiHeader />
       <CardContent className="space-y-4">
         {/* Streak Display */}

@@ -33,7 +33,7 @@ const Settings = ({
   };
 
   return (
-    <div className="p-4 bg-white border border-gray-300 rounded-md shadow-lg">
+    <div className="text-secondary p-4 bg-primary border border-border rounded-md shadow-lg">
       <h2 className="text-xl font-bold mb-4">Settings</h2>
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700">
