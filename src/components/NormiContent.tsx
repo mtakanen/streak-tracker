@@ -33,7 +33,7 @@ const NormiHeader = () => {
   return (
     <CardHeader className="space-y-1">
       <div className="flex items-center justify-between mb-2">
-        <CardTitle className="text-slate-600 text-xl">{title}</CardTitle>
+        <CardTitle className="text text-xl">{title}</CardTitle>
       </div>
     </CardHeader>
   );
@@ -44,7 +44,7 @@ const NormiFooter = () => {
   return (
     <>
       {/* Normi Display */}
-      <div className="text-sm text-center text-slate-600 pt-2 mt-4">
+      <div className="text text-sm text-center pt-2 mt-4">
         Stay active and healthy by {how} at least{' '}
         <span style={{ whiteSpace: 'nowrap' }}>
           {getMinimumDuration()} minutes
@@ -109,7 +109,7 @@ const NormiContent = ({
 
   return (
     <>
-      <Card className="w-full max-w-sm mx-auto">
+      <Card className="border-border w-full max-w-sm mx-auto">
         <NormiHeader />
         <CardContent className="space-y-4">
           {/* Current Streak Display */}
@@ -117,7 +117,7 @@ const NormiContent = ({
           {/* Stats Grid */}
           <div className="grid grid-cols-2 gap-3">
             <div
-              className="p-3 bg-slate-50 rounded-lg text-center cursor-pointer"
+              className="bg-muted p-3 rounded-lg text-center cursor-pointer"
               onClick={() => {
                 setShowStatsModal(true);
               }}
@@ -127,7 +127,7 @@ const NormiContent = ({
               <div className="text-xl font-bold">
                 {streakData.todayMinutes}min
               </div>
-              <div className="text-xs text-slate-600">today</div>
+              <div className="text-xs">today</div>
             </div>
             <MilestoneCard
               streakData={streakData}

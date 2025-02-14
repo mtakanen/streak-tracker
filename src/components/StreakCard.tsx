@@ -6,9 +6,9 @@ const CurrentStreak = ({ streakData }: { streakData: StreakData }) => {
   const bgColor = (dayCompleted: boolean) =>
     streakData.currentStreak > 0
       ? dayCompleted
-        ? 'bg-green-100'
-        : 'bg-orange-100'
-      : 'bg-slate-50';
+        ? 'bg-accent'
+        : 'bg-orange-100' // FIXME: define contextual color
+      : 'bg-muted';
 
   return (
     <div
@@ -20,7 +20,7 @@ const CurrentStreak = ({ streakData }: { streakData: StreakData }) => {
       <div className={`text-sm ${bgColor(streakData.completed)}`}>
         current streak
       </div>
-      <div className="text-xs text-slate-600">
+      <div className="text-xs">
         {streakData.currentStreak > 0
           ? `started on ${dateToIsoDate(streakData.currentStreakStartDate)}`
           : 'Go running!'}
@@ -36,7 +36,7 @@ const CurrentStreak = ({ streakData }: { streakData: StreakData }) => {
 
 const LongestStreak = ({ streakData }: { streakData: StreakData }) => {
   return (
-    <div className="p-4 rounded-lg text-center bg-slate-50 text-slate-600">
+    <div className="bg-muted p-4 rounded-lg text-center">
       <div className="text-4xl font-bold ">
         {streakData.longestStreak} days
       </div>
