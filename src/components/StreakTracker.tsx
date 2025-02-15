@@ -22,18 +22,17 @@ const StreakTracker = () => {
   const [showStatsModal, setShowStatsModal] = useState(false);
   const [showMilestoneModal, setShowMilestoneModal] = useState(false);
 
-  const fetchActivities = React.useCallback(async (fromTimestamp: number): Promise<StravaActivity[]> => {
+  const fetchActivities = React.useCallback(async (fromTimestamp: number, expirary: number): Promise<StravaActivity[]> => {
       let pageSize = 30;
       let activities: StravaActivity[] = [];
       const now = new Date().getTime();
-      const expirary = 5 * 30 * 1000; // 5min
 
       try {  
         const storedData = localStorage.getItem('stravaActivities');
   
         if (storedData) {
           const { activities, timestamp }: LocalActivities = JSON.parse(storedData);
-          if (now - timestamp < expirary) {
+          if (now - timestamp < expirary  * 60 * 1000) {
             // these should be fresh enough
             return activities;
           }  
@@ -120,8 +119,11 @@ const StreakTracker = () => {
       const week = 7 * 24 * 60 * 60 * 1000;
       const month = 30.5 * 24 * 60 * 60 * 1000;
       const fromTimestamp = initialize ? Math.floor((Date.now() - INITIAL_LOAD_MONTHS * month) / 1000) : Math.floor((Date.now() - week) / 1000);
-
-      const activities = await fetchActivities(fromTimestamp);
+      let expirary = 1; // mins
+      if (cachedStreaks && cachedStreaks.completed) { 
+        expirary = 5;
+      }
+      const activities = await fetchActivities(fromTimestamp, expirary);
       const redirectedFlag = localStorage.getItem('redirected');
       // FIXME: this is a hack to prevent infinite loop
        if (redirectedFlag) {
