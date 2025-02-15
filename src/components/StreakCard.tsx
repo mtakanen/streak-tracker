@@ -7,7 +7,7 @@ const CurrentStreak = ({ streakData }: { streakData: StreakData }) => {
     streakData.currentStreak > 0
       ? dayCompleted
         ? 'bg-accent'
-        : 'bg-orange-100' // FIXME: define contextual color
+        : 'bg-destructive'
       : 'bg-muted';
 
   return (
@@ -25,7 +25,7 @@ const CurrentStreak = ({ streakData }: { streakData: StreakData }) => {
           ? `started on ${dateToIsoDate(streakData.currentStreakStartDate)}`
           : 'Go running!'}
       </div>
-      <div className="text-sm text-orange-600">
+      <div className="text-sm">
         {streakData.currentStreak > 0 && !streakData.completed
           ? 'Keep going!'
           : ''}

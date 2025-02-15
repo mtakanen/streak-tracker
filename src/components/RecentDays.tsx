@@ -19,10 +19,10 @@ const RecentDays = ({
   const firstCompleted = streakData.lastSevenDays.findIndex((day) => day.completed);
   const adjustedFirstCompleted = firstCompleted === -1 ? streakData.lastSevenDays.length : firstCompleted;
   const bgColor = (dayCompleted: boolean, index: number) =>
-     index < adjustedFirstCompleted ? 'bg-muted' : dayCompleted ? 'bg-accent' : 'bg-orange-100'; // FIXME: define contextual color
+     index < adjustedFirstCompleted ? 'bg-muted' : dayCompleted ? 'bg-accent' : 'bg-destructive'; 
   return (
     <div className="space-y-2 max-h-48 overflow-y-auto">
-      <div className="text-sm">Last 7 days</div>
+      <div className="text-primary text-sm">Last 7 days</div>
       <div className="flex">
         {streakData.lastSevenDays.map(
           (
@@ -47,7 +47,7 @@ const RecentDays = ({
               }}
               style={{ cursor: day.completed ? 'pointer' : 'not-allowed' }}
             >
-              <div className="text-xs ">
+              <div className="text-primary text-xs ">
                 <span style={{ whiteSpace: 'nowrap' }}>{day.weekday}</span>
               </div>
             </div>

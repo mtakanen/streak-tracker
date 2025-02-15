@@ -68,7 +68,7 @@ const ActivityModal = ({
   }
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center px-4">
-      <div className="bg-primary p-4 rounded-lg max-w-md w-full sm:w-auto relative mx-4">
+      <div className="bg-card p-4 rounded-lg max-w-md w-full sm:w-auto relative mx-4">
         <h2 className="text-l font-bold">{dateTitle}</h2>
         <button
           className="absolute top-2 right-2 text-gray-500"
@@ -118,7 +118,7 @@ const LoadingModal = ({ isOpen, text, progress }: { isOpen: boolean; text: strin
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-primary p-6 rounded-lg shadow-lg text-center">
+      <div className="bg-card p-6 rounded-lg shadow-lg text-center">
         <Loader className="animate-spin mx-auto mb-4" />
         <p>{text}</p>
         <div className="w-full rounded-full h-2.5 mt-4">
@@ -219,7 +219,7 @@ const StatsModal = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center px-4">
-      <div className="bg-muted p-4 rounded-lg max-w-md w-full sm:w-auto relative mx-4">
+      <div className="bg-card p-4 rounded-lg max-w-md w-full sm:w-auto relative mx-4">
         <h1 className="font-bold mb-2 mr-4">Statistics</h1>
         <button
           className="absolute top-2 right-2 text-gray-500"

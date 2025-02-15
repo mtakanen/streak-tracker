@@ -36,8 +36,8 @@ const ProgressBar = ({ streak, goal }: { streak: number, goal: number }) => {
   return (
     <>
       <div className="flex justify-between">
-      <span className="text-sm">Goal progress</span>
-      <span className="text-xs ">{goal} days</span>
+      <span className="text-primary text-sm">Goal progress</span>
+      <span className="text-secondary text-xs ">{goal} days</span>
       </div>
       <div className="bg-muted w-full rounded-full h-2.5">
         <div

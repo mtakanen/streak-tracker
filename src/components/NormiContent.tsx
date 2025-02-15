@@ -44,7 +44,7 @@ const NormiFooter = () => {
   return (
     <>
       {/* Normi Display */}
-      <div className="text text-sm text-center pt-2 mt-4">
+      <div className="text-primary text-sm text-center pt-2 mt-4">
         Stay active and healthy by {how} at least{' '}
         <span style={{ whiteSpace: 'nowrap' }}>
           {getMinimumDuration()} minutes
