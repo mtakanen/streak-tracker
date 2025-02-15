@@ -162,7 +162,7 @@ const MilestoneModal = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center px-4">
-      <div className="bg-white p-4 rounded-lg max-w-md w-full sm:w-auto relative mx-4">
+      <div className="bg-card p-4 rounded-lg max-w-md w-full sm:w-auto relative mx-4">
         <h2 className="text-l font-bold mb-4">Milestone Unlocked!</h2>
         <button
           className="absolute top-2 right-2 text-gray-500"
