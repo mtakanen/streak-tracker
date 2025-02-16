@@ -133,11 +133,6 @@ const NormiContent = ({
               streakData={streakData}
             />
           </div>
-          {goal > 0 && (
-            <ProgressBar 
-              streak={streakData.currentStreak} 
-              goal={goal === SPECIAL_GOAL ? 365 : goal} />
-          )}
           {/* Last 7 Days Timeline with Strava Links */}
           <RecentDays
             streakData={streakData}
@@ -146,6 +141,11 @@ const NormiContent = ({
             setSelectedWeekday={setSelectedWeekday}
             setSelectedDayActivities={setSelectedDayActivities}
           />
+          {goal > 0 && (
+            <ProgressBar 
+              streak={streakData.currentStreak} 
+              goal={goal === SPECIAL_GOAL ? 365 : goal} />
+          )}
           <NormiFooter />
         </CardContent>
         {selectedDay !== null && (
