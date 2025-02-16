@@ -37,12 +37,13 @@ const ProgressBar = ({ streak, goal }: { streak: number, goal: number }) => {
     <>
       <div className="flex justify-between">
       <span className="text-primary text-sm">Goal progress</span>
-      <span className="text-secondary text-xs ">{goal} days</span>
+      <span className="text-primary text-xs ">{goal} days</span>
       </div>
       <div className="bg-muted w-full rounded-full h-2.5">
         <div
           className="bg-orange-500 h-2.5 rounded-full"
           style={{ width: `${progress * 100}%` }}
+          title={`${Math.round(progress * 100)}%`}
         ></div>
       </div>
     </>
