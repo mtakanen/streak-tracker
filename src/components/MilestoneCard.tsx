@@ -9,7 +9,7 @@ const MilestoneCard =  ({ streakData }: { streakData: StreakData })  => {
   const milestoneUnlocked = (milestoneDay && streakData.completed);
   return (
     <div
-      className={`p-3 bg-muted rounded-lg text-center ${milestoneUnlocked ? 'cursor-pointer' : ''}`}
+      className={`border border-border p-3 rounded-lg text-center ${milestoneUnlocked ? 'cursor-pointer' : ''}`}
       onClick={milestoneUnlocked ? () => window.location.reload() : undefined}
     >
       <Milestone className="w-5 h-5 mx-auto mb-1" />
