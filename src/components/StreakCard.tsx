@@ -12,9 +12,9 @@ const CurrentStreak = ({ streakData }: { streakData: StreakData }) => {
 
   return (
     <div
-      className='border border-border p-4 rounded-lg text-center'
+      className='border border-border p-4 rounded-lg text-primary text-center'
     >
-      <div className={`text-4xl font-bold ${textColor(streakData.completed)}`}>
+      <div className="text-4xl font-bold">
         {streakData.currentStreak} days
       </div>
       <div className='text-sm'>
@@ -25,7 +25,7 @@ const CurrentStreak = ({ streakData }: { streakData: StreakData }) => {
           ? `started on ${dateToIsoDate(streakData.currentStreakStartDate)}`
           : 'Go running!'}
       </div>
-      <div className="text-sm">
+      <div className={`text-sm ${textColor(streakData.completed)}`}>
         {streakData.currentStreak > 0 && !streakData.completed
           ? 'Keep going!'
           : ''}
@@ -36,7 +36,7 @@ const CurrentStreak = ({ streakData }: { streakData: StreakData }) => {
 
 const LongestStreak = ({ streakData }: { streakData: StreakData }) => {
   return (
-    <div className="border border-border p-4 rounded-lg text-center">
+    <div className="border border-border p-4 rounded-lg text-primary text-center">
       <div className="text-4xl font-bold ">
         {streakData.longestStreak} days
       </div>

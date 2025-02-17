@@ -19,7 +19,7 @@
     --accent: 149.3 80.4% 90%;
     --completed: 163 94% 24%;
     --destructive: 34 100% 92%;
-    --incomplete: 210 40% 98%;
+    --incomplete: 0 70% 35%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
@@ -43,7 +43,7 @@
       --accent: 163 88% 20%;
       --completed: 161 94% 30%;
       --destructive: 0 62.8% 30.6%;
-      --incomplete: 210 40% 98%;
+      --incomplete:  0 72% 51%;
       --border: 0.58	0.29%	19%;
       --input: 217.2 32.6% 17.5%;
       --ring: 212.7 26.8% 83.9%;

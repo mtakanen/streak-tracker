@@ -33,7 +33,7 @@ const NormiHeader = () => {
   return (
     <CardHeader className="space-y-1">
       <div className="flex items-center justify-between mb-2">
-        <CardTitle className="text text-xl">{title}</CardTitle>
+        <CardTitle className="text-primary text-xl">{title}</CardTitle>
       </div>
     </CardHeader>
   );
@@ -117,7 +117,7 @@ const NormiContent = ({
           {/* Stats Grid */}
           <div className="grid grid-cols-2 gap-3">
             <div
-              className="border border-border p-3 rounded-lg text-center cursor-pointer"
+              className="border border-border p-3 rounded-lg text-primary text-center cursor-pointer"
               onClick={() => {
                 setShowStatsModal(true);
               }}
