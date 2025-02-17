@@ -14,7 +14,7 @@ async function getAccessToken(): Promise<string | null> {
 
   if (Date.now() > tokenExpiry) {
     // Token has expired, refresh it
-    console.log('token expired, refreshing');
+    // console.log('token expired, refreshing');
     let response;
     try {
       response = await axios.post<StravaTokenData>(STRAVA_CONFIG.tokenUrl, {

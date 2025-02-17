@@ -9,7 +9,7 @@ const MilestoneCard =  ({ streakData }: { streakData: StreakData })  => {
   const milestoneUnlocked = (milestoneDay && streakData.completed);
   return (
     <div
-      className={`p-3 bg-muted rounded-lg text-center ${milestoneUnlocked ? 'cursor-pointer' : ''}`}
+      className={`border border-border p-3 rounded-lg text-primary text-center ${milestoneUnlocked ? 'cursor-pointer' : ''}`}
       onClick={milestoneUnlocked ? () => window.location.reload() : undefined}
     >
       <Milestone className="w-5 h-5 mx-auto mb-1" />
@@ -37,12 +37,13 @@ const ProgressBar = ({ streak, goal }: { streak: number, goal: number }) => {
     <>
       <div className="flex justify-between">
       <span className="text-primary text-sm">Goal progress</span>
-      <span className="text-secondary text-xs ">{goal} days</span>
+      <span className="text-primary text-xs ">{goal} days</span>
       </div>
       <div className="bg-muted w-full rounded-full h-2.5">
         <div
           className="bg-orange-500 h-2.5 rounded-full"
           style={{ width: `${progress * 100}%` }}
+          title={`${Math.round(progress * 100)}%`}
         ></div>
       </div>
     </>

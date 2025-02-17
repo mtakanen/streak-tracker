@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import { Clock } from 'lucide-react';
+import { Clock, XIcon } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { CardHeader, CardTitle } from '@/components/ui/card';
 import { StravaActivity, StreakData } from '@/types/strava';
@@ -33,7 +33,7 @@ const NormiHeader = () => {
   return (
     <CardHeader className="space-y-1">
       <div className="flex items-center justify-between mb-2">
-        <CardTitle className="text text-xl">{title}</CardTitle>
+        <CardTitle className="text-primary text-xl">{title}</CardTitle>
       </div>
     </CardHeader>
   );
@@ -117,7 +117,7 @@ const NormiContent = ({
           {/* Stats Grid */}
           <div className="grid grid-cols-2 gap-3">
             <div
-              className="bg-muted p-3 rounded-lg text-center cursor-pointer"
+              className="border border-border p-3 rounded-lg text-primary text-center cursor-pointer"
               onClick={() => {
                 setShowStatsModal(true);
               }}
@@ -133,11 +133,6 @@ const NormiContent = ({
               streakData={streakData}
             />
           </div>
-          {goal > 0 && (
-            <ProgressBar 
-              streak={streakData.currentStreak} 
-              goal={goal === SPECIAL_GOAL ? 365 : goal} />
-          )}
           {/* Last 7 Days Timeline with Strava Links */}
           <RecentDays
             streakData={streakData}
@@ -146,6 +141,11 @@ const NormiContent = ({
             setSelectedWeekday={setSelectedWeekday}
             setSelectedDayActivities={setSelectedDayActivities}
           />
+          {goal > 0 && (
+            <ProgressBar 
+              streak={streakData.currentStreak} 
+              goal={goal === SPECIAL_GOAL ? 365 : goal} />
+          )}
           <NormiFooter />
         </CardContent>
         {selectedDay !== null && (
@@ -180,6 +180,12 @@ const ErrorContent = ({ error }: { error: string }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
       <div className="bg-muted p-4 rounded-lg max-w-md w-full sm:w-auto relative mx-4">
+        <button
+          className="absolute top-2 right-2 text-gray-500"
+          onClick={() => {}}
+        >
+          <XIcon />
+        </button>
         <h1 className="text-red-500 font-bold">ERROR</h1>
         <p className="text-slate-600">Error: {error}</p>
       </div>

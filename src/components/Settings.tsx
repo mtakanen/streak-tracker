@@ -36,7 +36,7 @@ const Settings = ({
     <div className="text-primary p-4 bg-card border border-border rounded-md shadow-lg">
       <h2 className="text-xl font-bold mb-4">Settings</h2>
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium">
           Daily minimum minutes
         </label>
         <input
@@ -47,7 +47,7 @@ const Settings = ({
           min={MINIMUM_DURATION}
           disabled={settingsDisabled}
         />
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium">
           Goal streak (No goal = 0)
         </label>
         <input
@@ -57,7 +57,7 @@ const Settings = ({
           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           min={0}
         />
-        <label className="mt-2 block text-sm font-medium text-gray-700">
+        <label className="mt-2 block text-sm font-medium">
           Multi-sport
         </label>
         <input
@@ -70,13 +70,13 @@ const Settings = ({
       </div>
       <button
         onClick={onCancel}
-        className="px-4 py-2 bg-gray-500 text-white rounded-md mr-2"
+        className="px-4 py-2 rounded-md mr-2"
       >
         Cancel
       </button>
       <button
         onClick={handleSave}
-        className="px-4 py-2 bg-blue-500 text-white rounded-md"
+        className="px-4 py-2 bg-secondary rounded-md"
       >
         Save
       </button>
