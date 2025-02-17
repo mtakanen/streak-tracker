@@ -118,7 +118,7 @@ const LoadingModal = ({ isOpen, text, progress }: { isOpen: boolean; text: strin
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-opacity-50 z-50">
-      <div className="bg-card p-6 rounded-lg shadow-lg text-center">
+      <div className="bg-secondary p-6 rounded-lg shadow-lg text-center">
         <Loader className="animate-spin mx-auto mb-4" />
         <p>{text}</p>
         <div className="w-full rounded-full h-2.5 mt-4">
