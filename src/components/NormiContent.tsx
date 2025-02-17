@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import { Clock } from 'lucide-react';
+import { Clock, XIcon } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { CardHeader, CardTitle } from '@/components/ui/card';
 import { StravaActivity, StreakData } from '@/types/strava';
@@ -180,6 +180,12 @@ const ErrorContent = ({ error }: { error: string }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
       <div className="bg-muted p-4 rounded-lg max-w-md w-full sm:w-auto relative mx-4">
+        <button
+          className="absolute top-2 right-2 text-gray-500"
+          onClick={() => {}}
+        >
+          <XIcon />
+        </button>
         <h1 className="text-red-500 font-bold">ERROR</h1>
         <p className="text-slate-600">Error: {error}</p>
       </div>

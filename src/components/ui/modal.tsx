@@ -117,7 +117,7 @@ const ActivityModal = ({
 const LoadingModal = ({ isOpen, text, progress }: { isOpen: boolean; text: string; progress: number }) => {
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div className="fixed inset-0 flex items-center justify-center bg-opacity-50 z-50">
       <div className="bg-card p-6 rounded-lg shadow-lg text-center">
         <Loader className="animate-spin mx-auto mb-4" />
         <p>{text}</p>
@@ -225,7 +225,7 @@ const StatsModal = ({
           className="absolute top-2 right-2 text-gray-500"
           onClick={onClose}
         >
-          &times;
+          <XIcon />
         </button>
         <h2 className="text mt-2">Totals</h2>
         <p>
